@@ -2,9 +2,9 @@
 Excel Exporter — generates .xlsx bid worksheet using openpyxl.
 
 Sheets:
-  1. "Dự thầu"     — main bid sheet (DRAFT watermark if any unresolved rows)
-  2. "Mapping/Audit" — full mapping traceability
-  3. "Unresolved"  — rows with unresolved or error status
+  1. "Dự thầu"       — main bid sheet (DRAFT watermark if any unresolved rows)
+  2. "Mapping-Audit"  — full mapping traceability
+  3. "Unresolved"    — rows with unresolved or error status
 
 NEVER sums partial amounts into a grand total when any rows are unresolved.
 """

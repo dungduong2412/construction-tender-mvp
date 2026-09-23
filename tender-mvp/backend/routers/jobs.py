@@ -11,7 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from database import (
     BOQRow, Job, JobStatus, MappingResult, MappingStatus,
-    MasterItem, ParsedDocument, RowType, UnitRule, Coefficient, get_db,
+    MasterItem, ParsedDocument, UnitRule, Coefficient, get_db,
 )
 from parser_adapter.adapter import ParserAdapter, ParserAdapterError
 from parser_adapter.normalizer import DocumentNormalizer
@@ -68,11 +68,6 @@ async def get_job(job_id: str, db: AsyncSession = Depends(get_db)):
     job = await db.get(Job, job_id)
     if not job:
         raise HTTPException(404, "Job not found")
-    row_count = await db.scalar(
-        select(BOQRow).where(BOQRow.job_id == job_id).with_only_columns(
-            BOQRow.id
-        )
-    )
     rows = (await db.execute(select(BOQRow).where(BOQRow.job_id == job_id))).scalars().all()
     unresolved = 0
     if rows:
@@ -212,6 +207,10 @@ async def _process_job(job_id: str, pdf_bytes: bytes, filename: str) -> None:
             )
             db_rows = boq_rows_q.scalars().all()
 
+            # --- PRICING ---
+            job.status = JobStatus.pricing
+            await db.commit()
+
             for db_row in db_rows:
                 # Build candidates (all master items as candidates for now; real system would use embeddings)
                 candidates = [
@@ -244,8 +243,6 @@ async def _process_job(job_id: str, pdf_bytes: bytes, filename: str) -> None:
 
                 mapping_out = await mapper.map_item(boq_item, candidates, MASTER_VERSION)
 
-                # Pricing
-                job.status = JobStatus.pricing
                 price_out = engine.price_row(
                     boq_item, mapping_out, master_dict, unit_rules, coefficients, MASTER_VERSION
                 )
@@ -275,13 +272,7 @@ async def _process_job(job_id: str, pdf_bytes: bytes, filename: str) -> None:
 
             await db.commit()
 
-            # Final status
-            any_unresolved = any(
-                db_row.row_type == RowType.line_item
-                for db_row in db_rows
-                if True  # checked below after commit
-            )
-            # Reload to check
+            # Reload mapping results to determine final job status
             mrs = await db.execute(
                 select(MappingResult).join(BOQRow).where(BOQRow.job_id == job_id)
             )

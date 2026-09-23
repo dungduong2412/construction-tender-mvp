@@ -18,7 +18,7 @@
   {
     "version": "v1",
     "coeff_code": "K_NVCP",
-    "description_vi": "Hệ số nhân vật chí phí phát sinh",
+    "description_vi": "Hệ số nhân chi phí phát sinh",
     "value": 1.0,
     "applies_to": "all",
     "note": "Incidental cost coefficient from Hệ số sheet. Requires explicit project confirmation."

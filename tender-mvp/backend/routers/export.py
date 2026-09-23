@@ -6,7 +6,7 @@ from fastapi.responses import Response
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from database import BOQRow, Job, MasterItem, Override, get_db
+from database import BOQRow, Job, MappingResult, MasterItem, Override, get_db
 from excel_exporter.exporter import ExportRow, generate_excel
 
 DEMO_TENANT_ID = os.getenv("DEMO_TENANT_ID", "demo-tenant-001")
@@ -25,6 +25,12 @@ async def export_xlsx(job_id: str, db: AsyncSession = Depends(get_db)):
         select(BOQRow).where(BOQRow.job_id == job_id).order_by(BOQRow.doc_order)
     )
     boq_rows = rows_q.scalars().all()
+    boq_row_ids = [r.id for r in boq_rows]
+
+    mapping_map = {}
+    if boq_row_ids:
+        mr_q = await db.execute(select(MappingResult).where(MappingResult.boq_row_id.in_(boq_row_ids)))
+        mapping_map = {m.boq_row_id: m for m in mr_q.scalars().all()}
 
     masters_q = await db.execute(
         select(MasterItem).where(
@@ -45,7 +51,7 @@ async def export_xlsx(job_id: str, db: AsyncSession = Depends(get_db)):
 
     export_rows: list[ExportRow] = []
     for row in boq_rows:
-        mr = row.mapping_result
+        mr = mapping_map.get(row.id)
         master = master_map.get(mr.master_item_id) if mr and mr.master_item_id else None
         status = mr.status.value if mr else "unresolved"
         coeff_applied = json.loads(mr.coeff_applied_json) if (mr and mr.coeff_applied_json) else []

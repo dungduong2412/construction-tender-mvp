@@ -91,7 +91,7 @@ See `.env.template` for all variables. Key ones:
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `MOCK_PARSER` | `true` | Use fixture instead of real Azure API |
-| `MOCK_AI` | `false` | Use deterministic first-candidate mapper instead of OpenAI |
+| `MOCK_AI` | `false` | Use deterministic context-aware mock mapper instead of OpenAI |
 | `AZURE_DOC_INTEL_ENDPOINT` | — | Azure Document Intelligence endpoint URL |
 | `AZURE_DOC_INTEL_KEY` | — | Azure API key |
 | `OPENAI_API_KEY` | — | OpenAI API key |

@@ -6,12 +6,12 @@ from typing import Optional
 
 from fastapi import APIRouter, BackgroundTasks, Depends, File, HTTPException, UploadFile
 from pydantic import BaseModel
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database import (
     BOQRow, Job, JobStatus, MappingResult, MappingStatus,
-    MasterItem, ParsedDocument, UnitRule, Coefficient, get_db,
+    MasterItem, ParsedDocument, UnitRule, Coefficient, RowType, get_db,
 )
 from parser_adapter.adapter import ParserAdapter, ParserAdapterError
 from parser_adapter.normalizer import DocumentNormalizer
@@ -68,20 +68,26 @@ async def get_job(job_id: str, db: AsyncSession = Depends(get_db)):
     job = await db.get(Job, job_id)
     if not job:
         raise HTTPException(404, "Job not found")
-    rows = (await db.execute(select(BOQRow).where(BOQRow.job_id == job_id))).scalars().all()
-    unresolved = 0
-    if rows:
-        for r in rows:
-            if r.mapping_result and r.mapping_result.status in (MappingStatus.unresolved, MappingStatus.error):
-                unresolved += 1
+    row_count = await db.scalar(
+        select(func.count()).select_from(BOQRow).where(BOQRow.job_id == job_id)
+    )
+    unresolved = await db.scalar(
+        select(func.count())
+        .select_from(MappingResult)
+        .join(BOQRow, BOQRow.id == MappingResult.boq_row_id)
+        .where(
+            BOQRow.job_id == job_id,
+            MappingResult.status.in_([MappingStatus.unresolved, MappingStatus.error]),
+        )
+    )
 
     return JobStatusResponse(
         job_id=job.id,
         status=job.status,
         filename=job.filename,
         error_message=job.error_message,
-        row_count=len(rows),
-        unresolved_count=unresolved,
+        row_count=int(row_count or 0),
+        unresolved_count=int(unresolved or 0),
     )
 
 

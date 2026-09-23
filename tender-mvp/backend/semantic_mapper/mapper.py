@@ -197,8 +197,17 @@ class SemanticMapper:
 
         effective_candidates = unit_filtered if unit_filtered else filtered
 
-        if MOCK_AI or not self._client:
+        if MOCK_AI:
             out = self._mock_map(item, effective_candidates)
+        elif not self._client:
+            out = MappingOutput(
+                master_item_id=None,
+                confidence=0.0,
+                tags={},
+                evidence="OpenAI client is not configured.",
+                unresolved_reason="Semantic AI mapping requires OPENAI_API_KEY or MOCK_AI=true for demo mode.",
+                status="unresolved",
+            )
         else:
             out = await self._ai_map(item, effective_candidates)
 
@@ -207,7 +216,7 @@ class SemanticMapper:
 
     # ------------------------------------------------------------------
     def _mock_map(self, item: BOQLineItem, candidates: list[MasterCandidate]) -> MappingOutput:
-        """Deterministic mock: pick first candidate if any."""
+        """Deterministic mock: context-aware scoring for offline demos/tests."""
         if not candidates:
             return MappingOutput(
                 master_item_id=None,
@@ -217,12 +226,43 @@ class SemanticMapper:
                 unresolved_reason="No matching master data candidates found.",
                 status="unresolved",
             )
-        best = candidates[0]
+        desc = f"{item.section_path} {item.description_vi}".lower()
+
+        def score(c: MasterCandidate) -> float:
+            s = 0.0
+            tags = c.tags or {}
+            if c.unit.strip().lower() == item.unit_raw.strip().lower():
+                s += 1.0
+            if tags.get("road_bridge_context") == "road" and "đường" in desc:
+                s += 2.0
+            if tags.get("road_bridge_context") == "bridge" and "cầu" in desc:
+                s += 2.0
+            if tags.get("drilling_depth") and tags.get("drilling_depth") in desc:
+                s += 2.0
+            if tags.get("survey_discipline") and tags.get("survey_discipline") in desc:
+                s += 1.0
+            return s
+
+        ranked = sorted(((score(c), c) for c in candidates), key=lambda x: x[0], reverse=True)
+        best_score, best = ranked[0]
+        if best_score <= 0:
+            return MappingOutput(
+                master_item_id=None,
+                confidence=0.0,
+                tags={},
+                evidence="[MOCK] No context-supported candidate found.",
+                unresolved_reason="No confident mock match from section context.",
+                status="unresolved",
+            )
+
         return MappingOutput(
             master_item_id=best.id,
-            confidence=0.75,
+            confidence=min(0.95, 0.55 + best_score * 0.1),
             tags=best.tags,
-            evidence=f"[MOCK] Matched to '{best.description_vi}' (code: {best.item_code}) by first-candidate heuristic.",
+            evidence=(
+                f"[MOCK] Context match selected '{best.description_vi}' (code: {best.item_code}) "
+                f"using section_path + description + unit + tagged constraints."
+            ),
             unresolved_reason=None,
             status="resolved",
         )

@@ -44,7 +44,6 @@ except ImportError:
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o")
-MOCK_AI = os.getenv("MOCK_AI", "false").lower() in ("1", "true", "yes")
 
 # Strict output schema
 MAPPING_SCHEMA = {
@@ -140,8 +139,13 @@ def _unit_mismatch_check(item_unit: str, candidate_unit: str) -> bool:
 # ------------------------------------------------------------------
 
 class SemanticMapper:
-    def __init__(self):
+    def __init__(self, mock_ai: Optional[bool] = None):
         self._cache: dict[tuple, MappingOutput] = {}
+        self._mock_ai = (
+            mock_ai
+            if mock_ai is not None
+            else os.getenv("MOCK_AI", "false").lower() in ("1", "true", "yes")
+        )
         if _OPENAI_AVAILABLE and OPENAI_API_KEY:
             self._client = AsyncOpenAI(api_key=OPENAI_API_KEY)
         else:
@@ -197,7 +201,7 @@ class SemanticMapper:
 
         effective_candidates = unit_filtered if unit_filtered else filtered
 
-        if MOCK_AI:
+        if self._mock_ai:
             out = self._mock_map(item, effective_candidates)
         elif not self._client:
             out = MappingOutput(

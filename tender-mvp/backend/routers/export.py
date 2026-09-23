@@ -53,7 +53,7 @@ async def export_xlsx(job_id: str, db: AsyncSession = Depends(get_db)):
     for row in boq_rows:
         mr = mapping_map.get(row.id)
         master = master_map.get(mr.master_item_id) if mr and mr.master_item_id else None
-        status = mr.status.value if mr else "unresolved"
+        status = "priced" if (mr and mr.unit_price_str and mr.extended_amount_str) else (mr.status.value if mr else "unresolved")
         coeff_applied = json.loads(mr.coeff_applied_json) if (mr and mr.coeff_applied_json) else []
 
         export_rows.append(ExportRow(
@@ -73,7 +73,7 @@ async def export_xlsx(job_id: str, db: AsyncSession = Depends(get_db)):
             error_reason=mr.unresolved_reason if mr else "Not yet mapped",
             formula_ref=mr.formula_ref if mr else None,
             coeff_applied=coeff_applied,
-            unit_rule_ref=mr.unit_rule_id if mr else None,
+            unit_rule_ref=str(mr.unit_rule_id) if (mr and mr.unit_rule_id is not None) else None,
             evidence=mr.evidence if mr else None,
             overrides=override_map.get(row.row_id, []),
         ))

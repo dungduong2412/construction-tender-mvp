@@ -132,7 +132,7 @@ class TestUnitMismatch:
 class TestSemanticMapperMock:
     @pytest.mark.asyncio
     async def test_non_line_item_returns_error(self):
-        mapper = SemanticMapper()
+        mapper = SemanticMapper(mock_ai=True)
         item = make_item("CÔNG TÁC TRẮC ĐỊA", row_type="heading")
         result = await mapper.map_item(item, [], "v1")
         assert result.status == "error"
@@ -140,7 +140,7 @@ class TestSemanticMapperMock:
 
     @pytest.mark.asyncio
     async def test_no_candidates_returns_unresolved(self):
-        mapper = SemanticMapper()
+        mapper = SemanticMapper(mock_ai=True)
         item = make_item("Đo vẽ bình đồ")
         result = await mapper.map_item(item, [], "v1")
         assert result.status == "unresolved"
@@ -148,7 +148,7 @@ class TestSemanticMapperMock:
 
     @pytest.mark.asyncio
     async def test_unit_mismatch_all_candidates_returns_unresolved(self):
-        mapper = SemanticMapper()
+        mapper = SemanticMapper(mock_ai=True)
         item = make_item("Đo vẽ", unit="ha")
         candidates = [make_candidate(1, "Bình đồ 1/500", unit="100ha")]
         result = await mapper.map_item(item, candidates, "v1")
@@ -157,7 +157,7 @@ class TestSemanticMapperMock:
 
     @pytest.mark.asyncio
     async def test_resolved_with_good_candidate(self):
-        mapper = SemanticMapper()
+        mapper = SemanticMapper(mock_ai=True)
         item = make_item("Đo vẽ bình đồ tỷ lệ 1/500", unit="ha")
         candidates = [make_candidate(1, "Đo vẽ bình đồ 1/500 đồng bằng", unit="ha")]
         result = await mapper.map_item(item, candidates, "v1")
@@ -166,7 +166,7 @@ class TestSemanticMapperMock:
 
     @pytest.mark.asyncio
     async def test_caching(self):
-        mapper = SemanticMapper()
+        mapper = SemanticMapper(mock_ai=True)
         item = make_item("Test item", unit="m")
         candidates = [make_candidate(1, "Test master", unit="m")]
         r1 = await mapper.map_item(item, candidates, "v1")

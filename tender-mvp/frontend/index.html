@@ -275,8 +275,12 @@ function renderTable(rows) {
         <td>${confHtml}</td>
         <td>${r.page}</td>
         <td>${statusHtml}</td>
-        <td><button class="btn btn-sm" onclick="openModal('${r.row_id}','${escAttr(r.description_vi)}')">Sửa</button></td>
+        <td><button class="btn btn-sm btn-edit" data-row-id="${escAttr(r.row_id)}">Sửa</button></td>
       `;
+      const editBtn = tr.querySelector('.btn-edit');
+      if (editBtn) {
+        editBtn.addEventListener('click', () => openModal(r.row_id, r.description_vi));
+      }
     }
     tbody.appendChild(tr);
   });
@@ -379,7 +383,7 @@ function fmtNum(s) {
 function escHtml(s) {
   return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
-function escAttr(s) { return escHtml(s); }
+function escAttr(s) { return escHtml(s).replace(/'/g, '&#39;'); }
 </script>
 </body>
 </html>

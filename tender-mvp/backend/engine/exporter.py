@@ -56,7 +56,11 @@ def _fmt_qty(val) -> str:
 def export_xlsx(sheet: PricingSheet, output_dir: str = "/tmp") -> str:
     """
     Write the pricing sheet to a .xlsx file and return the file path.
+    Each call writes to a per-job subdirectory to avoid filename collisions.
     """
+    import tempfile
+    job_dir = os.path.join(output_dir, f"job_{sheet.job_id}")
+    os.makedirs(job_dir, exist_ok=True)
     wb = openpyxl.Workbook()
     wb.remove(wb.active)  # remove default sheet
 
@@ -64,7 +68,7 @@ def export_xlsx(sheet: PricingSheet, output_dir: str = "/tmp") -> str:
     _write_audit(wb, sheet)
     _write_unresolved(wb, sheet)
 
-    out_path = Path(output_dir) / f"du_thau_{sheet.job_id[:8]}.xlsx"
+    out_path = Path(job_dir) / f"du_thau_{sheet.job_id[:8]}.xlsx"
     wb.save(str(out_path))
     return str(out_path)
 

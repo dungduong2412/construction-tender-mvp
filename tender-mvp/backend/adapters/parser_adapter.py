@@ -424,7 +424,7 @@ async def parse_pdf(job_id: str, filename: str, pdf_bytes: bytes) -> ParsedDocum
     if not api_url:
         raise RuntimeError("PARSER_API_URL not configured and PARSER_USE_MOCK is not 'true'")
 
-    headers = {"Authorization": f"******"}
+    headers = {"Authorization": "Bearer " + api_key}
 
     async with httpx.AsyncClient(timeout=120) as client:
         # Submit

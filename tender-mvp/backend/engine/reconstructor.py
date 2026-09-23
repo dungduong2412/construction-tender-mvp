@@ -124,8 +124,6 @@ def reconstruct_boq(parsed: ParsedDocument) -> BOQDocument:
                     continue
 
                 row_counter += 1
-                row_id = f"p{page.page_number}_t{table.table_index}_r{row_dict.get('__row__', row_counter)}"
-                # Use actual dict-based key
                 row_id = f"p{page.page_number}_t{table.table_index}_r{row_counter}"
 
                 # ------------------------------------------------------------------

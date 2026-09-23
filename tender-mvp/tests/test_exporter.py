@@ -27,50 +27,61 @@ def get_xlsx_path():
     with tempfile.TemporaryDirectory() as tmp:
         path = export_xlsx(sheet, output_dir=tmp)
         wb = openpyxl.load_workbook(path)
-        return wb, sheet
+        # Read all data while the tempdir still exists
+        sheet_names = wb.sheetnames
+        ws_du_thau = wb["Dự thầu"]
+        ws_audit = wb["Audit_Mapping"]
+        ws_unresolved = wb["Unresolved"]
+        du_thau_rows = list(ws_du_thau.iter_rows(min_row=4, values_only=True))
+        audit_row1 = [c.value for c in ws_audit[1]]
+        all_text = " ".join(str(c.value or "") for row in ws_du_thau.iter_rows() for c in row)
+        unresolved_data_rows = list(ws_unresolved.iter_rows(min_row=3, values_only=True))
+    return {
+        "sheet_names": sheet_names,
+        "du_thau_rows": du_thau_rows,
+        "audit_row1": audit_row1,
+        "all_text": all_text,
+        "unresolved_data_rows": unresolved_data_rows,
+        "pricing_sheet": sheet,
+    }
 
 
 def test_xlsx_has_three_sheets():
-    wb, _ = get_xlsx_path()
-    names = wb.sheetnames
+    data = get_xlsx_path()
+    names = data["sheet_names"]
     assert "Dự thầu" in names, "Missing 'Dự thầu' sheet"
     assert "Audit_Mapping" in names, "Missing 'Audit_Mapping' sheet"
     assert "Unresolved" in names, "Missing 'Unresolved' sheet"
 
 
 def test_du_thau_has_data_rows():
-    wb, sheet = get_xlsx_path()
-    ws = wb["Dự thầu"]
-    non_empty_rows = [r for r in ws.iter_rows(min_row=4, values_only=True) if any(c for c in r)]
+    data = get_xlsx_path()
+    non_empty_rows = [r for r in data["du_thau_rows"] if any(c for c in r)]
     assert len(non_empty_rows) > 0
 
 
 def test_draft_warning_present_when_incomplete():
-    wb, sheet = get_xlsx_path()
-    if sheet.is_complete:
+    data = get_xlsx_path()
+    if data["pricing_sheet"].is_complete:
         return  # skip if fully priced
-    ws = wb["Dự thầu"]
-    all_text = " ".join(str(c.value or "") for row in ws.iter_rows() for c in row)
+    all_text = data["all_text"]
     assert "DRAFT" in all_text or "chưa hoàn chỉnh" in all_text.lower(), \
         "Draft warning not found in Dự thầu sheet"
 
 
 def test_audit_sheet_has_headers():
-    wb, _ = get_xlsx_path()
-    ws = wb["Audit_Mapping"]
-    row1 = [c.value for c in ws[1]]
+    data = get_xlsx_path()
+    row1 = data["audit_row1"]
     assert "Row ID" in row1
     assert "Evidence" in row1
 
 
 def test_unresolved_sheet_lists_unresolved_rows():
-    wb, sheet = get_xlsx_path()
+    data = get_xlsx_path()
+    sheet = data["pricing_sheet"]
     unresolved_count = sum(1 for l in sheet.lines if l.status == PriceLineStatus.UNRESOLVED)
     if unresolved_count == 0:
         return  # nothing to check
-    ws = wb["Unresolved"]
-    # Row 1 is warning banner, row 2 is header; data from row 3
-    data_rows = list(ws.iter_rows(min_row=3, values_only=True))
-    non_empty = [r for r in data_rows if any(c for c in r)]
+    non_empty = [r for r in data["unresolved_data_rows"] if any(c for c in r)]
     assert len(non_empty) == unresolved_count, \
         f"Unresolved sheet has {len(non_empty)} rows but sheet has {unresolved_count} unresolved"

@@ -129,7 +129,8 @@ def price_boq(
 
         # --- UNRESOLVED mapping ---
         if mapping.status in (MappingStatus.UNRESOLVED, MappingStatus.HEADING):
-            unresolved_count += 1
+            if mapping.status == MappingStatus.UNRESOLVED:
+                unresolved_count += 1
             lines.append(
                 PriceLine(
                     row_id=row.row_id,

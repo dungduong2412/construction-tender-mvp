@@ -262,7 +262,7 @@ function renderTable(rows) {
       const confHtml = confBadge(r.confidence);
       const statusHtml = statusBadge(r.status, r.error_reason);
       const masterHtml = r.master_code
-        ? `<span title="${r.master_description}">${r.master_code}</span>`
+        ? `<span title="${escAttr(r.master_description || '')}">${r.master_code}</span>`
         : '<em style="color:#999;">—</em>';
       tr.innerHTML = `
         <td>${r.row_number}</td>

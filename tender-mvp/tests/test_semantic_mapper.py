@@ -10,7 +10,7 @@ import pytest_asyncio
 sys.path.insert(0, str(Path(__file__).parent.parent / "backend"))
 
 from boq.reconstructor import BOQLineItem
-from semantic_mapper.mapper import MasterCandidate, SemanticMapper, _apply_distinction_rules, _unit_mismatch_check
+from semantic_mapper.mapper import MasterCandidate, SemanticMapper, _apply_distinction_rules, _units_are_compatible
 
 
 def make_item(desc, unit="m", qty_raw="100", qty=100.0, row_type="line_item") -> BOQLineItem:
@@ -119,9 +119,9 @@ class TestUnitMismatch:
         ("m", "km", True),        # different pair, not in forbidden set
     ])
     def test_unit_mismatch(self, item_unit, cand_unit, expected_compatible):
-        result = _unit_mismatch_check(item_unit, cand_unit)
+        result = _units_are_compatible(item_unit, cand_unit)
         assert result == expected_compatible, (
-            f"_unit_mismatch_check('{item_unit}', '{cand_unit}') = {result}, expected {expected_compatible}"
+            f"_units_are_compatible('{item_unit}', '{cand_unit}') = {result}, expected {expected_compatible}"
         )
 
 

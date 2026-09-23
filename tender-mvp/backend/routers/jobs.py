@@ -15,7 +15,7 @@ from database import (
 )
 from parser_adapter.adapter import ParserAdapter, ParserAdapterError
 from parser_adapter.normalizer import DocumentNormalizer
-from boq.reconstructor import BOQReconstructor
+from boq.reconstructor import BOQLineItem, BOQReconstructor
 from semantic_mapper.mapper import MasterCandidate, SemanticMapper
 from pricing_engine.engine import PricingEngine
 
@@ -232,7 +232,6 @@ async def _process_job(job_id: str, pdf_bytes: bytes, filename: str) -> None:
                 ]
 
                 # Reconstruct BOQLineItem
-                from boq.reconstructor import BOQLineItem
                 boq_item = BOQLineItem(
                     row_id=db_row.row_id,
                     row_number=db_row.row_number or "",

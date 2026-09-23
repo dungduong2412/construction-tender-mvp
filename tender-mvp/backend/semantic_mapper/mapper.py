@@ -119,7 +119,7 @@ def _apply_distinction_rules(
     return candidates
 
 
-def _unit_mismatch_check(item_unit: str, candidate_unit: str) -> bool:
+def _units_are_compatible(item_unit: str, candidate_unit: str) -> bool:
     """
     Returns True if units are compatible WITHOUT an explicit unit rule.
     Flagged mismatches: ha vs 100ha, m vs 100m, TN vs thí nghiệm
@@ -180,7 +180,7 @@ class SemanticMapper:
         # Filter out silent unit mismatches
         unit_filtered = [
             c for c in filtered
-            if _unit_mismatch_check(item.unit_raw, c.unit)
+            if _units_are_compatible(item.unit_raw, c.unit)
         ]
 
         if not unit_filtered and filtered:

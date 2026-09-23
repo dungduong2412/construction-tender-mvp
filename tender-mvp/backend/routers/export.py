@@ -1,6 +1,7 @@
 """Export router — generate and download the Excel bid worksheet."""
 import json
 import os
+import re
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import Response
 from sqlalchemy import select
@@ -79,7 +80,9 @@ async def export_xlsx(job_id: str, db: AsyncSession = Depends(get_db)):
         ))
 
     xlsx_bytes = generate_excel(export_rows, job_id)
-    safe_filename = job.filename.replace(".pdf", "").replace(" ", "_")
+    safe_filename = re.sub(r"[^A-Za-z0-9._-]", "_", job.filename.replace(".pdf", ""))
+    if not safe_filename:
+        safe_filename = "boq"
 
     return Response(
         content=xlsx_bytes,

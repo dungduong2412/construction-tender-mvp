@@ -114,7 +114,7 @@ async def get_review_rows(job_id: str, db: AsyncSession = Depends(get_db)):
             unit_price=mr.unit_price_str if mr else None,
             extended_amount=mr.extended_amount_str if mr else None,
             confidence=mr.confidence if mr else None,
-            status=mr.status.value if mr else "unresolved",
+            status=mr.status.value if mr else "mapping_unresolved",
             page=row.page,
             error_reason=mr.unresolved_reason if mr else "Not yet mapped",
             evidence=mr.evidence if mr else None,
@@ -187,7 +187,7 @@ async def _apply_override_and_reprice(db: AsyncSession, row: BOQRow, req: Overri
         mr = MappingResult(
             boq_row_id=row.id,
             master_item_id=None,
-            status=MappingStatus.unresolved,
+            status=MappingStatus.mapping_unresolved,
             confidence=0.0,
             tags_json=json.dumps({}, ensure_ascii=False),
             evidence="Created from manual override.",
@@ -208,9 +208,9 @@ async def _apply_override_and_reprice(db: AsyncSession, row: BOQRow, req: Overri
             raise HTTPException(400, "Selected master item is not available for this tenant/version")
 
         mr.master_item_id = master_id
-        mr.status = MappingStatus.resolved
+        mr.status = MappingStatus.mapping_ambiguous
         mr.confidence = max(float(mr.confidence or 0.0), 0.99)
-        mr.unresolved_reason = None
+        mr.unresolved_reason = "Manual review required: selected master item must still pass price validation."
         mr.evidence = f"{(mr.evidence or '').strip()} [override: master_item_id={master_id}]".strip()
         await _reprice_row(db, row, mr, unit_price_override=None)
         return
@@ -234,7 +234,7 @@ async def _reprice_row(
     unit_price_override: Optional[Decimal],
 ) -> None:
     if mr.master_item_id is None:
-        mr.status = MappingStatus.unresolved
+        mr.status = MappingStatus.mapping_unresolved
         mr.unresolved_reason = "No master item selected"
         mr.unit_price_str = None
         mr.extended_amount_str = None
@@ -242,7 +242,7 @@ async def _reprice_row(
 
     master = await db.get(MasterItem, mr.master_item_id)
     if not master:
-        mr.status = MappingStatus.error
+        mr.status = MappingStatus.mapping_unresolved
         mr.unresolved_reason = f"Master item id={mr.master_item_id} not found"
         mr.unit_price_str = None
         mr.extended_amount_str = None
@@ -267,7 +267,7 @@ async def _reprice_row(
 
     if unit_price_override is not None:
         if boq_item.quantity is None:
-            mr.status = MappingStatus.unresolved
+            mr.status = MappingStatus.invalid_quantity_or_unit
             mr.unresolved_reason = "Quantity is missing/unparseable — not defaulting to zero"
             mr.unit_price_str = None
             mr.extended_amount_str = None
@@ -282,7 +282,7 @@ async def _reprice_row(
                 None,
             )
             if rule is None:
-                mr.status = MappingStatus.unresolved
+                mr.status = MappingStatus.invalid_quantity_or_unit
                 mr.unresolved_reason = f"Unit mismatch: PDF='{boq_item.unit_raw}' master='{master.unit}' with no approved conversion rule"
                 mr.unit_price_str = None
                 mr.extended_amount_str = None
@@ -291,11 +291,11 @@ async def _reprice_row(
 
         qty = Decimal(str(boq_item.quantity)) * conversion_factor
         extended = (unit_price_override * qty).quantize(Decimal("1"), rounding=ROUND_HALF_UP)
-        mr.status = MappingStatus.resolved
+        mr.status = MappingStatus.mapped_and_priced
         mr.unresolved_reason = None
         mr.unit_price_str = str(unit_price_override.quantize(Decimal("1"), rounding=ROUND_HALF_UP))
         mr.extended_amount_str = str(extended)
-        mr.price_source = "user_override"
+        mr.price_source = "user_override (DEMO / MOCK DATA)"
         mr.formula_ref = "OVERRIDE_UNIT_PRICE"
         mr.coeff_applied_json = json.dumps([], ensure_ascii=False)
         mr.master_version = MASTER_VERSION
@@ -333,13 +333,13 @@ async def _reprice_row(
     engine = PricingEngine()
     price = engine.price_row(boq_item, mapping, master_dict, unit_rules, coefficients, MASTER_VERSION)
     if price.status == "priced":
-        mr.status = MappingStatus.resolved
+        mr.status = MappingStatus.mapped_and_priced
         mr.unresolved_reason = None
     elif price.status == "unresolved":
-        mr.status = MappingStatus.unresolved
+        mr.status = MappingStatus.mapped_price_unavailable
         mr.unresolved_reason = price.error_reason
     else:
-        mr.status = MappingStatus.error
+        mr.status = MappingStatus.mapping_unresolved
         mr.unresolved_reason = price.error_reason
     mr.unit_price_str = price.unit_price_str
     mr.extended_amount_str = price.extended_amount_str

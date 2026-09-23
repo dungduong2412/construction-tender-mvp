@@ -54,7 +54,13 @@ async def export_xlsx(job_id: str, db: AsyncSession = Depends(get_db)):
     for row in boq_rows:
         mr = mapping_map.get(row.id)
         master = master_map.get(mr.master_item_id) if mr and mr.master_item_id else None
-        status = "priced" if (mr and mr.unit_price_str and mr.extended_amount_str) else (mr.status.value if mr else "unresolved")
+        status = mr.status.value if mr else "mapping_unresolved"
+        if row.row_type.value == "heading":
+            status = "non_billable_heading"
+        elif row.row_type.value == "metadata":
+            status = "non_billable_metadata"
+        elif mr and mr.status.value == "mapped_and_priced" and mr.unit_price_str and mr.extended_amount_str:
+            status = "mapped_and_priced"
         coeff_applied = json.loads(mr.coeff_applied_json) if (mr and mr.coeff_applied_json) else []
 
         export_rows.append(ExportRow(

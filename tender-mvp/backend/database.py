@@ -60,10 +60,13 @@ class RowType(str, enum.Enum):
 
 
 class MappingStatus(str, enum.Enum):
-    resolved = "resolved"
-    unresolved = "unresolved"
-    error = "error"
-    override = "override"
+    mapped_and_priced = "mapped_and_priced"
+    mapped_price_unavailable = "mapped_price_unavailable"
+    mapping_ambiguous = "mapping_ambiguous"
+    mapping_unresolved = "mapping_unresolved"
+    invalid_quantity_or_unit = "invalid_quantity_or_unit"
+    non_billable_heading = "non_billable_heading"
+    non_billable_metadata = "non_billable_metadata"
 
 
 # ---------------------------------------------------------------------------

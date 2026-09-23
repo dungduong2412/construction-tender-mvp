@@ -29,6 +29,8 @@ Output schema:
 """
 import json
 import os
+import re
+import unicodedata
 from dataclasses import dataclass
 from typing import Any, Optional
 
@@ -91,7 +93,137 @@ class MappingOutput:
     tags: dict
     evidence: str
     unresolved_reason: Optional[str]
-    status: str  # "resolved" | "unresolved" | "error"
+    status: str
+    classification: Optional[str] = None
+
+
+def _normalize_mapping_status(status: Optional[str]) -> Optional[str]:
+    if status in {"mapped_and_priced", "resolved"}:
+        return "mapped_and_priced"
+    if status in {"mapped_price_unavailable", "unresolved"}:
+        return "mapped_price_unavailable"
+    if status in {"mapping_ambiguous"}:
+        return "mapping_ambiguous"
+    if status in {"mapping_unresolved", "error"}:
+        return "mapping_unresolved"
+    if status in {"invalid_quantity_or_unit"}:
+        return "invalid_quantity_or_unit"
+    if status in {"non_billable_heading"}:
+        return "non_billable_heading"
+    if status in {"non_billable_metadata"}:
+        return "non_billable_metadata"
+    return status
+
+
+def _normalize_text(value: str) -> str:
+    lowered = (value or "").lower().replace("–", "-").replace("—", "-")
+    lowered = lowered.replace("đ", "d")
+    return "".join(
+        ch for ch in unicodedata.normalize("NFD", lowered)
+        if unicodedata.category(ch) != "Mn"
+    )
+
+
+def _extract_row_features(item: BOQLineItem) -> dict[str, Optional[str]]:
+    text = _normalize_text(f"{item.section_path} {item.description_vi}")
+    features: dict[str, Optional[str]] = {
+        "survey_discipline": None,
+        "road_bridge_context": None,
+        "terrain_class": None,
+        "scale": None,
+        "work_method": None,
+        "drilling_depth": None,
+        "soil_rock_class": None,
+    }
+
+    scale_match = re.search(r"1\s*/\s*(200|500)", text)
+    if scale_match:
+        features["scale"] = f"1/{scale_match.group(1)}"
+
+    if "doi nui" in text:
+        features["terrain_class"] = "hilly"
+    elif "dong bang" in text:
+        features["terrain_class"] = "plain"
+
+    if "spt" in text or "xuyen tieu chuan" in text:
+        features["survey_discipline"] = "in_situ_testing"
+        features["work_method"] = "SPT"
+    elif "mau dat nguyen dang" in text or ("lay mau" in text and "dat" in text):
+        features["survey_discipline"] = "sample_collection"
+    elif "do ve" in text or "binh do" in text:
+        features["survey_discipline"] = "topography"
+    elif "trac doc" in text or "mat cat doc" in text:
+        features["survey_discipline"] = "longitudinal_section"
+    elif "trac ngang" in text or "mat cat ngang" in text:
+        features["survey_discipline"] = "cross_section"
+    elif "khoan" in text and "dia chat" in text:
+        features["survey_discipline"] = "geotechnical_drilling"
+
+    if features["survey_discipline"] == "geotechnical_drilling":
+        if "duong" in text and "cau" not in text:
+            features["road_bridge_context"] = "road"
+        elif "cau" in text and "duong" not in text:
+            features["road_bridge_context"] = "bridge"
+
+        if "0-30m" in text:
+            features["drilling_depth"] = "0-30m"
+        elif "0-60m" in text:
+            features["drilling_depth"] = "0-60m"
+
+        if "cap iii" in text or "cap 3" in text:
+            features["soil_rock_class"] = "dat_cap_III"
+        elif "cap ii" in text or "cap 2" in text:
+            features["soil_rock_class"] = "dat_cap_II"
+
+    return features
+
+
+def _tag_value(candidate: MasterCandidate, key: str) -> Optional[str]:
+    value = (candidate.tags or {}).get(key)
+    if value is None:
+        return None
+    return str(value)
+
+
+def _is_hard_compatible(
+    item: BOQLineItem,
+    candidate: MasterCandidate,
+    features: dict[str, Optional[str]],
+) -> bool:
+    item_unit = (item.unit_raw or "").strip()
+    if item_unit and not _units_are_compatible(item_unit, candidate.unit):
+        return False
+
+    discipline = features.get("survey_discipline")
+    if discipline:
+        cand_discipline = _tag_value(candidate, "survey_discipline")
+        if cand_discipline != discipline:
+            return False
+
+    for feature_key, tag_key in (
+        ("scale", "scale"),
+        ("terrain_class", "terrain_class"),
+        ("work_method", "work_method"),
+    ):
+        expected = features.get(feature_key)
+        if expected:
+            actual = _tag_value(candidate, tag_key)
+            if actual is None or _normalize_text(actual) != _normalize_text(expected):
+                return False
+
+    if discipline == "geotechnical_drilling":
+        for feature_key, tag_key in (
+            ("road_bridge_context", "road_bridge_context"),
+            ("drilling_depth", "drilling_depth"),
+            ("soil_rock_class", "soil_rock_class"),
+        ):
+            expected = features.get(feature_key)
+            if expected:
+                actual = _tag_value(candidate, tag_key)
+                if actual is None or _normalize_text(actual) != _normalize_text(expected):
+                    return False
+
+    return True
 
 
 # ------------------------------------------------------------------
@@ -102,36 +234,69 @@ def _apply_distinction_rules(
     item: BOQLineItem,
     candidates: list[MasterCandidate],
 ) -> list[MasterCandidate]:
-    """
-    Enforce non-negotiable distinction rules by filtering candidates.
-    Road drilling 0-30m ≠ Bridge drilling 0-60m.
-    """
+    """Filter incompatible candidates based on discipline, context, scale, and work method."""
     desc_lower = item.description_vi.lower()
+    item_unit = (item.unit_raw or "").strip().lower()
 
     is_road_drill = "đường" in desc_lower and "khoan" in desc_lower
     is_bridge_drill = "cầu" in desc_lower and "khoan" in desc_lower
+    is_longitudinal = "trắc dọc" in desc_lower or "mặt cắt dọc" in desc_lower
+    is_cross_section = "trắc ngang" in desc_lower or "mặt cắt ngang" in desc_lower
+    is_topo = "đo vẽ" in desc_lower or "bình đồ" in desc_lower
+    is_geotech = "khoan" in desc_lower or "lấy mẫu" in desc_lower or "thí nghiệm" in desc_lower
 
     if is_road_drill and not is_bridge_drill:
         candidates = [c for c in candidates if c.tags.get("road_bridge_context") != "bridge"]
     elif is_bridge_drill and not is_road_drill:
         candidates = [c for c in candidates if c.tags.get("road_bridge_context") != "road"]
 
+    if is_longitudinal:
+        candidates = [
+            c for c in candidates
+            if c.tags.get("survey_discipline") in ("longitudinal_section", "longitudinal_profile")
+            or c.tags.get("work_method") == "longitudinal"
+            or not c.tags.get("survey_discipline")
+        ]
+    if is_cross_section:
+        candidates = [
+            c for c in candidates
+            if c.tags.get("survey_discipline") in ("cross_section", "river_cross_section")
+            or not c.tags.get("survey_discipline")
+        ]
+    if is_topo:
+        candidates = [
+            c for c in candidates
+            if c.tags.get("survey_discipline") == "topography" or not c.tags.get("survey_discipline")
+        ]
+    is_spt_line = "spt" in desc_lower or "xuyên tiêu chuẩn" in desc_lower
+    if is_geotech and "khoan" in desc_lower and not is_spt_line:
+        candidates = [
+            c for c in candidates
+            if c.tags.get("survey_discipline") in ("geotechnical_drilling", "sample_collection")
+            or not c.tags.get("survey_discipline")
+        ]
+
+    if item_unit:
+        candidates = [c for c in candidates if not _unit_conflict(item_unit, c.unit)]
+
     return candidates
 
 
 def _units_are_compatible(item_unit: str, candidate_unit: str) -> bool:
-    """
-    Returns True if units are compatible WITHOUT an explicit unit rule.
-    Flagged mismatches: ha vs 100ha, m vs 100m, TN vs thí nghiệm
-    """
-    FORBIDDEN_SILENT = {
-        frozenset(["ha", "100ha"]),
-        frozenset(["m", "100m"]),
-        frozenset(["tn", "thí nghiệm"]),
-        frozenset(["tn", "thi nghiem"]),
-    }
-    pair = frozenset([item_unit.strip().lower(), candidate_unit.strip().lower()])
-    return pair not in FORBIDDEN_SILENT
+    """Hard guard: do not silently map across different unit systems."""
+    i = (item_unit or "").strip().lower()
+    c = (candidate_unit or "").strip().lower()
+    if not i or not c:
+        return True
+    if i == c:
+        return True
+    return False
+
+
+def _unit_conflict(item_unit: str, candidate_unit: str) -> bool:
+    if item_unit == candidate_unit:
+        return False
+    return not _units_are_compatible(item_unit, candidate_unit)
 
 
 # ------------------------------------------------------------------
@@ -161,15 +326,28 @@ class SemanticMapper:
         if cache_key in self._cache:
             return self._cache[cache_key]
 
-        # Not a line item — don't map
-        if item.row_type != "line_item":
+        if item.row_type == "heading":
             out = MappingOutput(
                 master_item_id=None,
                 confidence=0.0,
                 tags={},
-                evidence="Row is not a billable line item.",
-                unresolved_reason="Not a line item — heading or metadata.",
+                evidence="Heading row skipped from billable mapping.",
+                unresolved_reason="Non-billable heading row.",
                 status="error",
+                classification="non_billable_heading",
+            )
+            self._cache[cache_key] = out
+            return out
+
+        if item.row_type == "metadata":
+            out = MappingOutput(
+                master_item_id=None,
+                confidence=0.0,
+                tags={},
+                evidence="Metadata row skipped from billable mapping.",
+                unresolved_reason="Non-billable metadata row.",
+                status="error",
+                classification="non_billable_metadata",
             )
             self._cache[cache_key] = out
             return out
@@ -177,29 +355,29 @@ class SemanticMapper:
         # Apply hard-coded distinction rules
         filtered = _apply_distinction_rules(item, candidates)
 
-        # Filter out silent unit mismatches
-        unit_filtered = [
+        features = _extract_row_features(item)
+        compatible_candidates = [
             c for c in filtered
-            if _units_are_compatible(item.unit_raw, c.unit)
+            if _is_hard_compatible(item, c, features)
         ]
 
-        if not unit_filtered and filtered:
-            # All candidates had unit mismatches
+        if not compatible_candidates and filtered:
             out = MappingOutput(
                 master_item_id=None,
                 confidence=0.0,
                 tags={},
-                evidence="All candidates have unit mismatches with no approved unit rule.",
+                evidence="No candidate passed hard technical compatibility checks.",
                 unresolved_reason=(
-                    f"Unit mismatch: PDF unit '{item.unit_raw}' vs candidate units "
-                    f"{[c.unit for c in filtered]}"
+                    "No candidate satisfies hard technical constraints "
+                    "(discipline/work method/scale/terrain/depth/soil class/unit)."
                 ),
                 status="unresolved",
+                classification="mapping_unresolved",
             )
             self._cache[cache_key] = out
             return out
 
-        effective_candidates = unit_filtered if unit_filtered else filtered
+        effective_candidates = compatible_candidates if compatible_candidates else filtered
 
         if self._mock_ai:
             out = self._mock_map(item, effective_candidates)
@@ -210,7 +388,8 @@ class SemanticMapper:
                 tags={},
                 evidence="OpenAI client is not configured.",
                 unresolved_reason="Semantic AI mapping requires OPENAI_API_KEY or MOCK_AI=true for demo mode.",
-                status="unresolved",
+                status="mapping_unresolved",
+                classification="mapping_unresolved",
             )
         else:
             out = await self._ai_map(item, effective_candidates)
@@ -229,6 +408,7 @@ class SemanticMapper:
                 evidence="No candidates available.",
                 unresolved_reason="No matching master data candidates found.",
                 status="unresolved",
+                classification="mapping_unresolved",
             )
         desc = f"{item.section_path} {item.description_vi}".lower()
 
@@ -257,6 +437,18 @@ class SemanticMapper:
                 evidence="[MOCK] No context-supported candidate found.",
                 unresolved_reason="No confident mock match from section context.",
                 status="unresolved",
+                classification="mapping_unresolved",
+            )
+
+        if best_score < 1.0:
+            return MappingOutput(
+                master_item_id=None,
+                confidence=min(0.7, 0.55 + best_score * 0.1),
+                tags=best.tags,
+                evidence="[MOCK] Candidate fit is too weak for an authoritative assignment; manual review required.",
+                unresolved_reason="Manual review required: mapping confidence is below the authoritative threshold.",
+                status="unresolved",
+                classification="mapping_ambiguous",
             )
 
         return MappingOutput(
@@ -269,6 +461,7 @@ class SemanticMapper:
             ),
             unresolved_reason=None,
             status="resolved",
+            classification="mapped_and_priced",
         )
 
     # ------------------------------------------------------------------
@@ -346,6 +539,9 @@ OUTPUT SCHEMA:
                 evidence=data.get("evidence", ""),
                 unresolved_reason=data.get("unresolved_reason"),
                 status=status,
+                classification=(
+                    "mapped_and_priced" if data.get("master_item_id") is not None else "mapping_unresolved"
+                ),
             )
         except (json.JSONDecodeError, jsonschema.ValidationError) as exc:
             return MappingOutput(
@@ -355,6 +551,7 @@ OUTPUT SCHEMA:
                 evidence=f"AI response failed schema validation: {exc}",
                 unresolved_reason="AI returned invalid JSON or schema mismatch.",
                 status="unresolved",
+                classification="mapping_unresolved",
             )
         except Exception as exc:
             return MappingOutput(
@@ -364,4 +561,5 @@ OUTPUT SCHEMA:
                 evidence=f"AI call error: {exc}",
                 unresolved_reason=f"AI mapping failed: {exc}",
                 status="error",
+                classification="mapping_unresolved",
             )

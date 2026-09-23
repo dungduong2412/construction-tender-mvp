@@ -86,7 +86,7 @@
       <p style="margin:6px 0 0;color:#666;font-size:.85rem;">Chỉ chấp nhận file .pdf</p>
       <p id="selected-file" style="margin:8px 0 0;font-weight:600;color:#1a3a6b;"></p>
     </div>
-    <button class="btn" id="upload-btn" style="margin-top:16px;" disabled>Xử lý PDF</button>
+    <button class="btn" id="upload-btn" style="margin-top:16px;">Xử lý PDF</button>
   </div>
 
   <!-- Status bar -->
@@ -174,14 +174,39 @@ pdfInput.addEventListener('change', () => {
   if (pdfInput.files[0]) onFileSelected(pdfInput.files[0]);
 });
 
+pdfInput.addEventListener('input', () => {
+  if (pdfInput.files[0]) onFileSelected(pdfInput.files[0]);
+});
+
 function onFileSelected(f) {
   selectedFileLbl.textContent = '📄 ' + f.name;
   uploadBtn.disabled = false;
 }
 
+function syncUploadButtonState() {
+  const hasFile = !!(pdfInput.files && pdfInput.files.length > 0);
+  if (hasFile) {
+    selectedFileLbl.textContent = '📄 ' + pdfInput.files[0].name;
+  } else if (!selectedFileLbl.textContent) {
+    selectedFileLbl.textContent = '';
+  }
+  uploadBtn.disabled = !hasFile;
+}
+
+pdfInput.addEventListener('change', syncUploadButtonState);
+pdfInput.addEventListener('input', syncUploadButtonState);
+setInterval(syncUploadButtonState, 150);
+
 uploadBtn.addEventListener('click', async () => {
   const file = pdfInput.files[0];
-  if (!file) return;
+  if (!file) {
+    setStatus('Vui lòng chọn một file PDF trước khi tải lên.', 'err');
+    return;
+  }
+  if (!file.name.toLowerCase().endsWith('.pdf')) {
+    setStatus('Chỉ chấp nhận file .pdf', 'err');
+    return;
+  }
   uploadBtn.disabled = true;
   setStatus('Đang tải lên…', 'info');
   const fd = new FormData();
@@ -210,11 +235,11 @@ function pollJob() {
         setStatus(`Đang xử lý… (${s})`, 'info');
       } else if (s === 'needs_review') {
         clearInterval(pollTimer);
-        setStatus(`⚠ Còn ${data.unresolved_count} khoản chưa định giá — vui lòng kiểm tra`, 'warn');
+        setStatus(`⚠ DEMO / MOCK DATA — uploaded PDF content was not processed. Còn ${data.unresolved_count} khoản chưa định giá — vui lòng kiểm tra`, 'warn');
         loadReview();
       } else if (s === 'ready') {
         clearInterval(pollTimer);
-        setStatus('✅ Tất cả khoản đã định giá — sẵn sàng xuất Excel', 'ok');
+        setStatus('✅ DEMO / MOCK DATA — uploaded PDF content was not processed. Tất cả khoản đã định giá — sẵn sàng xuất Excel', 'ok');
         loadReview();
       } else if (s === 'failed') {
         clearInterval(pollTimer);
@@ -225,11 +250,35 @@ function pollJob() {
 }
 
 async function loadReview() {
-  const res = await fetch(`${API}/review/${currentJobId}/rows`);
-  const rows = await res.json();
-  renderTable(rows);
-  document.getElementById('review-section').style.display = '';
-  document.getElementById('upload-card').style.display = 'none';
+  try {
+    const res = await fetch(`${API}/review/${currentJobId}/rows`);
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}: ${res.statusText || 'Unable to load review rows'}`);
+    }
+    const rows = await res.json();
+    if (!Array.isArray(rows)) {
+      throw new Error('Review response was not a valid list of rows.');
+    }
+    renderTable(rows);
+    document.getElementById('review-section').style.display = 'block';
+    document.getElementById('upload-card').style.display = 'none';
+  } catch (err) {
+    const reviewSection = document.getElementById('review-section');
+    const tbody = document.getElementById('review-tbody');
+    if (tbody) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="11" style="padding:16px;color:#721c24;font-weight:600;">
+            ❌ Không thể tải hoặc hiển thị bảng review: ${escHtml(err.message || 'Không rõ nguyên nhân')}
+          </td>
+        </tr>
+      `;
+    }
+    if (reviewSection) {
+      reviewSection.style.display = 'block';
+    }
+    setStatus(`❌ Lỗi xem bảng review: ${err.message || 'unknown error'} — DEMO / MOCK DATA`, 'err');
+  }
 }
 
 function renderTable(rows) {
@@ -248,7 +297,7 @@ function renderTable(rows) {
       tr.innerHTML = `<td>${r.row_number}</td><td colspan="10"><em>${r.description_vi}</em> <span style="color:#aaa;font-size:.8rem;">[metadata]</span></td>`;
     } else {
       totalItems++;
-      const priced = r.status === 'resolved' || (r.unit_price && r.extended_amount);
+      const priced = r.status === 'mapped_and_priced' && !!r.unit_price && !!r.extended_amount;
       if (priced) {
         resolved++;
         grandTotal += parseFloat(r.extended_amount || 0);
@@ -363,9 +412,10 @@ function confBadge(conf) {
 }
 
 function statusBadge(status, reason) {
-  if (status === 'resolved' || status === 'priced') return '<span class="badge-resolved">OK</span>';
-  if (status === 'error') return `<span class="badge-error" title="${escAttr(reason||'')}">ERR</span>`;
-  return `<span class="badge-unresolved" title="${escAttr(reason||'')}">!</span>`;
+  if (status === 'mapped_and_priced') return '<span class="badge-resolved">OK</span>';
+  if (status === 'non_billable_heading' || status === 'non_billable_metadata') return `<span class="badge-error" title="${escAttr(reason||'')}">INFO</span>`;
+  if (status === 'mapping_ambiguous' || status === 'mapped_price_unavailable' || status === 'mapping_unresolved' || status === 'invalid_quantity_or_unit') return `<span class="badge-unresolved" title="${escAttr(reason||'')}">!</span>`;
+  return `<span class="badge-error" title="${escAttr(reason||'')}">ERR</span>`;
 }
 
 function fmtNum(s) {

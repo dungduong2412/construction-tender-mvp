@@ -49,7 +49,21 @@ class PricingEngine:
         master_version: str = "v1",
     ) -> PriceResult:
 
-        # Guard: non-billable rows
+        mapping_status = getattr(mapping, "classification", None) or getattr(mapping, "status", "unresolved")
+        mapping_status = str(mapping_status)
+        legacy_status = {
+            "mapped_and_priced": "mapped_and_priced",
+            "mapped_price_unavailable": "mapped_price_unavailable",
+            "mapping_ambiguous": "mapping_ambiguous",
+            "mapping_unresolved": "mapping_unresolved",
+            "invalid_quantity_or_unit": "invalid_quantity_or_unit",
+            "non_billable_heading": "non_billable_heading",
+            "non_billable_metadata": "non_billable_metadata",
+            "resolved": "mapped_and_priced",
+            "unresolved": "mapped_price_unavailable",
+            "error": "mapping_unresolved",
+        }.get(mapping_status, mapping_status)
+
         if item.row_type != "line_item":
             return PriceResult(
                 row_id=item.row_id,
@@ -63,8 +77,7 @@ class PricingEngine:
                 error_reason=f"Not a billable item: row_type={item.row_type}",
             )
 
-        # Guard: unresolved mapping
-        if mapping.status != "resolved" or mapping.master_item_id is None:
+        if mapping.master_item_id is None:
             return PriceResult(
                 row_id=item.row_id,
                 status="unresolved",
@@ -75,6 +88,19 @@ class PricingEngine:
                 coeff_applied=[],
                 unit_rule_ref=None,
                 error_reason=mapping.unresolved_reason or "Mapping unresolved",
+            )
+
+        if legacy_status not in {"mapped_and_priced", "mapped_price_unavailable"}:
+            return PriceResult(
+                row_id=item.row_id,
+                status="unresolved",
+                unit_price_str=None,
+                extended_amount_str=None,
+                price_source=f"master_{master_version}",
+                formula_ref=None,
+                coeff_applied=[],
+                unit_rule_ref=None,
+                error_reason=mapping.unresolved_reason or f"Mapping status is {mapping_status}",
             )
 
         # Guard: master item not found
@@ -92,7 +118,6 @@ class PricingEngine:
                 error_reason=f"Master item id={mapping.master_item_id} not found in version {master_version}",
             )
 
-        # Guard: quantity must not be None (zero is allowed if explicitly stated)
         if item.quantity is None:
             return PriceResult(
                 row_id=item.row_id,
@@ -104,6 +129,19 @@ class PricingEngine:
                 coeff_applied=[],
                 unit_rule_ref=None,
                 error_reason="Quantity is missing/unparseable — not defaulting to zero",
+            )
+
+        if master.get("unit_price") is None or master.get("unit_price") == 0:
+            return PriceResult(
+                row_id=item.row_id,
+                status="unresolved",
+                unit_price_str=None,
+                extended_amount_str=None,
+                price_source=f"master_{master_version}",
+                formula_ref=master.get("formula_ref"),
+                coeff_applied=[],
+                unit_rule_ref=None,
+                error_reason="Mapped master price is missing or zero; manual review required.",
             )
 
         # Unit compatibility check

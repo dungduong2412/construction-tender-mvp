@@ -43,7 +43,14 @@ class ExportRow:
 
 def generate_excel(rows: list[ExportRow], job_id: str) -> bytes:
     wb = Workbook()
-    is_partial = any(r.status in ("unresolved", "error") for r in rows)
+    priced_statuses = {"mapped_and_priced"}
+    unresolved_statuses = {
+        "mapped_price_unavailable",
+        "mapping_ambiguous",
+        "mapping_unresolved",
+        "invalid_quantity_or_unit",
+    }
+    is_partial = any(r.status not in priced_statuses and r.status not in {"non_billable_heading", "non_billable_metadata"} for r in rows)
 
     _build_du_thau(wb, rows, is_partial)
     _build_audit(wb, rows)
@@ -86,7 +93,7 @@ def _build_du_thau(wb: Workbook, rows: list[ExportRow], is_partial: bool) -> Non
     priced_rows = []
 
     for row in rows:
-        if row.status == "priced" and row.unit_price_str and row.extended_amount_str:
+        if row.status == "mapped_and_priced" and row.unit_price_str and row.extended_amount_str:
             up = _parse_decimal(row.unit_price_str)
             ea = _parse_decimal(row.extended_amount_str)
             priced_rows.append(ea)
@@ -103,9 +110,8 @@ def _build_du_thau(wb: Workbook, rows: list[ExportRow], is_partial: bool) -> Non
             float(ea) if ea is not None else None,
         ])
 
-        # Color unresolved rows
         data_row = ws.max_row
-        if row.status != "priced":
+        if row.status not in {"mapped_and_priced", "non_billable_heading", "non_billable_metadata"}:
             err_fill = PatternFill("solid", fgColor="FFCCCC")
             for col in range(1, 7):
                 ws.cell(row=data_row, column=col).fill = err_fill
@@ -190,7 +196,7 @@ def _build_unresolved(wb: Workbook, rows: list[ExportRow]) -> None:
     for col_idx in range(1, len(headers) + 1):
         ws.cell(row=1, column=col_idx).font = header_font
 
-    unresolved = [r for r in rows if r.status in ("unresolved", "error")]
+    unresolved = [r for r in rows if r.status in ("mapped_price_unavailable", "mapping_ambiguous", "mapping_unresolved", "invalid_quantity_or_unit")]
     if not unresolved:
         ws.append(["(Không có khoản nào chưa định giá)"])
         return

@@ -34,6 +34,42 @@ class JobStatusResponse(BaseModel):
     unresolved_count: Optional[int] = None
 
 
+def _derive_mapping_status(
+    mapping_out,
+    price_out,
+) -> MappingStatus:
+    mapping_status_name = str(
+        getattr(mapping_out, "classification", None)
+        or getattr(mapping_out, "status", "mapping_unresolved")
+    )
+    mapped = {
+        "mapped_and_priced": MappingStatus.mapped_and_priced,
+        "mapped_price_unavailable": MappingStatus.mapped_price_unavailable,
+        "mapping_ambiguous": MappingStatus.mapping_ambiguous,
+        "mapping_unresolved": MappingStatus.mapping_unresolved,
+        "invalid_quantity_or_unit": MappingStatus.invalid_quantity_or_unit,
+        "non_billable_heading": MappingStatus.non_billable_heading,
+        "non_billable_metadata": MappingStatus.non_billable_metadata,
+        "resolved": MappingStatus.mapped_and_priced,
+        "unresolved": MappingStatus.mapping_unresolved,
+        "error": MappingStatus.mapping_unresolved,
+    }
+    mapping_status = mapped.get(mapping_status_name, MappingStatus.mapping_unresolved)
+
+    if mapping_status in {MappingStatus.non_billable_heading, MappingStatus.non_billable_metadata}:
+        return mapping_status
+    if mapping_status in {MappingStatus.mapping_ambiguous, MappingStatus.mapping_unresolved, MappingStatus.invalid_quantity_or_unit}:
+        return mapping_status
+    if getattr(mapping_out, "master_item_id", None) is None:
+        return MappingStatus.mapping_unresolved
+
+    if price_out.status == "priced" and price_out.unit_price_str and price_out.extended_amount_str:
+        return MappingStatus.mapped_and_priced
+    if price_out.status == "unresolved":
+        return MappingStatus.mapped_price_unavailable
+    return MappingStatus.mapping_unresolved
+
+
 @router.post("/upload", response_model=JobStatusResponse)
 async def upload_pdf(
     background_tasks: BackgroundTasks,
@@ -83,7 +119,13 @@ async def get_job(job_id: str, db: AsyncSession = Depends(get_db)):
         .join(BOQRow, BOQRow.id == MappingResult.boq_row_id)
         .where(
             BOQRow.job_id == job_id,
-            MappingResult.status.in_([MappingStatus.unresolved, MappingStatus.error]),
+            BOQRow.row_type == RowType.line_item,
+            MappingResult.status.in_([
+                MappingStatus.mapped_price_unavailable,
+                MappingStatus.mapping_ambiguous,
+                MappingStatus.mapping_unresolved,
+                MappingStatus.invalid_quantity_or_unit,
+            ]),
         )
     )
 
@@ -257,21 +299,19 @@ async def _process_job(job_id: str, pdf_bytes: bytes, filename: str) -> None:
                 price_out = engine.price_row(
                     boq_item, mapping_out, master_dict, unit_rules, coefficients, MASTER_VERSION
                 )
-
-                status_map = {
-                    "resolved": MappingStatus.resolved,
-                    "unresolved": MappingStatus.unresolved,
-                    "error": MappingStatus.error,
-                }
+                derived_status = _derive_mapping_status(mapping_out, price_out)
+                unresolved_reason = mapping_out.unresolved_reason
+                if derived_status != MappingStatus.mapped_and_priced and price_out.error_reason:
+                    unresolved_reason = price_out.error_reason
 
                 mr = MappingResult(
                     boq_row_id=db_row.id,
                     master_item_id=mapping_out.master_item_id,
-                    status=status_map.get(mapping_out.status, MappingStatus.unresolved),
+                    status=derived_status,
                     confidence=mapping_out.confidence,
                     tags_json=json.dumps(mapping_out.tags, ensure_ascii=False),
                     evidence=mapping_out.evidence,
-                    unresolved_reason=mapping_out.unresolved_reason,
+                    unresolved_reason=unresolved_reason,
                     unit_price_str=price_out.unit_price_str,
                     extended_amount_str=price_out.extended_amount_str,
                     price_source=price_out.price_source,
@@ -288,11 +328,15 @@ async def _process_job(job_id: str, pdf_bytes: bytes, filename: str) -> None:
                 select(MappingResult).join(BOQRow).where(BOQRow.job_id == job_id)
             )
             mr_list = mrs.scalars().all()
-            has_unresolved = any(
-                m.status in (MappingStatus.unresolved, MappingStatus.error)
-                for m in mr_list
+            billable_rows = [
+                m for m in mr_list
+                if m.boq_row is not None and m.boq_row.row_type == RowType.line_item
+            ]
+            has_billable_issues = any(
+                m.status != MappingStatus.mapped_and_priced
+                for m in billable_rows
             )
-            job.status = JobStatus.needs_review if has_unresolved else JobStatus.ready
+            job.status = JobStatus.needs_review if has_billable_issues else JobStatus.ready
             await db.commit()
 
         except ParserAdapterError as exc:

@@ -29,12 +29,13 @@ def make_item(desc, unit="m", qty_raw="100", qty=100.0, row_type="line_item") ->
     )
 
 
-def make_candidate(id_, desc, unit="m", road_bridge=None, drilling_depth=None) -> MasterCandidate:
+def make_candidate(id_, desc, unit="m", road_bridge=None, drilling_depth=None, **extra_tags) -> MasterCandidate:
     tags = {}
     if road_bridge:
         tags["road_bridge_context"] = road_bridge
     if drilling_depth:
         tags["drilling_depth"] = drilling_depth
+    tags.update(extra_tags)
     return MasterCandidate(
         id=id_,
         item_code=f"KS-{id_:03d}",
@@ -116,7 +117,7 @@ class TestUnitMismatch:
         ("ha", "ha", True),
         ("km", "km", True),
         ("mẫu", "mẫu", True),
-        ("m", "km", True),        # different pair, not in forbidden set
+        ("m", "km", False),       # hard compatibility blocks cross-unit mapping
     ])
     def test_unit_mismatch(self, item_unit, cand_unit, expected_compatible):
         result = _units_are_compatible(item_unit, cand_unit)
@@ -159,7 +160,15 @@ class TestSemanticMapperMock:
     async def test_resolved_with_good_candidate(self):
         mapper = SemanticMapper(mock_ai=True)
         item = make_item("Đo vẽ bình đồ tỷ lệ 1/500", unit="ha")
-        candidates = [make_candidate(1, "Đo vẽ bình đồ 1/500 đồng bằng", unit="ha")]
+        candidates = [
+            make_candidate(
+                1,
+                "Đo vẽ bình đồ 1/500 đồng bằng",
+                unit="ha",
+                survey_discipline="topography",
+                scale="1/500",
+            )
+        ]
         result = await mapper.map_item(item, candidates, "v1")
         assert result.status == "resolved"
         assert result.master_item_id == 1

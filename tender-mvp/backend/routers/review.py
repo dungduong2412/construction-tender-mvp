@@ -25,6 +25,7 @@ router = APIRouter()
 class ReviewRow(BaseModel):
     row_id: str
     row_number: str
+    row_type: str
     section_path: str
     description_vi: str
     unit: str
@@ -101,6 +102,7 @@ async def get_review_rows(job_id: str, db: AsyncSession = Depends(get_db)):
         result.append(ReviewRow(
             row_id=row.row_id,
             row_number=row.row_number or "",
+            row_type=row.row_type.value,
             section_path=row.section_path,
             description_vi=row.description_vi,
             unit=row.unit_raw or "",

@@ -240,12 +240,10 @@ function renderTable(rows) {
 
   rows.forEach(r => {
     const tr = document.createElement('tr');
-    const isHeading = r.row_id.includes('heading') || (!r.unit && !r.quantity_raw && r.status === 'unresolved' && !r.master_item_id);
-
-    if (['heading'].includes(r.status) || (!r.unit && !r.quantity_raw && r.row_number && isRomanOrSub(r.row_number))) {
+    if (r.row_type === 'heading') {
       tr.className = 'row-heading';
       tr.innerHTML = `<td>${r.row_number}</td><td colspan="10"><strong>${r.description_vi}</strong></td>`;
-    } else if (!r.unit && !r.quantity_raw && !r.master_item_id && r.status === 'unresolved') {
+    } else if (r.row_type === 'metadata') {
       tr.className = 'row-metadata';
       tr.innerHTML = `<td>${r.row_number}</td><td colspan="10"><em>${r.description_vi}</em> <span style="color:#aaa;font-size:.8rem;">[metadata]</span></td>`;
     } else {
@@ -355,10 +353,6 @@ function setStatus(msg, type) {
   bar.textContent = msg;
   bar.className = `status-${type}`;
   bar.style.display = '';
-}
-
-function isRomanOrSub(s) {
-  return /^(I{1,3}|IV|V?I{0,3})(\.\d+)?$/i.test(s.trim());
 }
 
 function confBadge(conf) {

@@ -43,6 +43,13 @@ async def upload_pdf(
     if not file.filename or not file.filename.lower().endswith(".pdf"):
         raise HTTPException(400, "Only PDF files are accepted")
 
+    try:
+        pdf_bytes = await file.read()
+    except Exception as exc:
+        raise HTTPException(400, "Failed to read uploaded file") from exc
+    if not pdf_bytes:
+        raise HTTPException(400, "Uploaded PDF is empty")
+
     job_id = str(uuid.uuid4())
     job = Job(
         id=job_id,
@@ -53,7 +60,6 @@ async def upload_pdf(
     db.add(job)
     await db.commit()
 
-    pdf_bytes = await file.read()
     background_tasks.add_task(_process_job, job_id, pdf_bytes, file.filename)
 
     return JobStatusResponse(

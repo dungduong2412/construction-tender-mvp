@@ -1,0 +1,30 @@
+[
+  {
+    "version": "v1",
+    "from_unit": "100m",
+    "to_unit": "m",
+    "factor": 100,
+    "note": "Convert 100-metre billing unit to metres. Approved: reference XLS Đơn giá chi tiết."
+  },
+  {
+    "version": "v1",
+    "from_unit": "100ha",
+    "to_unit": "ha",
+    "factor": 100,
+    "note": "Convert 100-hectare billing unit to hectares. Approved: reference XLS Đơn giá chi tiết."
+  },
+  {
+    "version": "v1",
+    "from_unit": "1000m2",
+    "to_unit": "m2",
+    "factor": 1000,
+    "note": "Convert 1000 m² billing unit to m². Approved: reference XLS."
+  },
+  {
+    "version": "v1",
+    "from_unit": "km",
+    "to_unit": "m",
+    "factor": 1000,
+    "note": "Convert kilometres to metres where master item is priced per metre."
+  }
+]

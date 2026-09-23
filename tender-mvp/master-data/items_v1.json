@@ -1,0 +1,322 @@
+[
+  {
+    "version": "v1",
+    "item_code": "KS-001",
+    "description_vi": "Đo vẽ bình đồ tỷ lệ 1/500 vùng đồng bằng",
+    "unit": "ha",
+    "unit_price": 4500000,
+    "formula_ref": "DT_KS_001",
+    "source_sheet": "Đơn giá chi tiết",
+    "tags": {"survey_discipline": "topography", "terrain_class": "plain", "scale": "1/500"}
+  },
+  {
+    "version": "v1",
+    "item_code": "KS-002",
+    "description_vi": "Đo vẽ bình đồ tỷ lệ 1/500 vùng đồi núi",
+    "unit": "ha",
+    "unit_price": 7200000,
+    "formula_ref": "DT_KS_002",
+    "source_sheet": "Đơn giá chi tiết",
+    "tags": {"survey_discipline": "topography", "terrain_class": "hilly", "scale": "1/500"}
+  },
+  {
+    "version": "v1",
+    "item_code": "KS-003",
+    "description_vi": "Đo vẽ bình đồ tỷ lệ 1/200 vùng đồng bằng",
+    "unit": "ha",
+    "unit_price": 8500000,
+    "formula_ref": "DT_KS_003",
+    "source_sheet": "Đơn giá chi tiết",
+    "tags": {"survey_discipline": "topography", "terrain_class": "plain", "scale": "1/200"}
+  },
+  {
+    "version": "v1",
+    "item_code": "KS-004",
+    "description_vi": "Đo trắc dọc tuyến đường",
+    "unit": "km",
+    "unit_price": 1200000,
+    "formula_ref": "DT_KS_004",
+    "source_sheet": "Đơn giá chi tiết",
+    "tags": {"survey_discipline": "longitudinal_section", "road_bridge_context": "road"}
+  },
+  {
+    "version": "v1",
+    "item_code": "KS-005",
+    "description_vi": "Đo trắc ngang tuyến đường bình quân 20m/mặt cắt",
+    "unit": "km",
+    "unit_price": 950000,
+    "formula_ref": "DT_KS_005",
+    "source_sheet": "Đơn giá chi tiết",
+    "tags": {"survey_discipline": "cross_section", "road_bridge_context": "road"}
+  },
+  {
+    "version": "v1",
+    "item_code": "KS-006",
+    "description_vi": "Khoan thăm dò địa chất đường, lỗ khoan 0–30m, đất cấp II",
+    "unit": "m",
+    "unit_price": 380000,
+    "formula_ref": "DT_KS_006",
+    "source_sheet": "Đơn giá chi tiết",
+    "tags": {
+      "survey_discipline": "geotechnical_drilling",
+      "road_bridge_context": "road",
+      "drilling_depth": "0-30m",
+      "soil_rock_class": "dat_cap_II"
+    }
+  },
+  {
+    "version": "v1",
+    "item_code": "KS-007",
+    "description_vi": "Khoan thăm dò địa chất cầu, lỗ khoan 0–60m, đất cấp II",
+    "unit": "m",
+    "unit_price": 520000,
+    "formula_ref": "DT_KS_007",
+    "source_sheet": "Đơn giá chi tiết",
+    "tags": {
+      "survey_discipline": "geotechnical_drilling",
+      "road_bridge_context": "bridge",
+      "drilling_depth": "0-60m",
+      "soil_rock_class": "dat_cap_II"
+    }
+  },
+  {
+    "version": "v1",
+    "item_code": "KS-008",
+    "description_vi": "Lấy mẫu đất nguyên dạng",
+    "unit": "mẫu",
+    "unit_price": 85000,
+    "formula_ref": "DT_KS_008",
+    "source_sheet": "Đơn giá chi tiết",
+    "tags": {"survey_discipline": "sample_collection", "water_on_land": "on_land"}
+  },
+  {
+    "version": "v1",
+    "item_code": "KS-009",
+    "description_vi": "Thí nghiệm cơ lý đất (bộ chỉ tiêu cơ bản)",
+    "unit": "mẫu",
+    "unit_price": 320000,
+    "formula_ref": "DT_KS_009",
+    "source_sheet": "Đơn giá chi tiết",
+    "tags": {"survey_discipline": "laboratory_testing", "work_method": "standard"}
+  },
+  {
+    "version": "v1",
+    "item_code": "KS-010",
+    "description_vi": "Thí nghiệm thành phần hạt",
+    "unit": "TN",
+    "unit_price": 120000,
+    "formula_ref": "DT_KS_010",
+    "source_sheet": "Đơn giá chi tiết",
+    "tags": {"survey_discipline": "laboratory_testing", "work_method": "grain_size"}
+  },
+  {
+    "version": "v1",
+    "item_code": "KS-011",
+    "description_vi": "Thí nghiệm CBR ngâm nước",
+    "unit": "TN",
+    "unit_price": 450000,
+    "formula_ref": "DT_KS_011",
+    "source_sheet": "Đơn giá chi tiết",
+    "tags": {"survey_discipline": "laboratory_testing", "work_method": "CBR", "water_on_land": "water"}
+  },
+  {
+    "version": "v1",
+    "item_code": "KS-012",
+    "description_vi": "Thí nghiệm cắt trực tiếp",
+    "unit": "TN",
+    "unit_price": 280000,
+    "formula_ref": "DT_KS_012",
+    "source_sheet": "Đơn giá chi tiết",
+    "tags": {"survey_discipline": "laboratory_testing", "work_method": "direct_shear"}
+  },
+  {
+    "version": "v1",
+    "item_code": "KS-013",
+    "description_vi": "Thí nghiệm nén cố kết",
+    "unit": "TN",
+    "unit_price": 380000,
+    "formula_ref": "DT_KS_013",
+    "source_sheet": "Đơn giá chi tiết",
+    "tags": {"survey_discipline": "laboratory_testing", "work_method": "consolidation"}
+  },
+  {
+    "version": "v1",
+    "item_code": "KS-014",
+    "description_vi": "Thí nghiệm xuyên tiêu chuẩn SPT",
+    "unit": "TN",
+    "unit_price": 95000,
+    "formula_ref": "DT_KS_014",
+    "source_sheet": "Đơn giá chi tiết",
+    "tags": {"survey_discipline": "in_situ_testing", "work_method": "SPT"}
+  },
+  {
+    "version": "v1",
+    "item_code": "KS-015",
+    "description_vi": "Bơm hút thí nghiệm thủy văn",
+    "unit": "hố",
+    "unit_price": 1500000,
+    "formula_ref": "DT_KS_015",
+    "source_sheet": "Đơn giá chi tiết",
+    "tags": {"survey_discipline": "hydrogeological_testing", "work_method": "pump_test"}
+  },
+  {
+    "version": "v1",
+    "item_code": "KS-016",
+    "description_vi": "Đo vẽ địa hình mặt cắt dọc tim đường",
+    "unit": "km",
+    "unit_price": 850000,
+    "formula_ref": "DT_KS_016",
+    "source_sheet": "Đơn giá chi tiết",
+    "tags": {"survey_discipline": "longitudinal_profile", "road_bridge_context": "road"}
+  },
+  {
+    "version": "v1",
+    "item_code": "KS-017",
+    "description_vi": "Khảo sát thủy văn, thu thập tài liệu",
+    "unit": "km",
+    "unit_price": 350000,
+    "formula_ref": "DT_KS_017",
+    "source_sheet": "Đơn giá chi tiết",
+    "tags": {"survey_discipline": "hydrology", "work_method": "data_collection"}
+  },
+  {
+    "version": "v1",
+    "item_code": "KS-018",
+    "description_vi": "Đo đạc mặt cắt ngang sông tại vị trí cầu",
+    "unit": "mặt cắt",
+    "unit_price": 1200000,
+    "formula_ref": "DT_KS_018",
+    "source_sheet": "Đơn giá chi tiết",
+    "tags": {"survey_discipline": "river_cross_section", "road_bridge_context": "bridge"}
+  },
+  {
+    "version": "v1",
+    "item_code": "KS-019",
+    "description_vi": "Thí nghiệm nước",
+    "unit": "TN",
+    "unit_price": 250000,
+    "formula_ref": "DT_KS_019",
+    "source_sheet": "Đơn giá chi tiết",
+    "tags": {"survey_discipline": "water_testing"}
+  },
+  {
+    "version": "v1",
+    "item_code": "KS-020",
+    "description_vi": "Lập báo cáo khảo sát địa hình",
+    "unit": "báo cáo",
+    "unit_price": 12000000,
+    "formula_ref": "DT_KS_020",
+    "source_sheet": "Giá tổng hợp",
+    "tags": {"survey_discipline": "reporting", "work_method": "topography_report"}
+  },
+  {
+    "version": "v1",
+    "item_code": "KS-021",
+    "description_vi": "Lập báo cáo khảo sát địa chất",
+    "unit": "báo cáo",
+    "unit_price": 18000000,
+    "formula_ref": "DT_KS_021",
+    "source_sheet": "Giá tổng hợp",
+    "tags": {"survey_discipline": "reporting", "work_method": "geotechnical_report"}
+  },
+  {
+    "version": "v1",
+    "item_code": "KS-022",
+    "description_vi": "Đo trắc dọc sông suối dọc tuyến",
+    "unit": "km",
+    "unit_price": 780000,
+    "formula_ref": "DT_KS_022",
+    "source_sheet": "Đơn giá chi tiết",
+    "tags": {"survey_discipline": "river_longitudinal", "road_bridge_context": "road"}
+  },
+  {
+    "version": "v1",
+    "item_code": "KS-023",
+    "description_vi": "Xây dựng lưới khống chế trắc địa",
+    "unit": "điểm",
+    "unit_price": 2500000,
+    "formula_ref": "DT_KS_023",
+    "source_sheet": "Đơn giá chi tiết",
+    "tags": {"survey_discipline": "geodetic_control_network"}
+  },
+  {
+    "version": "v1",
+    "item_code": "KS-024",
+    "description_vi": "Thí nghiệm độ ẩm tự nhiên",
+    "unit": "TN",
+    "unit_price": 45000,
+    "formula_ref": "DT_KS_024",
+    "source_sheet": "Đơn giá chi tiết",
+    "tags": {"survey_discipline": "laboratory_testing", "work_method": "moisture_content"}
+  },
+  {
+    "version": "v1",
+    "item_code": "KS-025",
+    "description_vi": "Thí nghiệm giới hạn Atterberg",
+    "unit": "TN",
+    "unit_price": 85000,
+    "formula_ref": "DT_KS_025",
+    "source_sheet": "Đơn giá chi tiết",
+    "tags": {"survey_discipline": "laboratory_testing", "work_method": "Atterberg_limits"}
+  },
+  {
+    "version": "v1",
+    "item_code": "KS-026",
+    "description_vi": "Thí nghiệm dung trọng tự nhiên",
+    "unit": "TN",
+    "unit_price": 65000,
+    "formula_ref": "DT_KS_026",
+    "source_sheet": "Đơn giá chi tiết",
+    "tags": {"survey_discipline": "laboratory_testing", "work_method": "unit_weight"}
+  },
+  {
+    "version": "v1",
+    "item_code": "KS-027",
+    "description_vi": "Thí nghiệm tỷ trọng hạt đất",
+    "unit": "TN",
+    "unit_price": 95000,
+    "formula_ref": "DT_KS_027",
+    "source_sheet": "Đơn giá chi tiết",
+    "tags": {"survey_discipline": "laboratory_testing", "work_method": "specific_gravity"}
+  },
+  {
+    "version": "v1",
+    "item_code": "KS-028",
+    "description_vi": "Đóng cọc thử nghiệm, cọc bê tông D300",
+    "unit": "m",
+    "unit_price": 450000,
+    "formula_ref": "DT_KS_028",
+    "source_sheet": "Đơn giá chi tiết",
+    "tags": {"survey_discipline": "pile_testing", "road_bridge_context": "bridge", "work_method": "driven_pile_D300"}
+  },
+  {
+    "version": "v1",
+    "item_code": "KS-029",
+    "description_vi": "Khoan thăm dò địa chất đường, lỗ khoan 0–30m, đất cấp III",
+    "unit": "m",
+    "unit_price": 420000,
+    "formula_ref": "DT_KS_029",
+    "source_sheet": "Đơn giá chi tiết",
+    "tags": {
+      "survey_discipline": "geotechnical_drilling",
+      "road_bridge_context": "road",
+      "drilling_depth": "0-30m",
+      "soil_rock_class": "dat_cap_III"
+    }
+  },
+  {
+    "version": "v1",
+    "item_code": "KS-030",
+    "description_vi": "Khoan thăm dò địa chất cầu, lỗ khoan 0–60m, đất cấp III",
+    "unit": "m",
+    "unit_price": 580000,
+    "formula_ref": "DT_KS_030",
+    "source_sheet": "Đơn giá chi tiết",
+    "tags": {
+      "survey_discipline": "geotechnical_drilling",
+      "road_bridge_context": "bridge",
+      "drilling_depth": "0-60m",
+      "soil_rock_class": "dat_cap_III"
+    }
+  }
+]

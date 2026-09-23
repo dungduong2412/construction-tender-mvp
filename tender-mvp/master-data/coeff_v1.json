@@ -1,0 +1,26 @@
+[
+  {
+    "version": "v1",
+    "coeff_code": "K_TT",
+    "description_vi": "Hệ số trượt giá tháng",
+    "value": 1.0,
+    "applies_to": "all",
+    "note": "Price-slip coefficient — set to 1.0 for base period; update from Giá tháng sheet."
+  },
+  {
+    "version": "v1",
+    "coeff_code": "K_XD",
+    "description_vi": "Hệ số xây dựng khu vực",
+    "value": 1.0,
+    "applies_to": "all",
+    "note": "Regional construction coefficient. Base = 1.0; adjust per project location."
+  },
+  {
+    "version": "v1",
+    "coeff_code": "K_NVCP",
+    "description_vi": "Hệ số nhân vật chí phí phát sinh",
+    "value": 1.0,
+    "applies_to": "all",
+    "note": "Incidental cost coefficient from Hệ số sheet. Requires explicit project confirmation."
+  }
+]

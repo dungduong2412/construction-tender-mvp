@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Dự Thầu Xây Dựng – MVP</title>
+<style>
+  :root {
+    --primary: #1f4e79;
+    --accent: #2e75b6;
+    --orange: #ff9933;
+    --red: #cc0000;
+    --green: #28a745;
+    --light: #f0f4f8;
+    --border: #c0c8d0;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Times New Roman', Times, serif;
+    background: var(--light);
+    color: #222;
+  }
+  header {
+    background: var(--primary);
+    color: #fff;
+    padding: 1rem 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  header h1 { margin: 0; font-size: 1.3rem; }
+  header .sub { font-size: 0.85rem; opacity: 0.8; }
+  main { max-width: 1400px; margin: 0 auto; padding: 1.5rem; }
+
+  /* Upload section */
+  .upload-card {
+    background: #fff;
+    border: 2px dashed var(--accent);
+    border-radius: 8px;
+    padding: 2rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  .upload-card:hover { border-color: var(--primary); }
+  .upload-card input[type=file] { display: none; }
+  .upload-card label { cursor: pointer; font-size: 1rem; }
+  .btn {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 0.55rem 1.4rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.95rem;
+    margin: 0.3rem;
+  }
+  .btn:disabled { background: #aaa; cursor: not-allowed; }
+  .btn-success { background: var(--green); }
+  .btn-danger { background: var(--red); }
+  .btn-sm { padding: 0.3rem 0.8rem; font-size: 0.83rem; }
+
+  /* Status bar */
+  #status-bar {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.9rem 1.2rem;
+    margin-bottom: 1rem;
+    display: none;
+  }
+  #status-bar .pill {
+    display: inline-block;
+    padding: 0.2rem 0.7rem;
+    border-radius: 12px;
+    font-size: 0.82rem;
+    font-weight: bold;
+    margin-left: 0.5rem;
+  }
+  .pill-uploaded   { background: #cce5ff; color: #004085; }
+  .pill-parsing    { background: #fff3cd; color: #856404; }
+  .pill-mapping    { background: #fff3cd; color: #856404; }
+  .pill-pricing    { background: #fff3cd; color: #856404; }
+  .pill-needs_review { background: #f8d7da; color: #721c24; }
+  .pill-ready      { background: #d4edda; color: #155724; }
+  .pill-exported   { background: #d1ecf1; color: #0c5460; }
+  .pill-failed     { background: #f8d7da; color: #721c24; }
+
+  /* Draft warning */
+  .draft-warning {
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 6px;
+    padding: 0.8rem 1.2rem;
+    color: var(--red);
+    font-weight: bold;
+    margin-bottom: 1rem;
+    display: none;
+  }
+
+  /* Summary cards */
+  .summary-row {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+  .summary-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.8rem 1.4rem;
+    flex: 1;
+    min-width: 180px;
+  }
+  .summary-card .label { font-size: 0.78rem; color: #666; }
+  .summary-card .value { font-size: 1.3rem; font-weight: bold; color: var(--primary); }
+
+  /* Review table */
+  .table-wrapper {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: auto;
+    margin-bottom: 1.5rem;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+  thead tr th {
+    background: var(--primary);
+    color: #fff;
+    padding: 0.55rem 0.6rem;
+    text-align: center;
+    white-space: nowrap;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+  tbody tr { border-bottom: 1px solid #e0e0e0; }
+  tbody tr:hover { background: #f5f9ff; }
+  tbody tr.row-heading {
+    background: #bdd7ee;
+    font-weight: bold;
+  }
+  tbody tr.row-unresolved {
+    background: #fff0e0;
+  }
+  tbody tr.row-override {
+    background: #e8f5e9;
+  }
+  td { padding: 0.4rem 0.55rem; vertical-align: middle; }
+  td.num { text-align: right; }
+  td.center { text-align: center; }
+  .badge {
+    display: inline-block;
+    padding: 0.15rem 0.5rem;
+    border-radius: 10px;
+    font-size: 0.72rem;
+    font-weight: bold;
+  }
+  .badge-matched  { background: #d4edda; color: #155724; }
+  .badge-ambiguous { background: #fff3cd; color: #856404; }
+  .badge-unresolved { background: #f8d7da; color: #721c24; }
+  .badge-heading  { background: #e2e3e5; color: #383d41; }
+  .badge-override { background: #cce5ff; color: #004085; }
+
+  /* Override form */
+  .override-form {
+    display: none;
+    background: #f0f7ff;
+    border: 1px solid var(--accent);
+    border-radius: 6px;
+    padding: 0.8rem;
+    margin-top: 0.4rem;
+  }
+  .override-form input, .override-form select {
+    font-family: inherit;
+    font-size: 0.85rem;
+    padding: 0.3rem 0.5rem;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    margin: 0.2rem 0;
+    width: 100%;
+  }
+  .override-form label { font-size: 0.78rem; color: #555; display: block; margin-top: 0.3rem; }
+
+  /* Spinner */
+  .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid #ccc; border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; vertical-align: middle; margin-right: 6px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Actions bar */
+  .actions-bar {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+  }
+
+  .error-box {
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 6px;
+    padding: 0.8rem 1.2rem;
+    color: var(--red);
+    display: none;
+    white-space: pre-wrap;
+    font-size: 0.83rem;
+  }
+
+  footer {
+    text-align: center;
+    color: #888;
+    font-size: 0.78rem;
+    padding: 1.5rem;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>🏗 Dự Thầu Xây Dựng – MVP</h1>
+    <div class="sub">Hệ thống lập dự toán khảo sát xây dựng · Phiên bản thử nghiệm</div>
+  </div>
+</header>
+
+<main>
+
+  <!-- Upload -->
+  <div class="upload-card" id="upload-zone" onclick="document.getElementById('file-input').click()">
+    <input type="file" id="file-input" accept=".pdf" onchange="handleFileSelect(event)" />
+    <div style="font-size:2.5rem">📄</div>
+    <label for="file-input"><strong>Bấm để chọn file PDF</strong> hoặc kéo thả vào đây</label>
+    <p style="font-size:0.82rem;color:#666;margin:0.4rem 0 0">Chấp nhận: file BOQ/Dự toán khảo sát dạng PDF</p>
+  </div>
+
+  <!-- Error box -->
+  <div class="error-box" id="error-box"></div>
+
+  <!-- Status bar -->
+  <div id="status-bar">
+    <span id="status-spinner" class="spinner" style="display:none"></span>
+    <strong>Job:</strong> <span id="job-id-display" style="font-size:0.82rem;color:#666"></span>
+    <span class="pill" id="status-pill"></span>
+    <span id="status-msg" style="font-size:0.85rem;margin-left:0.6rem;color:#444"></span>
+  </div>
+
+  <!-- Draft warning -->
+  <div class="draft-warning" id="draft-warning"></div>
+
+  <!-- Summary cards -->
+  <div class="summary-row" id="summary-row" style="display:none">
+    <div class="summary-card">
+      <div class="label">Tổng hạng mục</div>
+      <div class="value" id="s-total">–</div>
+    </div>
+    <div class="summary-card">
+      <div class="label">Đã định giá</div>
+      <div class="value" id="s-priced">–</div>
+    </div>
+    <div class="summary-card">
+      <div class="label">Chưa định giá</div>
+      <div class="value" id="s-unresolved" style="color:var(--orange)">–</div>
+    </div>
+    <div class="summary-card">
+      <div class="label">Cộng chi phí trực tiếp (đồng)</div>
+      <div class="value" id="s-subtotal">–</div>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="actions-bar" id="actions-bar" style="display:none">
+    <button class="btn btn-success" id="btn-export" onclick="exportXlsx()" disabled>⬇ Tải xuống Excel</button>
+    <button class="btn" onclick="refreshStatus()">🔄 Làm mới</button>
+    <button class="btn btn-danger btn-sm" onclick="resetAll()">✖ Tải file mới</button>
+    <span style="font-size:0.78rem;color:#888" id="export-note"></span>
+  </div>
+
+  <!-- Review table -->
+  <div class="table-wrapper" id="table-wrapper" style="display:none">
+    <table id="review-table">
+      <thead>
+        <tr>
+          <th>TT</th>
+          <th>Nội dung công việc (PDF)</th>
+          <th>Phần</th>
+          <th>Đơn vị PDF</th>
+          <th>Khối lượng</th>
+          <th>Mã định mức</th>
+          <th>Mô tả định mức</th>
+          <th>Đơn giá (đ)</th>
+          <th>Thành tiền (đ)</th>
+          <th>Độ tin cậy</th>
+          <th>Trang</th>
+          <th>Trạng thái</th>
+          <th>Thao tác</th>
+        </tr>
+      </thead>
+      <tbody id="review-body"></tbody>
+    </table>
+  </div>
+
+</main>
+
+<footer>
+  Construction Tender MVP · Dữ liệu thử nghiệm – không dùng cho hồ sơ thầu chính thức
+</footer>
+
+<script>
+const API = '';  // same origin
+
+let currentJobId = null;
+let pollInterval = null;
+let pricingLines = [];
+
+// ---- Drag-and-drop ----
+const uploadZone = document.getElementById('upload-zone');
+uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.style.borderColor = 'var(--primary)'; });
+uploadZone.addEventListener('dragleave', () => { uploadZone.style.borderColor = 'var(--accent)'; });
+uploadZone.addEventListener('drop', e => {
+  e.preventDefault();
+  uploadZone.style.borderColor = 'var(--accent)';
+  const file = e.dataTransfer.files[0];
+  if (file) uploadFile(file);
+});
+
+function handleFileSelect(event) {
+  const file = event.target.files[0];
+  if (file) uploadFile(file);
+}
+
+async function uploadFile(file) {
+  if (!file.name.toLowerCase().endsWith('.pdf')) {
+    showError('Chỉ chấp nhận file PDF.');
+    return;
+  }
+  clearError();
+  resetDisplay();
+
+  const formData = new FormData();
+  formData.append('file', file);
+
+  try {
+    const res = await fetch(`${API}/api/jobs`, { method: 'POST', body: formData });
+    if (!res.ok) {
+      const err = await res.json();
+      showError('Lỗi tải file: ' + (err.detail || res.statusText));
+      return;
+    }
+    const data = await res.json();
+    currentJobId = data.job_id;
+    showStatusBar(data.job_id, data.status);
+    startPolling();
+  } catch (e) {
+    showError('Không thể kết nối tới server: ' + e.message);
+  }
+}
+
+function startPolling() {
+  if (pollInterval) clearInterval(pollInterval);
+  pollInterval = setInterval(refreshStatus, 2000);
+}
+
+async function refreshStatus() {
+  if (!currentJobId) return;
+  try {
+    const res = await fetch(`${API}/api/jobs/${currentJobId}`);
+    if (!res.ok) return;
+    const data = await res.json();
+    showStatusBar(data.job_id, data.status);
+
+    if (['needs_review', 'ready', 'exported', 'failed'].includes(data.status)) {
+      clearInterval(pollInterval);
+      pollInterval = null;
+
+      if (data.status === 'failed') {
+        showError('Pipeline thất bại:\n' + (data.error || 'Lỗi không xác định'));
+        return;
+      }
+
+      if (data.pricing) {
+        renderPricing(data.pricing);
+      }
+    }
+  } catch (e) {
+    // silent
+  }
+}
+
+function showStatusBar(jobId, status) {
+  const bar = document.getElementById('status-bar');
+  bar.style.display = 'block';
+  document.getElementById('job-id-display').textContent = jobId;
+
+  const pill = document.getElementById('status-pill');
+  pill.className = 'pill pill-' + status;
+  pill.textContent = status.toUpperCase().replace('_', ' ');
+
+  const spinner = document.getElementById('status-spinner');
+  const inProgress = ['parsing', 'mapping', 'pricing', 'uploaded'].includes(status);
+  spinner.style.display = inProgress ? 'inline-block' : 'none';
+
+  const msgs = {
+    uploaded: 'Đã tải file, đang chuẩn bị xử lý…',
+    parsing: 'Đang trích xuất cấu trúc PDF…',
+    mapping: 'Đang ánh xạ hạng mục vào định mức…',
+    pricing: 'Đang tính toán đơn giá…',
+    needs_review: 'Cần kiểm tra – có hạng mục chưa xác định.',
+    ready: 'Hoàn thành – sẵn sàng xuất Excel.',
+    exported: 'Đã xuất Excel.',
+    failed: 'Xử lý thất bại.',
+  };
+  document.getElementById('status-msg').textContent = msgs[status] || '';
+}
+
+function renderPricing(ps) {
+  pricingLines = ps.lines;
+
+  // Draft warning
+  const warn = document.getElementById('draft-warning');
+  if (!ps.is_complete) {
+    warn.style.display = 'block';
+    warn.textContent = `⚠ DRAFT – Bảng giá chưa hoàn chỉnh. ${ps.unresolved_count} hạng mục chưa có đơn giá. Không sử dụng tổng cộng làm giá dự thầu chính thức.`;
+  }
+
+  // Summary
+  const lineItems = ps.lines.filter(l => l.status !== 'heading');
+  const priced = lineItems.filter(l => l.status === 'priced' || l.status === 'user_override');
+  document.getElementById('summary-row').style.display = 'flex';
+  document.getElementById('s-total').textContent = lineItems.length;
+  document.getElementById('s-priced').textContent = priced.length;
+  document.getElementById('s-unresolved').textContent = ps.unresolved_count;
+  document.getElementById('s-subtotal').textContent = fmtVnd(ps.subtotal_priced_vnd);
+
+  // Actions
+  document.getElementById('actions-bar').style.display = 'flex';
+  const btnExport = document.getElementById('btn-export');
+  btnExport.disabled = false;
+  if (!ps.is_complete) {
+    document.getElementById('export-note').textContent = '* Excel sẽ được gắn nhãn DRAFT do còn hạng mục chưa định giá.';
+  }
+
+  // Table
+  document.getElementById('table-wrapper').style.display = 'block';
+  const tbody = document.getElementById('review-body');
+  tbody.innerHTML = '';
+
+  let tt = 0;
+  ps.lines.forEach((line, idx) => {
+    const tr = document.createElement('tr');
+
+    if (line.status === 'heading') {
+      tr.className = 'row-heading';
+    } else if (line.status === 'unresolved') {
+      tr.className = 'row-unresolved';
+    } else if (line.status === 'user_override') {
+      tr.className = 'row-override';
+    }
+
+    if (line.status !== 'heading') tt++;
+
+    const badgeMap = {
+      priced: '<span class="badge badge-matched">Đã định giá</span>',
+      unresolved: '<span class="badge badge-unresolved">Chưa định giá</span>',
+      heading: '<span class="badge badge-heading">Tiêu đề</span>',
+      user_override: '<span class="badge badge-override">Điều chỉnh</span>',
+    };
+
+    const confStr = line.confidence ? (line.confidence * 100).toFixed(0) + '%' : '–';
+    const qtyStr = line.quantity !== null && line.quantity !== undefined ? line.quantity : '–';
+    const upStr = line.unit_price !== null && line.unit_price !== undefined ? fmtVnd(line.unit_price) : '–';
+    const exStr = line.extended_amount !== null && line.extended_amount !== undefined ? fmtVnd(line.extended_amount) : (line.status === 'unresolved' ? '<span style="color:var(--red)">Chưa có</span>' : '–');
+
+    tr.innerHTML = `
+      <td class="center">${line.status !== 'heading' ? tt : line.source_section || ''}</td>
+      <td>${esc(line.description_vi)}${line.exception_reason ? '<br><small style="color:#999">' + esc(line.exception_reason) + '</small>' : ''}</td>
+      <td class="center">${esc(line.source_section || '')}</td>
+      <td class="center">${esc(line.unit_pdf || '')}</td>
+      <td class="num">${qtyStr}</td>
+      <td class="center">${esc(line.master_code || '')}</td>
+      <td style="font-size:0.78rem;color:#555">${esc(line.master_description || '')}</td>
+      <td class="num">${upStr}</td>
+      <td class="num">${exStr}</td>
+      <td class="center">${confStr}</td>
+      <td class="center">${line.source_page || '–'}</td>
+      <td class="center">${badgeMap[line.status] || line.status}</td>
+      <td class="center">
+        ${line.status !== 'heading' ? `<button class="btn btn-sm" onclick="toggleOverride('${line.row_id}')">✏ Sửa</button>` : ''}
+      </td>
+    `;
+    tbody.appendChild(tr);
+
+    // Override form row (hidden by default)
+    if (line.status !== 'heading') {
+      const overrideTr = document.createElement('tr');
+      overrideTr.id = 'override-row-' + line.row_id.replace(/[^a-zA-Z0-9_]/g, '_');
+      overrideTr.style.display = 'none';
+      overrideTr.innerHTML = `
+        <td colspan="13">
+          <div class="override-form" style="display:block">
+            <strong>Điều chỉnh hàng: ${esc(line.description_vi.substring(0, 60))}</strong>
+            <label>Đơn giá mới (đồng):</label>
+            <input type="number" id="up-${line.row_id.replace(/[^a-zA-Z0-9_]/g, '_')}" placeholder="Để trống = giữ nguyên" />
+            <label>Khối lượng mới:</label>
+            <input type="number" step="any" id="qty-${line.row_id.replace(/[^a-zA-Z0-9_]/g, '_')}" placeholder="Để trống = giữ nguyên" />
+            <label>Lý do điều chỉnh:</label>
+            <input type="text" id="reason-${line.row_id.replace(/[^a-zA-Z0-9_]/g, '_')}" placeholder="Nhập lý do…" />
+            <button class="btn btn-success btn-sm" style="margin-top:0.5rem" onclick="submitOverride('${line.row_id}')">✔ Xác nhận</button>
+            <button class="btn btn-sm" style="background:#888" onclick="toggleOverride('${line.row_id}')">Huỷ</button>
+          </div>
+        </td>
+      `;
+      tbody.appendChild(overrideTr);
+    }
+  });
+}
+
+function toggleOverride(rowId) {
+  const safe = rowId.replace(/[^a-zA-Z0-9_]/g, '_');
+  const el = document.getElementById('override-row-' + safe);
+  if (el) el.style.display = el.style.display === 'none' ? 'table-row' : 'none';
+}
+
+async function submitOverride(rowId) {
+  const safe = rowId.replace(/[^a-zA-Z0-9_]/g, '_');
+  const upVal = document.getElementById('up-' + safe).value;
+  const qtyVal = document.getElementById('qty-' + safe).value;
+  const reason = document.getElementById('reason-' + safe).value;
+
+  const override = {
+    row_id: rowId,
+    approved: true,
+    override_reason: reason || null,
+  };
+  if (upVal) override.unit_price_override = parseInt(upVal);
+  if (qtyVal) override.quantity_override = qtyVal;
+
+  try {
+    const res = await fetch(`${API}/api/jobs/${currentJobId}/override`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ overrides: [override] }),
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      showError('Lỗi cập nhật: ' + (err.detail || res.statusText));
+      return;
+    }
+    clearError();
+    toggleOverride(rowId);
+    await refreshStatus();
+  } catch (e) {
+    showError('Lỗi kết nối: ' + e.message);
+  }
+}
+
+async function exportXlsx() {
+  if (!currentJobId) return;
+  window.open(`${API}/api/jobs/${currentJobId}/export`, '_blank');
+}
+
+function resetAll() {
+  if (pollInterval) { clearInterval(pollInterval); pollInterval = null; }
+  currentJobId = null;
+  pricingLines = [];
+  document.getElementById('file-input').value = '';
+  resetDisplay();
+  clearError();
+}
+
+function resetDisplay() {
+  document.getElementById('status-bar').style.display = 'none';
+  document.getElementById('draft-warning').style.display = 'none';
+  document.getElementById('summary-row').style.display = 'none';
+  document.getElementById('actions-bar').style.display = 'none';
+  document.getElementById('table-wrapper').style.display = 'none';
+  document.getElementById('review-body').innerHTML = '';
+  document.getElementById('export-note').textContent = '';
+  document.getElementById('btn-export').disabled = true;
+}
+
+function showError(msg) {
+  const el = document.getElementById('error-box');
+  el.style.display = 'block';
+  el.textContent = msg;
+}
+function clearError() {
+  const el = document.getElementById('error-box');
+  el.style.display = 'none';
+  el.textContent = '';
+}
+
+function esc(str) {
+  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function fmtVnd(val) {
+  if (val === null || val === undefined) return '–';
+  return Number(val).toLocaleString('vi-VN');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,426 @@
+{
+  "version": "1.0.0",
+  "source": "DuToan KS CauBinhGoi 2609.21 DuThau.xls (read-only analysis)",
+  "effective_date": "2021-09-26",
+  "tenant_id": "demo-internal",
+  "currency": "VND",
+  "notes": "Seeded from Gía tháng, Đầu vào, Đơn giá chi tiết sheets. Prices in VND per stated unit. Marked UNRESOLVED where the source Excel rule could not be verified.",
+  "unit_rules": [
+    {
+      "from_unit": "100m",
+      "to_unit": "m",
+      "factor": 100,
+      "note": "Multiply quantity by 100 to convert 100m-denominated unit price to per-m basis"
+    },
+    {
+      "from_unit": "100ha",
+      "to_unit": "ha",
+      "factor": 100,
+      "note": "Multiply quantity by 100 to convert 100ha-denominated unit price to per-ha basis"
+    },
+    {
+      "from_unit": "km",
+      "to_unit": "m",
+      "factor": 1000,
+      "note": "1 km = 1000 m"
+    },
+    {
+      "from_unit": "100m2",
+      "to_unit": "m2",
+      "factor": 100
+    }
+  ],
+  "items": [
+    {
+      "id": "MD-001",
+      "code": "KS-101",
+      "description": "Đo đạc bình đồ tỷ lệ 1/500, địa hình đồng bằng",
+      "tags": {
+        "discipline": "survey",
+        "work_type": "topographic_mapping",
+        "scale": "1:500",
+        "terrain": "flat",
+        "condition": null
+      },
+      "unit": "ha",
+      "unit_price": 8200000,
+      "source_sheet": "Đơn giá chi tiết",
+      "resolved": true
+    },
+    {
+      "id": "MD-002",
+      "code": "KS-102",
+      "description": "Đo đạc bình đồ tỷ lệ 1/500, địa hình đồi núi",
+      "tags": {
+        "discipline": "survey",
+        "work_type": "topographic_mapping",
+        "scale": "1:500",
+        "terrain": "hilly",
+        "condition": null
+      },
+      "unit": "ha",
+      "unit_price": 11500000,
+      "source_sheet": "Đơn giá chi tiết",
+      "resolved": true
+    },
+    {
+      "id": "MD-003",
+      "code": "KS-201",
+      "description": "Khoan địa chất công trình đường, đất cấp I-II, độ sâu 0-30m",
+      "tags": {
+        "discipline": "geotechnical",
+        "work_type": "drilling",
+        "context": "road",
+        "soil_class": "I-II",
+        "depth_range": "0-30m",
+        "condition": "on_land"
+      },
+      "unit": "m",
+      "unit_price": 180000,
+      "source_sheet": "Đơn giá chi tiết",
+      "resolved": true
+    },
+    {
+      "id": "MD-004",
+      "code": "KS-202",
+      "description": "Khoan địa chất công trình đường, đá cấp III-IV, độ sâu 0-30m",
+      "tags": {
+        "discipline": "geotechnical",
+        "work_type": "drilling",
+        "context": "road",
+        "soil_class": "III-IV",
+        "depth_range": "0-30m",
+        "condition": "on_land"
+      },
+      "unit": "m",
+      "unit_price": 320000,
+      "source_sheet": "Đơn giá chi tiết",
+      "resolved": true
+    },
+    {
+      "id": "MD-005",
+      "code": "KS-211",
+      "description": "Khoan địa chất công trình cầu, đất cấp I-II, độ sâu 0-30m, trên cạn",
+      "tags": {
+        "discipline": "geotechnical",
+        "work_type": "drilling",
+        "context": "bridge",
+        "soil_class": "I-II",
+        "depth_range": "0-30m",
+        "condition": "on_land"
+      },
+      "unit": "m",
+      "unit_price": 230000,
+      "source_sheet": "Đơn giá chi tiết",
+      "resolved": true
+    },
+    {
+      "id": "MD-006",
+      "code": "KS-212",
+      "description": "Khoan địa chất công trình cầu, đất cấp I-II, độ sâu 0-60m, trên cạn",
+      "tags": {
+        "discipline": "geotechnical",
+        "work_type": "drilling",
+        "context": "bridge",
+        "soil_class": "I-II",
+        "depth_range": "0-60m",
+        "condition": "on_land"
+      },
+      "unit": "m",
+      "unit_price": 265000,
+      "source_sheet": "Đơn giá chi tiết",
+      "resolved": true
+    },
+    {
+      "id": "MD-007",
+      "code": "KS-213",
+      "description": "Khoan địa chất công trình cầu, đất cấp I-II, độ sâu 0-60m, dưới nước",
+      "tags": {
+        "discipline": "geotechnical",
+        "work_type": "drilling",
+        "context": "bridge",
+        "soil_class": "I-II",
+        "depth_range": "0-60m",
+        "condition": "underwater"
+      },
+      "unit": "m",
+      "unit_price": 390000,
+      "source_sheet": "Đơn giá chi tiết",
+      "resolved": true
+    },
+    {
+      "id": "MD-008",
+      "code": "KS-301",
+      "description": "Lấy mẫu đất nguyên dạng",
+      "tags": {
+        "discipline": "geotechnical",
+        "work_type": "sampling",
+        "sample_type": "undisturbed_soil"
+      },
+      "unit": "mẫu",
+      "unit_price": 75000,
+      "source_sheet": "Đơn giá chi tiết",
+      "resolved": true
+    },
+    {
+      "id": "MD-009",
+      "code": "KS-302",
+      "description": "Lấy mẫu đá nguyên dạng",
+      "tags": {
+        "discipline": "geotechnical",
+        "work_type": "sampling",
+        "sample_type": "rock"
+      },
+      "unit": "mẫu",
+      "unit_price": 120000,
+      "source_sheet": "Đơn giá chi tiết",
+      "resolved": true
+    },
+    {
+      "id": "MD-010",
+      "code": "KS-401",
+      "description": "Thí nghiệm đất trong phòng – chỉ tiêu cơ lý cơ bản",
+      "tags": {
+        "discipline": "laboratory",
+        "work_type": "soil_testing",
+        "test_type": "basic_physical_mechanical"
+      },
+      "unit": "mẫu",
+      "unit_price": 850000,
+      "source_sheet": "Đơn giá chi tiết",
+      "resolved": true
+    },
+    {
+      "id": "MD-011",
+      "code": "KS-402",
+      "description": "Thí nghiệm đá trong phòng – chỉ tiêu cơ lý cơ bản",
+      "tags": {
+        "discipline": "laboratory",
+        "work_type": "rock_testing",
+        "test_type": "basic_physical_mechanical"
+      },
+      "unit": "mẫu",
+      "unit_price": 1200000,
+      "source_sheet": "Đơn giá chi tiết",
+      "resolved": true
+    },
+    {
+      "id": "MD-012",
+      "code": "KS-501",
+      "description": "Thí nghiệm SPT trong hố khoan",
+      "tags": {
+        "discipline": "geotechnical",
+        "work_type": "in_situ_testing",
+        "test_type": "SPT"
+      },
+      "unit": "lần",
+      "unit_price": 95000,
+      "source_sheet": "Đơn giá chi tiết",
+      "resolved": true
+    },
+    {
+      "id": "MD-013",
+      "code": "KS-601",
+      "description": "Đo đạc mặt cắt dọc tuyến đường",
+      "tags": {
+        "discipline": "survey",
+        "work_type": "longitudinal_section",
+        "context": "road"
+      },
+      "unit": "km",
+      "unit_price": 3500000,
+      "source_sheet": "Đơn giá chi tiết",
+      "resolved": true
+    },
+    {
+      "id": "MD-014",
+      "code": "KS-602",
+      "description": "Đo đạc mặt cắt ngang tuyến đường, đồng bằng",
+      "tags": {
+        "discipline": "survey",
+        "work_type": "cross_section",
+        "context": "road",
+        "terrain": "flat"
+      },
+      "unit": "km",
+      "unit_price": 4200000,
+      "source_sheet": "Đơn giá chi tiết",
+      "resolved": true
+    },
+    {
+      "id": "MD-015",
+      "code": "KS-603",
+      "description": "Đo đạc mặt cắt ngang tuyến đường, đồi núi",
+      "tags": {
+        "discipline": "survey",
+        "work_type": "cross_section",
+        "context": "road",
+        "terrain": "hilly"
+      },
+      "unit": "km",
+      "unit_price": 6100000,
+      "source_sheet": "Đơn giá chi tiết",
+      "resolved": true
+    },
+    {
+      "id": "MD-016",
+      "code": "KS-701",
+      "description": "Điều tra địa chất dọc tuyến",
+      "tags": {
+        "discipline": "geology",
+        "work_type": "geological_survey",
+        "context": "road"
+      },
+      "unit": "km",
+      "unit_price": 2800000,
+      "source_sheet": "Đơn giá chi tiết",
+      "resolved": true
+    },
+    {
+      "id": "MD-017",
+      "code": "KS-801",
+      "description": "Khảo sát thủy văn công trình cầu",
+      "tags": {
+        "discipline": "hydrology",
+        "work_type": "hydrological_survey",
+        "context": "bridge"
+      },
+      "unit": "công trình",
+      "unit_price": 15000000,
+      "source_sheet": "Đơn giá chi tiết",
+      "resolved": true
+    },
+    {
+      "id": "MD-018",
+      "code": "KS-901",
+      "description": "Lập báo cáo khảo sát địa chất",
+      "tags": {
+        "discipline": "reporting",
+        "work_type": "geotechnical_report"
+      },
+      "unit": "báo cáo",
+      "unit_price": 25000000,
+      "source_sheet": "Đơn giá chi tiết",
+      "resolved": true
+    },
+    {
+      "id": "MD-019",
+      "code": "KS-902",
+      "description": "Lập báo cáo khảo sát địa hình",
+      "tags": {
+        "discipline": "reporting",
+        "work_type": "topographic_report"
+      },
+      "unit": "báo cáo",
+      "unit_price": 18000000,
+      "source_sheet": "Đơn giá chi tiết",
+      "resolved": true
+    },
+    {
+      "id": "MD-020",
+      "code": "KS-203",
+      "description": "Khoan địa chất công trình đường, đất cấp I-II, độ sâu 0-30m, địa hình đồi núi",
+      "tags": {
+        "discipline": "geotechnical",
+        "work_type": "drilling",
+        "context": "road",
+        "soil_class": "I-II",
+        "depth_range": "0-30m",
+        "terrain": "hilly",
+        "condition": "on_land"
+      },
+      "unit": "m",
+      "unit_price": 210000,
+      "source_sheet": "Đơn giá chi tiết",
+      "resolved": true
+    },
+    {
+      "id": "MD-021",
+      "code": "KS-110",
+      "description": "Đo đạc bình đồ tỷ lệ 1/1000, địa hình đồng bằng",
+      "tags": {
+        "discipline": "survey",
+        "work_type": "topographic_mapping",
+        "scale": "1:1000",
+        "terrain": "flat"
+      },
+      "unit": "ha",
+      "unit_price": 5400000,
+      "source_sheet": "Đơn giá chi tiết",
+      "resolved": true
+    },
+    {
+      "id": "MD-022",
+      "code": "KS-111",
+      "description": "Đo đạc bình đồ tỷ lệ 1/2000, địa hình đồng bằng",
+      "tags": {
+        "discipline": "survey",
+        "work_type": "topographic_mapping",
+        "scale": "1:2000",
+        "terrain": "flat"
+      },
+      "unit": "ha",
+      "unit_price": 3100000,
+      "source_sheet": "Đơn giá chi tiết",
+      "resolved": true
+    },
+    {
+      "id": "MD-023",
+      "code": "KS-214",
+      "description": "Khoan địa chất công trình cầu, đá cấp III-IV, độ sâu 0-60m, trên cạn",
+      "tags": {
+        "discipline": "geotechnical",
+        "work_type": "drilling",
+        "context": "bridge",
+        "soil_class": "III-IV",
+        "depth_range": "0-60m",
+        "condition": "on_land"
+      },
+      "unit": "m",
+      "unit_price": 480000,
+      "source_sheet": "Đơn giá chi tiết",
+      "resolved": true
+    },
+    {
+      "id": "MD-024",
+      "code": "KS-502",
+      "description": "Thí nghiệm xuyên tĩnh CPT",
+      "tags": {
+        "discipline": "geotechnical",
+        "work_type": "in_situ_testing",
+        "test_type": "CPT"
+      },
+      "unit": "m",
+      "unit_price": 45000,
+      "source_sheet": "Đơn giá chi tiết",
+      "resolved": true
+    }
+  ],
+  "unresolved_gap_report": [
+    {
+      "item": "Chi phí di chuyển thiết bị khoan (mobilization)",
+      "reason": "No explicit unit rate found in source Excel; typically a lump-sum negotiated separately",
+      "suggested_action": "Request supplier quote or apply standard % of drilling cost"
+    },
+    {
+      "item": "Thí nghiệm nước ngầm (groundwater testing)",
+      "reason": "Sheet 'Đơn giá chi tiết' references thí nghiệm nước but rate not extractable from available analysis",
+      "suggested_action": "Mark UNRESOLVED; add to exceptions list"
+    },
+    {
+      "item": "Cắm cọc tim tuyến (centerline staking)",
+      "reason": "Referenced in PDF context but no matching rate sheet in the 62-sheet workbook analysis",
+      "suggested_action": "Obtain current QCVN/standard rate; mark UNRESOLVED until confirmed"
+    },
+    {
+      "item": "Hệ số điều chỉnh lương (wage adjustment coefficient)",
+      "reason": "Sheet 'Hệ số' contains coefficients dependent on region/period not independently verifiable",
+      "suggested_action": "Use coefficient = 1.0 as conservative default; flag for owner review"
+    },
+    {
+      "item": "VAT / Thuế VAT",
+      "reason": "VAT rate (8% or 10%) not confirmed for contract period",
+      "suggested_action": "Apply 10% as standard; owner to confirm"
+    }
+  ]
+}

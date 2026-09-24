@@ -396,3 +396,58 @@ def test_explicit_approval_and_tender_cost_rules_are_separated_and_coverage_has_
     assert coverage["total_work_items"] == 6
     assert coverage["blocked_work_items"]
     assert coverage["full_project_coverage"] is False
+
+
+def test_approval_uses_contingency_and_tender_excludes_it():
+    engine = CalculationEngineV2()
+    runtime = engine.load_runtime_data()
+
+    approval = engine.calculate_approval_estimate(runtime)
+    tender = engine.calculate_tender_estimate(runtime)
+
+    assert approval["status"] == "INCOMPLETE"
+    assert tender["status"] == "INCOMPLETE"
+    assert approval["category_components"]["topography"]["Gdp"] > Decimal("0")
+    assert abs(approval["category_components"]["topography"]["Gdp"] - (approval["category_components"]["topography"]["Gks"] * Decimal("0.10"))) <= Decimal("0.1")
+    assert tender["tender_total"] < approval["approved_estimate_total"]
+
+
+def test_branch_scoped_mutations_only_affect_the_matching_total():
+    engine = CalculationEngineV2()
+    runtime = engine.load_runtime_data()
+
+    approval_base = engine.calculate_approval_estimate(runtime)
+    tender_base = engine.calculate_tender_estimate(runtime)
+
+    approval_runtime = engine.apply_runtime_mutation(runtime, {"work_item_code": "CF.11620", "approval_rules": {"gdp_rate": "0.20"}})
+    tender_runtime = engine.apply_runtime_mutation(runtime, {"work_item_code": "CF.11620", "tender_rules": {"gtgt_rate": "0.20"}})
+
+    approval_mut = engine.calculate_approval_estimate(approval_runtime)
+    tender_mut = engine.calculate_tender_estimate(tender_runtime)
+
+    assert approval_mut["approved_estimate_total"] != approval_base["approved_estimate_total"]
+    assert tender_mut["tender_total"] == tender_base["tender_total"]
+
+
+def test_unresolved_required_items_mark_totals_incomplete():
+    engine = CalculationEngineV2()
+    runtime = engine.load_runtime_data()
+    runtime["work_item_master"]["CF.11620"]["missing_dependencies"] = ["resource_price:A28.0341"]
+
+    approval = engine.calculate_approval_estimate(runtime)
+    tender = engine.calculate_tender_estimate(runtime)
+
+    assert approval["status"] == "INCOMPLETE"
+    assert tender["status"] == "INCOMPLETE"
+    assert "CF.11620" in approval["blocked_items"]
+    assert "CF.11620" in tender["blocked_items"]
+
+
+def test_coverage_report_never_claims_full_project_parity_for_six_rep_items():
+    engine = CalculationEngineV2()
+    runtime = engine.load_runtime_data()
+
+    coverage = engine.coverage_report(runtime)
+    assert coverage["total_work_items"] == 6
+    assert coverage["approval_project_parity_coverage"] == Decimal("0")
+    assert coverage["full_project_coverage"] is False

@@ -1,14 +1,21 @@
-# Calculation V2 six-item coverage matrix
+# Calculation V2 coverage matrix
 
-| Work item | Category | Recipe resources | Missing dependencies | Provenance status | Direct total | Loaded unit price |
-|---|---|---:|---|---|---:|---:|
-| CF.11620 | topography | 11 | - | accepted | 1967829.3 | 3808696 |
-| CC.21310 | geotechnical_drilling | 13 | - | accepted | 733074.0 | 1414311 |
-| DC.02001 | laboratory | 9 | - | accepted | 357525.0 | 634808 |
-| KS.4/8 | traffic_survey | 1 | labour.UNRESOLVED.KS4_8.LABOUR | blocked | 298700.0 | 584015 |
-| CF.21120 | gmpb_stake | 11 | - | accepted | 1065580.7 | 2045481 |
-| AG.11112 | gmpb_marker | 8 | - | accepted | 1460669.6 | 2919165 |
+## Coverage dimensions
 
-Coverage ratio: 5/6
+- Source coverage: 43/43 lines match code/unit/source cell/price.
+- Direct-cost parity coverage: 5/6 items have direct_total delta = 0.
+- Loaded-price parity coverage: 5/6 items have loaded_unit_price delta = 0.
+- Full project coverage: false (resolved items 5/6; KS.4/8 remains blocked/incomplete).
 
-Snapshot note: Dự thầu!J51 remains a literal snapshot ledger value and is not used as a computed target.
+## Item status
+
+| Work item | Category | Gate status | Missing dependencies | Direct delta | Loaded delta |
+|---|---|---|---|---:|---:|
+| CF.11620 | topography | ACCEPTED | - | 0 | 0 |
+| CC.21310 | geotechnical_drilling | ACCEPTED | - | 0 | 0 |
+| DC.02001 | laboratory | ACCEPTED | - | 0 | 0 |
+| KS.4/8 | traffic_survey | BLOCKED/INCOMPLETE | labour.UNRESOLVED.KS4_8.LABOUR, resource_price:UNRESOLVED.KS4_8.LABOUR | N/A | N/A |
+| CF.21120 | gmpb_stake | ACCEPTED | - | 0 | 0 |
+| AG.11112 | gmpb_marker | ACCEPTED | - | 0 | 0 |
+
+Snapshot note: workbook_expected values are reference snapshots only; runtime totals are recomputed from current norms + price book.

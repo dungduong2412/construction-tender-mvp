@@ -151,7 +151,8 @@
           "source_sheet": "Giá tháng",
           "sheet_ref": "F69",
           "line_total": "5139.0",
-          "classification": "SOURCE_VERIFIED"
+          "classification": "SOURCE_VERIFIED",
+          "coefficient": "1.0000"
         },
         {
           "resource_type": "material",
@@ -163,7 +164,8 @@
           "source_sheet": "Giá tháng",
           "sheet_ref": "F26",
           "line_total": "4500.0",
-          "classification": "SOURCE_VERIFIED"
+          "classification": "SOURCE_VERIFIED",
+          "coefficient": "1.0000"
         },
         {
           "resource_type": "material",
@@ -175,7 +177,8 @@
           "source_sheet": "Giá tháng",
           "sheet_ref": "F12",
           "line_total": "1800.0",
-          "classification": "SOURCE_VERIFIED"
+          "classification": "SOURCE_VERIFIED",
+          "coefficient": "1.0000"
         },
         {
           "resource_type": "material",
@@ -187,7 +190,8 @@
           "source_sheet": "Giá tháng",
           "sheet_ref": "F32",
           "line_total": "2000.0",
-          "classification": "SOURCE_VERIFIED"
+          "classification": "SOURCE_VERIFIED",
+          "coefficient": "1.0000"
         },
         {
           "resource_type": "material",
@@ -199,7 +203,8 @@
           "source_sheet": "Giá tháng",
           "sheet_ref": "F64",
           "line_total": "8962.8",
-          "classification": "SOURCE_VERIFIED"
+          "classification": "SOURCE_VERIFIED",
+          "coefficient": "1.0000"
         },
         {
           "resource_type": "material",
@@ -211,7 +216,8 @@
           "source_sheet": "Giá tháng",
           "sheet_ref": "F58",
           "line_total": "9091.0",
-          "classification": "SOURCE_VERIFIED"
+          "classification": "SOURCE_VERIFIED",
+          "coefficient": "1.0000"
         },
         {
           "resource_type": "material",
@@ -223,7 +229,8 @@
           "source_sheet": "Đơn giá chi tiết",
           "sheet_ref": "H49",
           "line_total": "3149.3",
-          "classification": "FORMULA_DERIVED"
+          "classification": "FORMULA_DERIVED",
+          "coefficient": "1"
         },
         {
           "resource_type": "labour",
@@ -235,7 +242,8 @@
           "source_sheet": "Giá tháng",
           "sheet_ref": "F72",
           "line_total": "521982.8",
-          "classification": "SOURCE_VERIFIED"
+          "classification": "SOURCE_VERIFIED",
+          "coefficient": "0.8500"
         },
         {
           "resource_type": "labour",
@@ -247,7 +255,8 @@
           "source_sheet": "Giá tháng",
           "sheet_ref": "F79",
           "line_total": "1330376.8",
-          "classification": "SOURCE_VERIFIED"
+          "classification": "SOURCE_VERIFIED",
+          "coefficient": "0.8500"
         },
         {
           "resource_type": "machine",
@@ -259,7 +268,8 @@
           "source_sheet": "Giá tháng",
           "sheet_ref": "F87",
           "line_total": "73479.6",
-          "classification": "SOURCE_VERIFIED"
+          "classification": "SOURCE_VERIFIED",
+          "coefficient": "0.8500"
         },
         {
           "resource_type": "machine",
@@ -271,7 +281,8 @@
           "source_sheet": "Đơn giá chi tiết",
           "sheet_ref": "H57",
           "line_total": "7348.0",
-          "classification": "FORMULA_DERIVED"
+          "classification": "FORMULA_DERIVED",
+          "coefficient": "1"
         }
       ],
       "direct_material_total": "34642.1",
@@ -392,7 +403,168 @@
           "rate": "",
           "value": 3808696.0
         }
-      ]
+      ],
+      "work_item_norm": [
+        {
+          "resource_type": "material",
+          "code": "A28.0341",
+          "description": "Xi măng PCB30",
+          "unit": "kg",
+          "norm_quantity": "3.0",
+          "coefficient": "1.0000",
+          "pricing_rule": "PRICE_BOOK",
+          "percent_rate": null,
+          "cached_workbook_line_total": "5139.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F69",
+          "price_code": "A28.0341"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0008",
+          "description": "Đá 1x2",
+          "unit": "m3",
+          "norm_quantity": "0.01",
+          "coefficient": "1.0000",
+          "pricing_rule": "PRICE_BOOK",
+          "percent_rate": null,
+          "cached_workbook_line_total": "4500.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F26",
+          "price_code": "A28.0008"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0089",
+          "description": "Cát vàng (ML<2)",
+          "unit": "m3",
+          "norm_quantity": "0.006",
+          "coefficient": "1.0000",
+          "pricing_rule": "PRICE_BOOK",
+          "percent_rate": null,
+          "cached_workbook_line_total": "1800.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F12",
+          "price_code": "A28.0089"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0026",
+          "description": "Đinh + dây thép",
+          "unit": "kg",
+          "norm_quantity": "0.1",
+          "coefficient": "1.0000",
+          "pricing_rule": "PRICE_BOOK",
+          "percent_rate": null,
+          "cached_workbook_line_total": "2000.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F32",
+          "price_code": "A28.0026"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0296",
+          "description": "Sơn trắng + đỏ",
+          "unit": "kg",
+          "norm_quantity": "0.2",
+          "coefficient": "1.0000",
+          "pricing_rule": "PRICE_BOOK",
+          "percent_rate": null,
+          "cached_workbook_line_total": "8962.8",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F64",
+          "price_code": "A28.0296@CF.11620"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0298",
+          "description": "Sổ đo",
+          "unit": "quyển",
+          "norm_quantity": "1.0",
+          "coefficient": "1.0000",
+          "pricing_rule": "PRICE_BOOK",
+          "percent_rate": null,
+          "cached_workbook_line_total": "9091.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F58",
+          "price_code": "A28.0298"
+        },
+        {
+          "resource_type": "material",
+          "code": "Z999",
+          "description": "Vật liệu khác",
+          "unit": "%",
+          "norm_quantity": "10.0",
+          "coefficient": "1",
+          "pricing_rule": "PCT_MATERIAL_SUBTOTAL",
+          "percent_rate": "10.0",
+          "cached_workbook_line_total": "3149.3",
+          "source_sheet": "Đơn giá chi tiết",
+          "sheet_ref": "H49"
+        },
+        {
+          "resource_type": "labour",
+          "code": "NKS",
+          "description": "Kỹ sư",
+          "unit": "công",
+          "norm_quantity": "1.76",
+          "coefficient": "0.8500",
+          "pricing_rule": "PRICE_BOOK",
+          "percent_rate": null,
+          "cached_workbook_line_total": "521982.8",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F72",
+          "price_code": "NKS"
+        },
+        {
+          "resource_type": "labour",
+          "code": "N3",
+          "description": "Nhân công nhóm 3",
+          "unit": "công",
+          "norm_quantity": "4.39",
+          "coefficient": "0.8500",
+          "pricing_rule": "PRICE_BOOK",
+          "percent_rate": null,
+          "cached_workbook_line_total": "1330376.8",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F79",
+          "price_code": "N3"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M201.0022",
+          "description": "Bộ thiết bị GPS G3100-R2",
+          "unit": "ca",
+          "norm_quantity": "0.16",
+          "coefficient": "0.8500",
+          "pricing_rule": "PRICE_BOOK",
+          "percent_rate": null,
+          "cached_workbook_line_total": "73479.6",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F87",
+          "price_code": "M201.0022"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M999",
+          "description": "Máy khác",
+          "unit": "%",
+          "norm_quantity": "10.0",
+          "coefficient": "1",
+          "pricing_rule": "PCT_MACHINE_SUBTOTAL",
+          "percent_rate": "10.0",
+          "cached_workbook_line_total": "7348.0",
+          "source_sheet": "Đơn giá chi tiết",
+          "sheet_ref": "H57"
+        }
+      ],
+      "hsxl_rules": {
+        "c_rate": "0.6",
+        "c_base": "labour",
+        "tt_rate": "0",
+        "vat_rate": "0.1",
+        "lt_rate": "0.02"
+      }
     },
     "CC.21310": {
       "code": "CC.21310",
@@ -542,7 +714,8 @@
           "source_sheet": "Giá tháng",
           "sheet_ref": "F42",
           "line_total": "8400.0",
-          "classification": "SOURCE_VERIFIED"
+          "classification": "SOURCE_VERIFIED",
+          "coefficient": "1.0000"
         },
         {
           "resource_type": "material",
@@ -554,7 +727,8 @@
           "source_sheet": "Giá tháng",
           "sheet_ref": "F15",
           "line_total": "1020.0",
-          "classification": "SOURCE_VERIFIED"
+          "classification": "SOURCE_VERIFIED",
+          "coefficient": "1.0000"
         },
         {
           "resource_type": "material",
@@ -566,7 +740,8 @@
           "source_sheet": "Giá tháng",
           "sheet_ref": "F27",
           "line_total": "825.0",
-          "classification": "SOURCE_VERIFIED"
+          "classification": "SOURCE_VERIFIED",
+          "coefficient": "1.0000"
         },
         {
           "resource_type": "material",
@@ -578,7 +753,8 @@
           "source_sheet": "Giá tháng",
           "sheet_ref": "F47",
           "line_total": "600.0",
-          "classification": "SOURCE_VERIFIED"
+          "classification": "SOURCE_VERIFIED",
+          "coefficient": "1.0000"
         },
         {
           "resource_type": "material",
@@ -590,7 +766,8 @@
           "source_sheet": "Giá tháng",
           "sheet_ref": "F28",
           "line_total": "400.0",
-          "classification": "SOURCE_VERIFIED"
+          "classification": "SOURCE_VERIFIED",
+          "coefficient": "1.0000"
         },
         {
           "resource_type": "material",
@@ -602,7 +779,8 @@
           "source_sheet": "Giá tháng",
           "sheet_ref": "F50",
           "line_total": "1800.0",
-          "classification": "SOURCE_VERIFIED"
+          "classification": "SOURCE_VERIFIED",
+          "coefficient": "1.0000"
         },
         {
           "resource_type": "material",
@@ -614,7 +792,8 @@
           "source_sheet": "Giá tháng",
           "sheet_ref": "F51",
           "line_total": "140.0",
-          "classification": "SOURCE_VERIFIED"
+          "classification": "SOURCE_VERIFIED",
+          "coefficient": "1.0000"
         },
         {
           "resource_type": "material",
@@ -626,7 +805,8 @@
           "source_sheet": "Giá tháng",
           "sheet_ref": "F37",
           "line_total": "8000.0",
-          "classification": "SOURCE_VERIFIED"
+          "classification": "SOURCE_VERIFIED",
+          "coefficient": "1.0000"
         },
         {
           "resource_type": "material",
@@ -638,7 +818,8 @@
           "source_sheet": "Giá tháng",
           "sheet_ref": "F34",
           "line_total": "14000.0",
-          "classification": "SOURCE_VERIFIED"
+          "classification": "SOURCE_VERIFIED",
+          "coefficient": "1.0000"
         },
         {
           "resource_type": "material",
@@ -650,7 +831,8 @@
           "source_sheet": "Đơn giá chi tiết",
           "sheet_ref": "H205",
           "line_total": "3518.5",
-          "classification": "FORMULA_DERIVED"
+          "classification": "FORMULA_DERIVED",
+          "coefficient": "1"
         },
         {
           "resource_type": "labour",
@@ -662,7 +844,8 @@
           "source_sheet": "Giá tháng",
           "sheet_ref": "F79",
           "line_total": "683941.7",
-          "classification": "SOURCE_VERIFIED"
+          "classification": "SOURCE_VERIFIED",
+          "coefficient": "0.9450"
         },
         {
           "resource_type": "machine",
@@ -674,7 +857,8 @@
           "source_sheet": "Giá tháng",
           "sheet_ref": "F104",
           "line_total": "10224.3",
-          "classification": "SOURCE_VERIFIED"
+          "classification": "SOURCE_VERIFIED",
+          "coefficient": "0.9450"
         },
         {
           "resource_type": "machine",
@@ -686,7 +870,8 @@
           "source_sheet": "Đơn giá chi tiết",
           "sheet_ref": "H211",
           "line_total": "204.5",
-          "classification": "FORMULA_DERIVED"
+          "classification": "FORMULA_DERIVED",
+          "coefficient": "1"
         }
       ],
       "direct_material_total": "38703.5",
@@ -807,7 +992,196 @@
           "rate": "",
           "value": 1414311.0
         }
-      ]
+      ],
+      "work_item_norm": [
+        {
+          "resource_type": "material",
+          "code": "A28.0254",
+          "description": "Mũi khoan hợp kim",
+          "unit": "cái",
+          "norm_quantity": "0.056",
+          "coefficient": "1.0000",
+          "pricing_rule": "PRICE_BOOK",
+          "percent_rate": null,
+          "cached_workbook_line_total": "8400.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F42",
+          "price_code": "A28.0254"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0097",
+          "description": "Cần khoan",
+          "unit": "m",
+          "norm_quantity": "0.017",
+          "coefficient": "1.0000",
+          "pricing_rule": "PRICE_BOOK",
+          "percent_rate": null,
+          "cached_workbook_line_total": "1020.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F15",
+          "price_code": "A28.0097"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0022",
+          "description": "Đầu nối cần",
+          "unit": "bộ",
+          "norm_quantity": "0.0055",
+          "coefficient": "1.0000",
+          "pricing_rule": "PRICE_BOOK",
+          "percent_rate": null,
+          "cached_workbook_line_total": "825.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F27",
+          "price_code": "A28.0022"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0172",
+          "description": "Ống chống",
+          "unit": "m",
+          "norm_quantity": "0.03",
+          "coefficient": "1.0000",
+          "pricing_rule": "PRICE_BOOK",
+          "percent_rate": null,
+          "cached_workbook_line_total": "600.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F47",
+          "price_code": "A28.0172"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0023",
+          "description": "Đầu nối ống chống",
+          "unit": "cái",
+          "norm_quantity": "0.01",
+          "coefficient": "1.0000",
+          "pricing_rule": "PRICE_BOOK",
+          "percent_rate": null,
+          "cached_workbook_line_total": "400.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F28",
+          "price_code": "A28.0023"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0177",
+          "description": "Ống mẫu đơn",
+          "unit": "m",
+          "norm_quantity": "0.04",
+          "coefficient": "1.0000",
+          "pricing_rule": "PRICE_BOOK",
+          "percent_rate": null,
+          "cached_workbook_line_total": "1800.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F50",
+          "price_code": "A28.0177"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0178",
+          "description": "Ống mẫu kép",
+          "unit": "cái",
+          "norm_quantity": "0.002",
+          "coefficient": "1.0000",
+          "pricing_rule": "PRICE_BOOK",
+          "percent_rate": null,
+          "cached_workbook_line_total": "140.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F51",
+          "price_code": "A28.0178"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0216",
+          "description": "Hộp nhựa đựng mẫu",
+          "unit": "cái",
+          "norm_quantity": "0.4",
+          "coefficient": "1.0000",
+          "pricing_rule": "PRICE_BOOK",
+          "percent_rate": null,
+          "cached_workbook_line_total": "8000.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F37",
+          "price_code": "A28.0216"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0192",
+          "description": "Gỗ nhóm V",
+          "unit": "m3",
+          "norm_quantity": "0.0035",
+          "coefficient": "1.0000",
+          "pricing_rule": "PRICE_BOOK",
+          "percent_rate": null,
+          "cached_workbook_line_total": "14000.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F34",
+          "price_code": "A28.0192"
+        },
+        {
+          "resource_type": "material",
+          "code": "Z999",
+          "description": "Vật liệu khác",
+          "unit": "%",
+          "norm_quantity": "10.0",
+          "coefficient": "1",
+          "pricing_rule": "PCT_MATERIAL_SUBTOTAL",
+          "percent_rate": "10.0",
+          "cached_workbook_line_total": "3518.5",
+          "source_sheet": "Đơn giá chi tiết",
+          "sheet_ref": "H205"
+        },
+        {
+          "resource_type": "labour",
+          "code": "N3",
+          "description": "Nhân công nhóm 3",
+          "unit": "công",
+          "norm_quantity": "2.03",
+          "coefficient": "0.9450",
+          "pricing_rule": "PRICE_BOOK",
+          "percent_rate": null,
+          "cached_workbook_line_total": "683941.7",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F79",
+          "price_code": "N3"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M201.0002",
+          "description": "Máy khoan XY - 1A",
+          "unit": "ca",
+          "norm_quantity": "0.1",
+          "coefficient": "0.9450",
+          "pricing_rule": "PRICE_BOOK",
+          "percent_rate": null,
+          "cached_workbook_line_total": "10224.3",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F104",
+          "price_code": "M201.0002"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M999",
+          "description": "Máy khác",
+          "unit": "%",
+          "norm_quantity": "2.0",
+          "coefficient": "1",
+          "pricing_rule": "PCT_MACHINE_SUBTOTAL",
+          "percent_rate": "2.0",
+          "cached_workbook_line_total": "204.5",
+          "source_sheet": "Đơn giá chi tiết",
+          "sheet_ref": "H211"
+        }
+      ],
+      "hsxl_rules": {
+        "c_rate": "0.6",
+        "c_base": "labour",
+        "tt_rate": "0",
+        "vat_rate": "0.1",
+        "lt_rate": "0.02"
+      }
     },
     "DC.02001": {
       "code": "DC.02001",
@@ -933,7 +1307,8 @@
           "source_sheet": "Giá tháng",
           "sheet_ref": "F29",
           "line_total": "29386.4",
-          "classification": "SOURCE_VERIFIED"
+          "classification": "SOURCE_VERIFIED",
+          "coefficient": "1.0000"
         },
         {
           "resource_type": "material",
@@ -945,7 +1320,8 @@
           "source_sheet": "Giá tháng",
           "sheet_ref": "F45",
           "line_total": "8500.0",
-          "classification": "SOURCE_VERIFIED"
+          "classification": "SOURCE_VERIFIED",
+          "coefficient": "1.0000"
         },
         {
           "resource_type": "material",
@@ -957,7 +1333,8 @@
           "source_sheet": "Giá tháng",
           "sheet_ref": "F39",
           "line_total": "1000.0",
-          "classification": "SOURCE_VERIFIED"
+          "classification": "SOURCE_VERIFIED",
+          "coefficient": "1.0000"
         },
         {
           "resource_type": "material",
@@ -969,7 +1346,8 @@
           "source_sheet": "Đơn giá chi tiết",
           "sheet_ref": "H286",
           "line_total": "3888.6",
-          "classification": "FORMULA_DERIVED"
+          "classification": "FORMULA_DERIVED",
+          "coefficient": "1"
         },
         {
           "resource_type": "labour",
@@ -981,7 +1359,8 @@
           "source_sheet": "Giá tháng",
           "sheet_ref": "F82",
           "line_total": "289379.9",
-          "classification": "SOURCE_VERIFIED"
+          "classification": "SOURCE_VERIFIED",
+          "coefficient": "1.0000"
         },
         {
           "resource_type": "machine",
@@ -993,7 +1372,8 @@
           "source_sheet": "Giá tháng",
           "sheet_ref": "F113",
           "line_total": "24114.5",
-          "classification": "SOURCE_VERIFIED"
+          "classification": "SOURCE_VERIFIED",
+          "coefficient": "1.0000"
         },
         {
           "resource_type": "machine",
@@ -1005,7 +1385,8 @@
           "source_sheet": "Giá tháng",
           "sheet_ref": "F103",
           "line_total": "27.9",
-          "classification": "SOURCE_VERIFIED"
+          "classification": "SOURCE_VERIFIED",
+          "coefficient": "1.0014"
         },
         {
           "resource_type": "machine",
@@ -1017,7 +1398,8 @@
           "source_sheet": "Giá tháng",
           "sheet_ref": "F88",
           "line_total": "19.6",
-          "classification": "SOURCE_VERIFIED"
+          "classification": "SOURCE_VERIFIED",
+          "coefficient": "1.0019"
         },
         {
           "resource_type": "machine",
@@ -1029,7 +1411,8 @@
           "source_sheet": "Đơn giá chi tiết",
           "sheet_ref": "H294",
           "line_total": "1208.1",
-          "classification": "FORMULA_DERIVED"
+          "classification": "FORMULA_DERIVED",
+          "coefficient": "1"
         }
       ],
       "direct_material_total": "42775.0",
@@ -1150,7 +1533,139 @@
           "rate": "",
           "value": 634808.0
         }
-      ]
+      ],
+      "work_item_norm": [
+        {
+          "resource_type": "material",
+          "code": "A0001",
+          "description": "Điện năng",
+          "unit": "kWh",
+          "norm_quantity": "17.44",
+          "coefficient": "1.0000",
+          "pricing_rule": "PRICE_BOOK",
+          "percent_rate": null,
+          "cached_workbook_line_total": "29386.4",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F29",
+          "price_code": "A0001"
+        },
+        {
+          "resource_type": "material",
+          "code": "A0008",
+          "description": "Nước cất",
+          "unit": "lít",
+          "norm_quantity": "0.5",
+          "coefficient": "1.0000",
+          "pricing_rule": "PRICE_BOOK",
+          "percent_rate": null,
+          "cached_workbook_line_total": "8500.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F45",
+          "price_code": "A0008"
+        },
+        {
+          "resource_type": "material",
+          "code": "A0044",
+          "description": "Khay men",
+          "unit": "cái",
+          "norm_quantity": "0.05",
+          "coefficient": "1.0000",
+          "pricing_rule": "PRICE_BOOK",
+          "percent_rate": null,
+          "cached_workbook_line_total": "1000.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F39",
+          "price_code": "A0044"
+        },
+        {
+          "resource_type": "material",
+          "code": "Z999",
+          "description": "Vật liệu khác",
+          "unit": "%",
+          "norm_quantity": "10.0",
+          "coefficient": "1",
+          "pricing_rule": "PCT_MATERIAL_SUBTOTAL",
+          "percent_rate": "10.0",
+          "cached_workbook_line_total": "3888.6",
+          "source_sheet": "Đơn giá chi tiết",
+          "sheet_ref": "H286"
+        },
+        {
+          "resource_type": "labour",
+          "code": "N4",
+          "description": "Nhân công nhóm 4",
+          "unit": "công",
+          "norm_quantity": "0.76",
+          "coefficient": "1.0000",
+          "pricing_rule": "PRICE_BOOK",
+          "percent_rate": null,
+          "cached_workbook_line_total": "289379.9",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F82",
+          "price_code": "N4"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M202.0014",
+          "description": "Tủ sấy",
+          "unit": "ca",
+          "norm_quantity": "2.125",
+          "coefficient": "1.0000",
+          "pricing_rule": "PRICE_BOOK",
+          "percent_rate": null,
+          "cached_workbook_line_total": "24114.5",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F113",
+          "price_code": "M202.0014"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M202.0018",
+          "description": "Máy hút ẩm",
+          "unit": "ca",
+          "norm_quantity": "0.003",
+          "coefficient": "1.0014",
+          "pricing_rule": "PRICE_BOOK",
+          "percent_rate": null,
+          "cached_workbook_line_total": "27.9",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F103",
+          "price_code": "M202.0018"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M006",
+          "description": "Cân kỹ thuật",
+          "unit": "ca",
+          "norm_quantity": "0.003",
+          "coefficient": "1.0019",
+          "pricing_rule": "PRICE_BOOK",
+          "percent_rate": null,
+          "cached_workbook_line_total": "19.6",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F88",
+          "price_code": "M006"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M999",
+          "description": "Máy khác",
+          "unit": "%",
+          "norm_quantity": "5.0",
+          "coefficient": "1",
+          "pricing_rule": "PCT_MACHINE_SUBTOTAL",
+          "percent_rate": "5.0",
+          "cached_workbook_line_total": "1208.1",
+          "source_sheet": "Đơn giá chi tiết",
+          "sheet_ref": "H294"
+        }
+      ],
+      "hsxl_rules": {
+        "c_rate": "0.6",
+        "c_base": "labour",
+        "tt_rate": "0",
+        "vat_rate": "0.1"
+      }
     },
     "KS.4/8": {
       "code": "KS.4/8",
@@ -1230,7 +1745,8 @@
           "source_sheet": "Đơn giá chi tiết",
           "sheet_ref": "H683",
           "line_total": "298700.0",
-          "classification": "EXTERNAL_UNRESOLVED"
+          "classification": "EXTERNAL_UNRESOLVED",
+          "coefficient": "1.0000"
         }
       ],
       "direct_material_total": "0",
@@ -1351,7 +1867,29 @@
           "rate": "",
           "value": 584015.0
         }
-      ]
+      ],
+      "work_item_norm": [
+        {
+          "resource_type": "labour",
+          "code": "UNRESOLVED.KS4_8.LABOUR",
+          "description": "Nhân công",
+          "unit": "",
+          "norm_quantity": "1.0",
+          "coefficient": "1.0000",
+          "pricing_rule": "PRICE_BOOK",
+          "percent_rate": null,
+          "cached_workbook_line_total": "298700.0",
+          "source_sheet": "Đơn giá chi tiết",
+          "sheet_ref": "H683"
+        }
+      ],
+      "hsxl_rules": {
+        "c_rate": "0.6",
+        "c_base": "labour",
+        "tt_rate": "1",
+        "vat_rate": "0.08",
+        "lt_rate": "0.02"
+      }
     },
     "CF.21120": {
       "code": "CF.21120",
@@ -1489,7 +2027,8 @@
           "source_sheet": "Giá tháng",
           "sheet_ref": "F69",
           "line_total": "22269.0",
-          "classification": "SOURCE_VERIFIED"
+          "classification": "SOURCE_VERIFIED",
+          "coefficient": "1.0000"
         },
         {
           "resource_type": "material",
@@ -1501,7 +2040,8 @@
           "source_sheet": "Giá tháng",
           "sheet_ref": "F26",
           "line_total": "18000.0",
-          "classification": "SOURCE_VERIFIED"
+          "classification": "SOURCE_VERIFIED",
+          "coefficient": "1.0000"
         },
         {
           "resource_type": "material",
@@ -1513,7 +2053,8 @@
           "source_sheet": "Giá tháng",
           "sheet_ref": "F12",
           "line_total": "7800.0",
-          "classification": "SOURCE_VERIFIED"
+          "classification": "SOURCE_VERIFIED",
+          "coefficient": "1.0000"
         },
         {
           "resource_type": "material",
@@ -1525,7 +2066,8 @@
           "source_sheet": "Giá tháng",
           "sheet_ref": "F32",
           "line_total": "2000.0",
-          "classification": "SOURCE_VERIFIED"
+          "classification": "SOURCE_VERIFIED",
+          "coefficient": "1.0000"
         },
         {
           "resource_type": "material",
@@ -1537,7 +2079,8 @@
           "source_sheet": "Giá tháng",
           "sheet_ref": "F63",
           "line_total": "2.3",
-          "classification": "SOURCE_VERIFIED"
+          "classification": "SOURCE_VERIFIED",
+          "coefficient": "1.0222"
         },
         {
           "resource_type": "material",
@@ -1549,7 +2092,8 @@
           "source_sheet": "Giá tháng",
           "sheet_ref": "F58",
           "line_total": "4545.5",
-          "classification": "SOURCE_VERIFIED"
+          "classification": "SOURCE_VERIFIED",
+          "coefficient": "1.0000"
         },
         {
           "resource_type": "material",
@@ -1561,7 +2105,8 @@
           "source_sheet": "Đơn giá chi tiết",
           "sheet_ref": "H708",
           "line_total": "5461.7",
-          "classification": "FORMULA_DERIVED"
+          "classification": "FORMULA_DERIVED",
+          "coefficient": "1"
         },
         {
           "resource_type": "labour",
@@ -1573,7 +2118,8 @@
           "source_sheet": "Giá tháng",
           "sheet_ref": "F72",
           "line_total": "275646.0",
-          "classification": "SOURCE_VERIFIED"
+          "classification": "SOURCE_VERIFIED",
+          "coefficient": "1.0000"
         },
         {
           "resource_type": "labour",
@@ -1585,7 +2131,8 @@
           "source_sheet": "Giá tháng",
           "sheet_ref": "F79",
           "line_total": "702356.2",
-          "classification": "SOURCE_VERIFIED"
+          "classification": "SOURCE_VERIFIED",
+          "coefficient": "1.0000"
         },
         {
           "resource_type": "machine",
@@ -1597,7 +2144,8 @@
           "source_sheet": "Giá tháng",
           "sheet_ref": "F108",
           "line_total": "25000.0",
-          "classification": "SOURCE_VERIFIED"
+          "classification": "SOURCE_VERIFIED",
+          "coefficient": "1.0000"
         },
         {
           "resource_type": "machine",
@@ -1609,7 +2157,8 @@
           "source_sheet": "Đơn giá chi tiết",
           "sheet_ref": "H716",
           "line_total": "2500.0",
-          "classification": "FORMULA_DERIVED"
+          "classification": "FORMULA_DERIVED",
+          "coefficient": "1"
         }
       ],
       "direct_material_total": "60078.5",
@@ -1730,7 +2279,168 @@
           "rate": "",
           "value": 2045481.0
         }
-      ]
+      ],
+      "work_item_norm": [
+        {
+          "resource_type": "material",
+          "code": "A28.0341",
+          "description": "Xi măng PCB30",
+          "unit": "kg",
+          "norm_quantity": "13.0",
+          "coefficient": "1.0000",
+          "pricing_rule": "PRICE_BOOK",
+          "percent_rate": null,
+          "cached_workbook_line_total": "22269.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F69",
+          "price_code": "A28.0341"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0008",
+          "description": "Đá 1x2",
+          "unit": "m3",
+          "norm_quantity": "0.04",
+          "coefficient": "1.0000",
+          "pricing_rule": "PRICE_BOOK",
+          "percent_rate": null,
+          "cached_workbook_line_total": "18000.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F26",
+          "price_code": "A28.0008"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0089",
+          "description": "Cát vàng (ML<2)",
+          "unit": "m3",
+          "norm_quantity": "0.026",
+          "coefficient": "1.0000",
+          "pricing_rule": "PRICE_BOOK",
+          "percent_rate": null,
+          "cached_workbook_line_total": "7800.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F12",
+          "price_code": "A28.0089"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0026",
+          "description": "Đinh + dây thép",
+          "unit": "kg",
+          "norm_quantity": "0.1",
+          "coefficient": "1.0000",
+          "pricing_rule": "PRICE_BOOK",
+          "percent_rate": null,
+          "cached_workbook_line_total": "2000.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F32",
+          "price_code": "A28.0026"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0296",
+          "description": "Sơn trắng + đỏ",
+          "unit": "kg",
+          "norm_quantity": "0.05",
+          "coefficient": "1.0222",
+          "pricing_rule": "PRICE_BOOK",
+          "percent_rate": null,
+          "cached_workbook_line_total": "2.3",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F63",
+          "price_code": "A28.0296@CF.21120"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0298",
+          "description": "Sổ đo",
+          "unit": "quyển",
+          "norm_quantity": "0.5",
+          "coefficient": "1.0000",
+          "pricing_rule": "PRICE_BOOK",
+          "percent_rate": null,
+          "cached_workbook_line_total": "4545.5",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F58",
+          "price_code": "A28.0298"
+        },
+        {
+          "resource_type": "material",
+          "code": "Z999",
+          "description": "Vật liệu khác",
+          "unit": "%",
+          "norm_quantity": "10.0",
+          "coefficient": "1",
+          "pricing_rule": "PCT_MATERIAL_SUBTOTAL",
+          "percent_rate": "10.0",
+          "cached_workbook_line_total": "5461.7",
+          "source_sheet": "Đơn giá chi tiết",
+          "sheet_ref": "H708"
+        },
+        {
+          "resource_type": "labour",
+          "code": "NKS",
+          "description": "Kỹ sư",
+          "unit": "công",
+          "norm_quantity": "0.79",
+          "coefficient": "1.0000",
+          "pricing_rule": "PRICE_BOOK",
+          "percent_rate": null,
+          "cached_workbook_line_total": "275646.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F72",
+          "price_code": "NKS"
+        },
+        {
+          "resource_type": "labour",
+          "code": "N3",
+          "description": "Nhân công nhóm 3",
+          "unit": "công",
+          "norm_quantity": "1.97",
+          "coefficient": "1.0000",
+          "pricing_rule": "PRICE_BOOK",
+          "percent_rate": null,
+          "cached_workbook_line_total": "702356.2",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F79",
+          "price_code": "N3"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M201.0021",
+          "description": "Máy toàn đạc điện tử",
+          "unit": "ca",
+          "norm_quantity": "0.17",
+          "coefficient": "1.0000",
+          "pricing_rule": "PRICE_BOOK",
+          "percent_rate": null,
+          "cached_workbook_line_total": "25000.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F108",
+          "price_code": "M201.0021"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M999",
+          "description": "Máy khác",
+          "unit": "%",
+          "norm_quantity": "10.0",
+          "coefficient": "1",
+          "pricing_rule": "PCT_MACHINE_SUBTOTAL",
+          "percent_rate": "10.0",
+          "cached_workbook_line_total": "2500.0",
+          "source_sheet": "Đơn giá chi tiết",
+          "sheet_ref": "H716"
+        }
+      ],
+      "hsxl_rules": {
+        "c_rate": "0.6",
+        "c_base": "labour",
+        "tt_rate": "0.03",
+        "vat_rate": "0.08",
+        "lt_rate": "0.02"
+      }
     },
     "AG.11112": {
       "code": "AG.11112",
@@ -1850,7 +2560,8 @@
           "source_sheet": "Giá tháng",
           "sheet_ref": "F70",
           "line_total": "292065.2",
-          "classification": "SOURCE_VERIFIED"
+          "classification": "SOURCE_VERIFIED",
+          "coefficient": "1.0000"
         },
         {
           "resource_type": "material",
@@ -1862,7 +2573,8 @@
           "source_sheet": "Giá tháng",
           "sheet_ref": "F13",
           "line_total": "214368.0",
-          "classification": "SOURCE_VERIFIED"
+          "classification": "SOURCE_VERIFIED",
+          "coefficient": "1.0000"
         },
         {
           "resource_type": "material",
@@ -1874,7 +2586,8 @@
           "source_sheet": "Giá tháng",
           "sheet_ref": "F25",
           "line_total": "468554.5",
-          "classification": "SOURCE_VERIFIED"
+          "classification": "SOURCE_VERIFIED",
+          "coefficient": "1.0000"
         },
         {
           "resource_type": "material",
@@ -1886,7 +2599,8 @@
           "source_sheet": "Giá tháng",
           "sheet_ref": "F44",
           "line_total": "1857.5",
-          "classification": "SOURCE_VERIFIED"
+          "classification": "SOURCE_VERIFIED",
+          "coefficient": "1.0000"
         },
         {
           "resource_type": "material",
@@ -1898,7 +2612,8 @@
           "source_sheet": "Đơn giá chi tiết",
           "sheet_ref": "H749",
           "line_total": "4884.2",
-          "classification": "FORMULA_DERIVED"
+          "classification": "FORMULA_DERIVED",
+          "coefficient": "1"
         },
         {
           "resource_type": "labour",
@@ -1910,7 +2625,8 @@
           "source_sheet": "Giá tháng",
           "sheet_ref": "F75",
           "line_total": "364303.6",
-          "classification": "SOURCE_VERIFIED"
+          "classification": "SOURCE_VERIFIED",
+          "coefficient": "1.0000"
         },
         {
           "resource_type": "machine",
@@ -1922,7 +2638,8 @@
           "source_sheet": "Giá tháng",
           "sheet_ref": "F110",
           "line_total": "42428.0",
-          "classification": "SOURCE_VERIFIED"
+          "classification": "SOURCE_VERIFIED",
+          "coefficient": "1.0000"
         },
         {
           "resource_type": "machine",
@@ -1934,7 +2651,8 @@
           "source_sheet": "Giá tháng",
           "sheet_ref": "F100",
           "line_total": "72208.6",
-          "classification": "SOURCE_VERIFIED"
+          "classification": "SOURCE_VERIFIED",
+          "coefficient": "1.0000"
         }
       ],
       "direct_material_total": "981729.4",
@@ -2055,7 +2773,314 @@
           "rate": "",
           "value": 2919165.0
         }
-      ]
+      ],
+      "work_item_norm": [
+        {
+          "resource_type": "material",
+          "code": "A24.0796A",
+          "description": "Xi măng PCB40",
+          "unit": "kg",
+          "norm_quantity": "262.885",
+          "coefficient": "1.0000",
+          "pricing_rule": "PRICE_BOOK",
+          "percent_rate": null,
+          "cached_workbook_line_total": "292065.2",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F70",
+          "price_code": "A24.0796A"
+        },
+        {
+          "resource_type": "material",
+          "code": "A24.0180",
+          "description": "Cát vàng (ML>2)",
+          "unit": "m3",
+          "norm_quantity": "0.53592",
+          "coefficient": "1.0000",
+          "pricing_rule": "PRICE_BOOK",
+          "percent_rate": null,
+          "cached_workbook_line_total": "214368.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F13",
+          "price_code": "A24.0180"
+        },
+        {
+          "resource_type": "material",
+          "code": "A24.0008",
+          "description": "Đá 1x2",
+          "unit": "m3",
+          "norm_quantity": "0.884065",
+          "coefficient": "1.0000",
+          "pricing_rule": "PRICE_BOOK",
+          "percent_rate": null,
+          "cached_workbook_line_total": "468554.5",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F25",
+          "price_code": "A24.0008"
+        },
+        {
+          "resource_type": "material",
+          "code": "A24.0524",
+          "description": "Nước",
+          "unit": "lít",
+          "norm_quantity": "185.745",
+          "coefficient": "1.0000",
+          "pricing_rule": "PRICE_BOOK",
+          "percent_rate": null,
+          "cached_workbook_line_total": "1857.5",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F44",
+          "price_code": "A24.0524"
+        },
+        {
+          "resource_type": "material",
+          "code": "Z999",
+          "description": "Vât liệu khác",
+          "unit": "%",
+          "norm_quantity": "0.5",
+          "coefficient": "1",
+          "pricing_rule": "PCT_MATERIAL_SUBTOTAL",
+          "percent_rate": "0.5",
+          "cached_workbook_line_total": "4884.2",
+          "source_sheet": "Đơn giá chi tiết",
+          "sheet_ref": "H749"
+        },
+        {
+          "resource_type": "labour",
+          "code": "N2.30",
+          "description": "Nhân công 3,0/7 - Nhóm 2",
+          "unit": "công",
+          "norm_quantity": "1.37",
+          "coefficient": "1.0000",
+          "pricing_rule": "PRICE_BOOK",
+          "percent_rate": null,
+          "cached_workbook_line_total": "364303.6",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F75",
+          "price_code": "N2.30"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M104.0102",
+          "description": "Máy trộn 250l",
+          "unit": "ca",
+          "norm_quantity": "0.095",
+          "coefficient": "1.0000",
+          "pricing_rule": "PRICE_BOOK",
+          "percent_rate": null,
+          "cached_workbook_line_total": "42428.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F110",
+          "price_code": "M104.0102"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M112.1301",
+          "description": "Máy đầm dùi 1,5 KW",
+          "unit": "ca",
+          "norm_quantity": "0.18",
+          "coefficient": "1.0000",
+          "pricing_rule": "PRICE_BOOK",
+          "percent_rate": null,
+          "cached_workbook_line_total": "72208.6",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F100",
+          "price_code": "M112.1301"
+        }
+      ],
+      "hsxl_rules": {
+        "c_rate": "0.6",
+        "c_base": "T",
+        "tt_rate": "0.03",
+        "vat_rate": "0.08",
+        "lt_rate": "0.02"
+      }
     }
+  },
+  "resource_price_book": {
+    "A28.0341": {
+      "unit_price": "1713.0",
+      "source_sheet": "Giá tháng",
+      "sheet_ref": "F69"
+    },
+    "A28.0008": {
+      "unit_price": "450000.0",
+      "source_sheet": "Giá tháng",
+      "sheet_ref": "F26"
+    },
+    "A28.0089": {
+      "unit_price": "300000.0",
+      "source_sheet": "Giá tháng",
+      "sheet_ref": "F12"
+    },
+    "A28.0026": {
+      "unit_price": "20000.0",
+      "source_sheet": "Giá tháng",
+      "sheet_ref": "F32"
+    },
+    "A28.0296": {
+      "unit_price": "44814.0",
+      "source_sheet": "Giá tháng",
+      "sheet_ref": "F64"
+    },
+    "A28.0298": {
+      "unit_price": "9091.0",
+      "source_sheet": "Giá tháng",
+      "sheet_ref": "F58"
+    },
+    "NKS": {
+      "unit_price": "348919.0",
+      "source_sheet": "Giá tháng",
+      "sheet_ref": "F72"
+    },
+    "N3": {
+      "unit_price": "356526.0",
+      "source_sheet": "Giá tháng",
+      "sheet_ref": "F79"
+    },
+    "M201.0022": {
+      "unit_price": "540291.0",
+      "source_sheet": "Giá tháng",
+      "sheet_ref": "F87"
+    },
+    "A28.0254": {
+      "unit_price": "150000.0",
+      "source_sheet": "Giá tháng",
+      "sheet_ref": "F42"
+    },
+    "A28.0097": {
+      "unit_price": "60000.0",
+      "source_sheet": "Giá tháng",
+      "sheet_ref": "F15"
+    },
+    "A28.0022": {
+      "unit_price": "150000.0",
+      "source_sheet": "Giá tháng",
+      "sheet_ref": "F27"
+    },
+    "A28.0172": {
+      "unit_price": "20000.0",
+      "source_sheet": "Giá tháng",
+      "sheet_ref": "F47"
+    },
+    "A28.0023": {
+      "unit_price": "40000.0",
+      "source_sheet": "Giá tháng",
+      "sheet_ref": "F28"
+    },
+    "A28.0177": {
+      "unit_price": "45000.0",
+      "source_sheet": "Giá tháng",
+      "sheet_ref": "F50"
+    },
+    "A28.0178": {
+      "unit_price": "70000.0",
+      "source_sheet": "Giá tháng",
+      "sheet_ref": "F51"
+    },
+    "A28.0216": {
+      "unit_price": "20000.0",
+      "source_sheet": "Giá tháng",
+      "sheet_ref": "F37"
+    },
+    "A28.0192": {
+      "unit_price": "4000000.0",
+      "source_sheet": "Giá tháng",
+      "sheet_ref": "F34"
+    },
+    "M201.0002": {
+      "unit_price": "108194.0",
+      "source_sheet": "Giá tháng",
+      "sheet_ref": "F104"
+    },
+    "A0001": {
+      "unit_price": "1685.0",
+      "source_sheet": "Giá tháng",
+      "sheet_ref": "F29"
+    },
+    "A0008": {
+      "unit_price": "17000.0",
+      "source_sheet": "Giá tháng",
+      "sheet_ref": "F45"
+    },
+    "A0044": {
+      "unit_price": "20000.0",
+      "source_sheet": "Giá tháng",
+      "sheet_ref": "F39"
+    },
+    "N4": {
+      "unit_price": "380763.0",
+      "source_sheet": "Giá tháng",
+      "sheet_ref": "F82"
+    },
+    "M202.0014": {
+      "unit_price": "11348.0",
+      "source_sheet": "Giá tháng",
+      "sheet_ref": "F113"
+    },
+    "M202.0018": {
+      "unit_price": "9287.0",
+      "source_sheet": "Giá tháng",
+      "sheet_ref": "F103"
+    },
+    "M006": {
+      "unit_price": "6521.0",
+      "source_sheet": "Giá tháng",
+      "sheet_ref": "F88"
+    },
+    "M201.0021": {
+      "unit_price": "147059.0",
+      "source_sheet": "Giá tháng",
+      "sheet_ref": "F108"
+    },
+    "A24.0796A": {
+      "unit_price": "1111.0",
+      "source_sheet": "Giá tháng",
+      "sheet_ref": "F70"
+    },
+    "A24.0180": {
+      "unit_price": "400000.0",
+      "source_sheet": "Giá tháng",
+      "sheet_ref": "F13"
+    },
+    "A24.0008": {
+      "unit_price": "530000.0",
+      "source_sheet": "Giá tháng",
+      "sheet_ref": "F25"
+    },
+    "A24.0524": {
+      "unit_price": "10.0",
+      "source_sheet": "Giá tháng",
+      "sheet_ref": "F44"
+    },
+    "N2.30": {
+      "unit_price": "265915.0",
+      "source_sheet": "Giá tháng",
+      "sheet_ref": "F75"
+    },
+    "M104.0102": {
+      "unit_price": "446610.0",
+      "source_sheet": "Giá tháng",
+      "sheet_ref": "F110"
+    },
+    "M112.1301": {
+      "unit_price": "401159.0",
+      "source_sheet": "Giá tháng",
+      "sheet_ref": "F100"
+    },
+    "A28.0296@CF.11620": {
+      "unit_price": "44814.0",
+      "source_sheet": "Giá tháng",
+      "sheet_ref": "F64"
+    },
+    "A28.0296@CF.21120": {
+      "unit_price": "45.0",
+      "source_sheet": "Giá tháng",
+      "sheet_ref": "F63"
+    }
+  },
+  "resource_price_book_meta": {
+    "version": "workbook_v2_2026_09_24",
+    "note": "Versioned resource prices extracted from workbook sources; used for dynamic recomputation.",
+    "conflict_policy": "code-level conflicts split into item-specific price_code; shared cement remains common code"
   }
 }

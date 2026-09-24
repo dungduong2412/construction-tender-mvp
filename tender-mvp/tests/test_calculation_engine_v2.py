@@ -37,10 +37,10 @@ EXPECTED_RUNTIME_ITEMS = {
     },
     "KS.4/8": {
         "direct_material_total": Decimal("0.0"),
-        "direct_labour_total": Decimal("298700.0"),
+        "direct_labour_total": Decimal("0.0"),
         "direct_machine_total": Decimal("0.0"),
-        "direct_total": Decimal("298700.0"),
-        "loaded_unit_price": Decimal("584015"),
+        "direct_total": None,
+        "loaded_unit_price": None,
         "provenance_status": "blocked",
     },
     "CF.21120": {
@@ -186,17 +186,25 @@ def test_runtime_data_model_resolves_all_audited_items_and_coverage_report():
         assert result["direct_total"] == expected["direct_total"]
         assert result["loaded_unit_price"] == expected["loaded_unit_price"]
         if code == "KS.4/8":
-            assert result["missing_dependencies"] == ["labour.UNRESOLVED.KS4_8.LABOUR"]
+            assert result["calculation_status"] == "blocked"
+        else:
+            assert result["calculation_status"] == "resolved"
+        if code == "KS.4/8":
+            assert any(dep.endswith("UNRESOLVED.KS4_8.LABOUR") for dep in result["missing_dependencies"])
+            assert result["direct_total_parity"] is None
+            assert result["loaded_unit_price_parity"] is None
         else:
             assert result["missing_dependencies"] == []
-        assert result["loaded_unit_price_parity"] == Decimal("0")
-        assert result["components"]["T"] == expected["direct_total"]
+            assert result["direct_total_parity"] == Decimal("0")
+            assert result["loaded_unit_price_parity"] == Decimal("0")
+            assert result["components"]["T"] == expected["direct_total"]
 
     coverage = engine.coverage_report(runtime)
     assert coverage["resolved_items"] == 5
     assert coverage["item_count"] == 6
     assert coverage["snapshot_is_unlinked_literal"] is True
-    assert "KS.4/8:labour.UNRESOLVED.KS4_8.LABOUR" in coverage["missing_dependencies"]
+    assert any(entry.startswith("KS.4/8:") and entry.endswith("UNRESOLVED.KS4_8.LABOUR") for entry in coverage["missing_dependencies"])
+    assert coverage["full_project_coverage"] is False
 
 
 def test_cf_11620_source_provenance_and_runtime_mutation_gate():
@@ -265,3 +273,93 @@ def test_runtime_mutations_preserve_unaffected_components_on_other_items():
         assert mac_mut["direct_machine_total"] > baseline["direct_machine_total"]
         assert mac_mut["direct_material_total"] == baseline["direct_material_total"]
         assert mac_mut["direct_labour_total"] == baseline["direct_labour_total"]
+
+
+def test_shared_cement_price_change_recalculates_cf11620_and_cf21120_only():
+    engine = CalculationEngineV2()
+    runtime = engine.load_runtime_data()
+
+    cf_base = engine.calculate_work_item_from_runtime("CF.11620", runtime)
+    cf21120_base = engine.calculate_work_item_from_runtime("CF.21120", runtime)
+    cc_base = engine.calculate_work_item_from_runtime("CC.21310", runtime)
+
+    # Keep recipes and cached workbook expected values untouched; mutate only price-book cement.
+    mutated = engine.apply_runtime_mutation(
+        runtime,
+        {
+            "work_item_code": "CF.11620",
+            "resource_price_updates": {"A28.0341": "2000"},
+        },
+    )
+
+    cf_mut = engine.calculate_work_item_from_runtime("CF.11620", mutated)
+    cf21120_mut = engine.calculate_work_item_from_runtime("CF.21120", mutated)
+    cc_mut = engine.calculate_work_item_from_runtime("CC.21310", mutated)
+
+    assert cf_mut["loaded_unit_price"] != cf_base["loaded_unit_price"]
+    assert cf21120_mut["loaded_unit_price"] != cf21120_base["loaded_unit_price"]
+    assert cc_mut["loaded_unit_price"] == cc_base["loaded_unit_price"]
+
+    base_recipe = runtime["work_item_master"]["CF.11620"]["resource_recipe"]
+    mutated_recipe = mutated["work_item_master"]["CF.11620"]["resource_recipe"]
+    assert base_recipe == mutated_recipe
+
+
+def test_project_quantity_changes_extension_not_unit_price():
+    engine = CalculationEngineV2()
+    runtime = engine.load_runtime_data()
+
+    base = engine.calculate_work_item_from_runtime("CF.11620", runtime)
+    mutated_runtime = engine.apply_runtime_mutation(runtime, {"work_item_code": "CF.11620", "quantity": 10})
+    mutated = engine.calculate_work_item_from_runtime("CF.11620", mutated_runtime)
+
+    assert mutated["loaded_unit_price"] == base["loaded_unit_price"]
+
+    base_tender = engine.calculate_tender_estimate(runtime)
+    mut_tender = engine.calculate_tender_estimate(mutated_runtime)
+    assert mut_tender["tender_total"] != base_tender["tender_total"]
+
+
+def test_hsxl_edits_change_component_bases_not_generic_multiplier():
+    engine = CalculationEngineV2()
+    runtime = engine.load_runtime_data()
+
+    base = engine.calculate_work_item_from_runtime("CF.11620", runtime)
+    mutated_runtime = engine.apply_runtime_mutation(
+        runtime,
+        {
+            "work_item_code": "CF.11620",
+            "hsxl_rules": {"c_rate": "0.66"},
+        },
+    )
+    mutated = engine.calculate_work_item_from_runtime("CF.11620", mutated_runtime)
+
+    assert mutated["direct_total"] == base["direct_total"]
+    assert mutated["components"]["C"] > base["components"]["C"]
+    assert mutated["loaded_unit_price"] > base["loaded_unit_price"]
+
+
+def test_aggregate_first_approval_and_unit_first_tender_use_fresh_calculations():
+    engine = CalculationEngineV2()
+    runtime = engine.load_runtime_data()
+
+    approval = engine.calculate_approval_estimate(runtime)
+    tender = engine.calculate_tender_estimate(runtime)
+
+    assert approval["approved_estimate_total"] > Decimal("0")
+    assert tender["tender_total"] > Decimal("0")
+    assert "KS.4/8" in approval["blocked_items"]
+    assert "KS.4/8" in tender["blocked_items"]
+
+    mutated_runtime = engine.apply_runtime_mutation(
+        runtime,
+        {
+            "work_item_code": "CF.11620",
+            "resource_price_updates": {"A28.0341": "2200"},
+        },
+    )
+    approval_mut = engine.calculate_approval_estimate(mutated_runtime)
+    tender_mut = engine.calculate_tender_estimate(mutated_runtime)
+
+    assert approval_mut["approved_estimate_total"] != approval["approved_estimate_total"]
+    assert tender_mut["tender_total"] != tender["tender_total"]

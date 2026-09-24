@@ -1,48 +1,33 @@
-# DC.02001 source-provenance and dynamic-calculation gate
+# DC.02001 acceptance gate
 
-Status: accepted
+Status: ACCEPTED
 
-## Provenance summary
+## Architecture checks
 
-| Element | Value | Source | Classification |
-|---|---:|---|---|
-| material.A0001 | 29386.4 | Đơn giá chi tiết!H283 | SOURCE_VERIFIED |
-| material.A0008 | 8500.0 | Đơn giá chi tiết!H284 | SOURCE_VERIFIED |
-| material.A0044 | 1000.0 | Đơn giá chi tiết!H285 | SOURCE_VERIFIED |
-| material.Z999 | 3888.6 | Đơn giá chi tiết!H286 | FORMULA_DERIVED |
-| labour.N4 | 289379.9 | Đơn giá chi tiết!H289 | SOURCE_VERIFIED |
-| machine.M202.0014 | 24114.5 | Đơn giá chi tiết!H291 | SOURCE_VERIFIED |
-| machine.M202.0018 | 27.9 | Đơn giá chi tiết!H292 | SOURCE_VERIFIED |
-| machine.M006 | 19.6 | Đơn giá chi tiết!H293 | SOURCE_VERIFIED |
-| machine.M999 | 1208.1 | Đơn giá chi tiết!H294 | FORMULA_DERIVED |
-| material_total | 42775.0 | Đơn giá chi tiết!H591 | SOURCE_VERIFIED |
-| labour_total | 289379.9 | Đơn giá chi tiết!H593 | SOURCE_VERIFIED |
-| machine_total | 25370.1 | Đơn giá chi tiết!H599 | SOURCE_VERIFIED |
-| direct_total | 357525.0 | Chiết tính!H600 | SOURCE_VERIFIED |
-| loaded_unit_price | 634808.0 | Chiết tính!H615 | SOURCE_VERIFIED |
-| rounding.price_rounding | 1 | Đầu vào!D39 | SOURCE_VERIFIED |
-| rounding.total_rounding | 0 | Đầu vào!D41 | SOURCE_VERIFIED |
+- Runtime is recomputed from work_item_norm and resource_price_book (no stored direct/loaded totals in compute path).
+- Delta is computed as independent runtime result minus workbook_expected snapshot.
+- Price source check validates price code, source cell, and unit alignment per resource line.
 
-## Cell-level parity
+## Independent parity
 
-| Stage | Runtime | Workbook | Delta |
+| Metric | Runtime | Workbook expected | Delta (runtime - workbook) |
 |---|---:|---:|---:|
-| Direct material | 42775.0 | 42775.0 | 0.0 |
-| Direct labour | 289379.9 | 289379.9 | 0.0 |
-| Direct machine | 25370.1 | 25370.1 | 0.0 |
+| Direct total | 357525 | 357525 | 0 |
 | Loaded unit price | 634808 | 634808 | 0 |
 
-## Mutation gate
+## Source verification
 
-| Mutation | Loaded unit price | Notes |
-|---|---:|---|
-| Baseline | 634808 | Baseline runtime |
-| Material +10% | 639920 | Material path changed |
-| Labour +10% | 690144 | Labour path changed |
-| Machine +10% | 637840 | Machine path changed |
-| Quantity mutation | 634808 | Quantity set to 10 in gate |
-| HSXL x1.10 | 698289 | HSXL coefficient scaling |
+| Resource code | Unit | Price in price book | Price cell (price book) | Price cell (recipe) | Check |
+|---|---|---:|---|---|---|
+| A0001 | kWh | 1685 | Giá tháng!F29 | Giá tháng!F29 | MATCH |
+| A0008 | lít | 17000 | Giá tháng!F45 | Giá tháng!F45 | MATCH |
+| A0044 | cái | 20000 | Giá tháng!F39 | Giá tháng!F39 | MATCH |
+| N4 | công | 380763 | Giá tháng!F82 | Giá tháng!F82 | MATCH |
+| M202.0014 | ca | 11348 | Giá tháng!F113 | Giá tháng!F113 | MATCH |
+| M202.0018 | ca | 9287 | Giá tháng!F103 | Giá tháng!F103 | MATCH |
+| M006 | ca | 6521 | Giá tháng!F88 | Giá tháng!F88 | MATCH |
 
 ## Missing dependencies
 
-- []
+- none
+

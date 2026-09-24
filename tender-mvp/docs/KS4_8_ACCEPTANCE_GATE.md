@@ -1,40 +1,33 @@
-# KS.4/8 source-provenance and dynamic-calculation gate
+# KS.4/8 acceptance gate
 
-Status: blocked
+Status: BLOCKED/INCOMPLETE
 
-## Provenance summary
+## Architecture checks
 
-| Element | Value | Source | Classification |
-|---|---:|---|---|
-| labour.UNRESOLVED.KS4_8.LABOUR | 298700.0 | Đơn giá chi tiết!H683 | EXTERNAL_UNRESOLVED |
-| material_total | 0 | Đơn giá chi tiết!H1452 | SOURCE_VERIFIED |
-| labour_total | 298700.0 | Đơn giá chi tiết!H1451 | SOURCE_VERIFIED |
-| machine_total | 0 | Đơn giá chi tiết!H1452 | SOURCE_VERIFIED |
-| direct_total | 298700.0 | Chiết tính!H1452 | SOURCE_VERIFIED |
-| loaded_unit_price | 584015.0 | Chiết tính!H1467 | SOURCE_VERIFIED |
-| rounding.price_rounding | 1 | Đầu vào!D39 | SOURCE_VERIFIED |
-| rounding.total_rounding | 0 | Đầu vào!D41 | SOURCE_VERIFIED |
+- Runtime is recomputed from work_item_norm and resource_price_book (no stored direct/loaded totals in compute path).
+- Delta is computed as independent runtime result minus workbook_expected snapshot.
+- Price source check validates price code, source cell, and unit alignment per resource line.
 
-## Cell-level parity
+## Independent parity
 
-| Stage | Runtime | Workbook | Delta |
+| Metric | Runtime | Workbook expected | Delta (runtime - workbook) |
 |---|---:|---:|---:|
-| Direct material | 0 | 0 | 0 |
-| Direct labour | 298700.0 | 298700.0 | 0.0 |
-| Direct machine | 0 | 0 | 0 |
-| Loaded unit price | 584015 | 584015 | 0 |
+| Direct total | N/A | 298700 | N/A |
+| Loaded unit price | N/A | 584015 | N/A |
 
-## Mutation gate
+## Source verification
 
-| Mutation | Loaded unit price | Notes |
-|---|---:|---|
-| Baseline | 584015 | Baseline runtime |
-| Material +10% | 584015 | Material path changed |
-| Labour +10% | 642417 | Labour path changed |
-| Machine +10% | 584015 | Machine path changed |
-| Quantity mutation | 584015 | Quantity set to 10 in gate |
-| HSXL x1.10 | 642417 | HSXL coefficient scaling |
+| Resource code | Unit | Price in price book | Price cell (price book) | Price cell (recipe) | Check |
+|---|---|---:|---|---|---|
+| UNRESOLVED.KS4_8.LABOUR |  | N/A | N/A | N/A | BLOCKED |
 
 ## Missing dependencies
 
-- ['labour.UNRESOLVED.KS4_8.LABOUR']
+- labour.UNRESOLVED.KS4_8.LABOUR
+- resource_price:UNRESOLVED.KS4_8.LABOUR
+
+## Block reason
+
+- Labour source remains unresolved; calculation is intentionally fail-closed.
+- Workbook expected values are retained for comparison only and are not used in runtime computation.
+

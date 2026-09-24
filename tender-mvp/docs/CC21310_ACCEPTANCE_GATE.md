@@ -1,52 +1,37 @@
-# CC.21310 source-provenance and dynamic-calculation gate
+# CC.21310 acceptance gate
 
-Status: accepted
+Status: ACCEPTED
 
-## Provenance summary
+## Architecture checks
 
-| Element | Value | Source | Classification |
-|---|---:|---|---|
-| material.A28.0254 | 8400.0 | Đơn giá chi tiết!H196 | SOURCE_VERIFIED |
-| material.A28.0097 | 1020.0 | Đơn giá chi tiết!H197 | SOURCE_VERIFIED |
-| material.A28.0022 | 825.0 | Đơn giá chi tiết!H198 | SOURCE_VERIFIED |
-| material.A28.0172 | 600.0 | Đơn giá chi tiết!H199 | SOURCE_VERIFIED |
-| material.A28.0023 | 400.0 | Đơn giá chi tiết!H200 | SOURCE_VERIFIED |
-| material.A28.0177 | 1800.0 | Đơn giá chi tiết!H201 | SOURCE_VERIFIED |
-| material.A28.0178 | 140.0 | Đơn giá chi tiết!H202 | SOURCE_VERIFIED |
-| material.A28.0216 | 8000.0 | Đơn giá chi tiết!H203 | SOURCE_VERIFIED |
-| material.A28.0192 | 14000.0 | Đơn giá chi tiết!H204 | SOURCE_VERIFIED |
-| material.Z999 | 3518.5 | Đơn giá chi tiết!H205 | FORMULA_DERIVED |
-| labour.N3 | 683941.7 | Đơn giá chi tiết!H208 | SOURCE_VERIFIED |
-| machine.M201.0002 | 10224.3 | Đơn giá chi tiết!H210 | SOURCE_VERIFIED |
-| machine.M999 | 204.5 | Đơn giá chi tiết!H211 | FORMULA_DERIVED |
-| material_total | 38703.5 | Đơn giá chi tiết!H398 | SOURCE_VERIFIED |
-| labour_total | 683941.7 | Đơn giá chi tiết!H400 | SOURCE_VERIFIED |
-| machine_total | 10428.8 | Đơn giá chi tiết!H404 | SOURCE_VERIFIED |
-| direct_total | 733074.0 | Chiết tính!H405 | SOURCE_VERIFIED |
-| loaded_unit_price | 1414311.0 | Chiết tính!H420 | SOURCE_VERIFIED |
-| rounding.price_rounding | 1 | Đầu vào!D39 | SOURCE_VERIFIED |
-| rounding.total_rounding | 0 | Đầu vào!D41 | SOURCE_VERIFIED |
+- Runtime is recomputed from work_item_norm and resource_price_book (no stored direct/loaded totals in compute path).
+- Delta is computed as independent runtime result minus workbook_expected snapshot.
+- Price source check validates price code, source cell, and unit alignment per resource line.
 
-## Cell-level parity
+## Independent parity
 
-| Stage | Runtime | Workbook | Delta |
+| Metric | Runtime | Workbook expected | Delta (runtime - workbook) |
 |---|---:|---:|---:|
-| Direct material | 38703.5 | 38703.5 | 0.0 |
-| Direct labour | 683941.7 | 683941.7 | 0.0 |
-| Direct machine | 10428.8 | 10428.8 | 0.0 |
+| Direct total | 733074 | 733074 | 0 |
 | Loaded unit price | 1414311 | 1414311 | 0 |
 
-## Mutation gate
+## Source verification
 
-| Mutation | Loaded unit price | Notes |
-|---|---:|---|
-| Baseline | 1414311 | Baseline runtime |
-| Material +10% | 1419099 | Material path changed |
-| Labour +10% | 1549666 | Labour path changed |
-| Machine +10% | 1415602 | Machine path changed |
-| Quantity mutation | 1414311 | Quantity set to 10 in gate |
-| HSXL x1.10 | 1555742 | HSXL coefficient scaling |
+| Resource code | Unit | Price in price book | Price cell (price book) | Price cell (recipe) | Check |
+|---|---|---:|---|---|---|
+| A28.0254 | cái | 150000 | Giá tháng!F42 | Giá tháng!F42 | MATCH |
+| A28.0097 | m | 60000 | Giá tháng!F15 | Giá tháng!F15 | MATCH |
+| A28.0022 | bộ | 150000 | Giá tháng!F27 | Giá tháng!F27 | MATCH |
+| A28.0172 | m | 20000 | Giá tháng!F47 | Giá tháng!F47 | MATCH |
+| A28.0023 | cái | 40000 | Giá tháng!F28 | Giá tháng!F28 | MATCH |
+| A28.0177 | m | 45000 | Giá tháng!F50 | Giá tháng!F50 | MATCH |
+| A28.0178 | cái | 70000 | Giá tháng!F51 | Giá tháng!F51 | MATCH |
+| A28.0216 | cái | 20000 | Giá tháng!F37 | Giá tháng!F37 | MATCH |
+| A28.0192 | m3 | 4000000 | Giá tháng!F34 | Giá tháng!F34 | MATCH |
+| N3 | công | 356526 | Giá tháng!F79 | Giá tháng!F79 | MATCH |
+| M201.0002 | ca | 108194 | Giá tháng!F104 | Giá tháng!F104 | MATCH |
 
 ## Missing dependencies
 
-- []
+- none
+

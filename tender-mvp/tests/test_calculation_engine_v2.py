@@ -363,3 +363,36 @@ def test_aggregate_first_approval_and_unit_first_tender_use_fresh_calculations()
 
     assert approval_mut["approved_estimate_total"] != approval["approved_estimate_total"]
     assert tender_mut["tender_total"] != tender["tender_total"]
+
+
+def test_explicit_approval_and_tender_cost_rules_are_separated_and_coverage_has_all_dimensions():
+    engine = CalculationEngineV2()
+    runtime = engine.load_runtime_data()
+
+    approval_rules = engine.approval_rules_for("topography")
+    tender_rules = engine.tender_rules_for("topography")
+
+    assert approval_rules is not None
+    assert tender_rules is not None
+    assert approval_rules["c_base"] == "labour"
+    assert tender_rules["c_base"] == "labour"
+    assert approval_rules["vat_rate"] == Decimal("0.10")
+    assert tender_rules["vat_rate"] == Decimal("0.10")
+
+    coverage = engine.coverage_report(runtime)
+    for key in [
+        "resource_source_coverage",
+        "direct_cost_parity_coverage",
+        "tender_loaded_price_parity_coverage",
+        "approval_project_parity_coverage",
+        "supported_work_items",
+        "total_work_items",
+        "blocked_work_items",
+        "unresolved_external_dependencies",
+    ]:
+        assert key in coverage
+
+    assert coverage["supported_work_items"] >= 0
+    assert coverage["total_work_items"] == 6
+    assert coverage["blocked_work_items"]
+    assert coverage["full_project_coverage"] is False

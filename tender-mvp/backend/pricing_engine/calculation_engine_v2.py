@@ -2,9 +2,66 @@ from __future__ import annotations
 
 import copy
 import json
+import warnings
 from decimal import Decimal, ROUND_HALF_UP
 from pathlib import Path
 from typing import Any
+
+
+class ApprovalCostRules(dict):
+    """Explicit aggregate-first project approval rule set.
+
+    These rules intentionally differ from tender unit-price loading. They are
+    applied to aggregated direct cost totals per category/project branch.
+    """
+
+    DEFAULTS = {
+        "c_rate": Decimal("0.60"),
+        "vat_rate": Decimal("0.10"),
+        "tt_rate": Decimal("0"),
+        "cpa_rate": Decimal("0.015"),
+        "cbc_rate": Decimal("0.025"),
+        "lt_rate": Decimal("0.02"),
+        "gdp_rate": Decimal("0.10"),
+        "c_base": "labour",
+        "disabled_components": {},
+        "survey_laboratory": False,
+        "rounding": "whole_dong",
+    }
+
+    def __init__(self, overrides: dict[str, Any] | None = None):
+        merged = dict(self.DEFAULTS)
+        if overrides:
+            merged.update(overrides)
+        super().__init__(merged)
+
+
+class TenderCostRules(dict):
+    """Explicit unit-price tender rule set.
+
+    These rules cover loaded-unit-price calculations on a per-work-item basis and
+    keep the tender branch distinct from the approval/project branch.
+    """
+
+    DEFAULTS = {
+        "c_rate": Decimal("0.60"),
+        "vat_rate": Decimal("0.10"),
+        "tt_rate": Decimal("0"),
+        "cpa_rate": Decimal("0.015"),
+        "cbc_rate": Decimal("0.025"),
+        "lt_rate": Decimal("0.02"),
+        "gdp_rate": Decimal("0"),
+        "c_base": "labour",
+        "disabled_components": {},
+        "survey_laboratory": False,
+        "rounding": "down_to_thousand",
+    }
+
+    def __init__(self, overrides: dict[str, Any] | None = None):
+        merged = dict(self.DEFAULTS)
+        if overrides:
+            merged.update(overrides)
+        super().__init__(merged)
 
 
 def _d(value: Any) -> Decimal:
@@ -124,6 +181,46 @@ class CalculationEngineV2:
         if category_key in self.CATEGORY_RULES:
             merged.update(self.CATEGORY_RULES[category_key])
         return merged
+
+    def approval_rules_for(self, category: str, item: dict[str, Any] | None = None) -> ApprovalCostRules:
+        overrides = (item or {}).get("hsxl_rules") or {}
+        category_rule = self._rule_for_category(category)
+        approval_rule = ApprovalCostRules(
+            {
+                **category_rule,
+                "gdp_rate": Decimal("0.10"),
+                "rounding": "whole_dong",
+            }
+        )
+        for key in ["c_rate", "tt_rate", "vat_rate", "lt_rate", "cpa_rate", "cbc_rate", "gdp_rate"]:
+            if key in overrides and overrides[key] not in (None, ""):
+                approval_rule[key] = _d(overrides[key])
+        if "c_base" in overrides and overrides["c_base"]:
+            approval_rule["c_base"] = str(overrides["c_base"])
+        if "disable_cpa" in overrides:
+            approval_rule["disabled_components"] = dict(approval_rule.get("disabled_components") or {})
+            approval_rule["disabled_components"]["cpa"] = bool(overrides["disable_cpa"])
+        return approval_rule
+
+    def tender_rules_for(self, category: str, item: dict[str, Any] | None = None) -> TenderCostRules:
+        overrides = (item or {}).get("hsxl_rules") or {}
+        category_rule = self._rule_for_category(category)
+        tender_rule = TenderCostRules(
+            {
+                **category_rule,
+                "gdp_rate": Decimal("0"),
+                "rounding": "down_to_thousand",
+            }
+        )
+        for key in ["c_rate", "tt_rate", "vat_rate", "lt_rate", "cpa_rate", "cbc_rate", "gdp_rate"]:
+            if key in overrides and overrides[key] not in (None, ""):
+                tender_rule[key] = _d(overrides[key])
+        if "c_base" in overrides and overrides["c_base"]:
+            tender_rule["c_base"] = str(overrides["c_base"])
+        if "disable_cpa" in overrides:
+            tender_rule["disabled_components"] = dict(tender_rule.get("disabled_components") or {})
+            tender_rule["disabled_components"]["cpa"] = bool(overrides["disable_cpa"])
+        return tender_rule
 
     def _rule_for_item(self, category: str, item: dict[str, Any]) -> dict[str, Any]:
         rule = self._rule_for_category(category)
@@ -478,12 +575,14 @@ class CalculationEngineV2:
         source_resolved = 0
         direct_parity = 0
         loaded_parity = 0
-        missing_dependencies: list[str] = []
+        blocked_work_items: list[str] = []
+        unresolved_external_dependencies: list[str] = []
         for code, item in items.items():
             result = self.calculate_work_item_from_runtime(code, runtime)
-            deps = list(result.get("missing_dependencies") or [])
-            if deps:
-                missing_dependencies.extend(f"{code}:{dep}" for dep in deps)
+            missing = list(result.get("missing_dependencies") or [])
+            if missing:
+                blocked_work_items.append(code)
+                unresolved_external_dependencies.extend(f"{code}:{dep}" for dep in missing)
             else:
                 source_resolved += 1
             if result.get("direct_total_parity") == Decimal("0"):
@@ -491,17 +590,38 @@ class CalculationEngineV2:
             if result.get("loaded_unit_price_parity") == Decimal("0"):
                 loaded_parity += 1
 
+        item_count = len(items)
         snapshot = (runtime.get("snapshot_ledger") or {}).get("Dự thầu!J51", {})
+        supported_work_items = source_resolved
+        resource_source_coverage = Decimal(str(source_resolved)) / Decimal(str(item_count)) if item_count else Decimal("0")
+        direct_cost_parity_coverage = Decimal(str(direct_parity)) / Decimal(str(item_count)) if item_count else Decimal("0")
+        tender_loaded_price_parity_coverage = Decimal(str(loaded_parity)) / Decimal(str(item_count)) if item_count else Decimal("0")
+        approval_project_parity_coverage = Decimal("0")
+        full_project_coverage = bool(
+            item_count
+            and supported_work_items == item_count
+            and direct_parity == item_count
+            and loaded_parity == item_count
+            and not blocked_work_items
+            and not unresolved_external_dependencies
+        )
         return {
-            "item_count": len(items),
+            "item_count": item_count,
+            "total_work_items": item_count,
+            "supported_work_items": supported_work_items,
+            "blocked_work_items": blocked_work_items,
+            "unresolved_external_dependencies": unresolved_external_dependencies,
             "resolved_items": source_resolved,
-            "missing_dependencies": missing_dependencies,
+            "missing_dependencies": unresolved_external_dependencies,
             "snapshot_is_unlinked_literal": bool(snapshot.get("is_unlinked_literal", True)),
             "snapshot_value": snapshot.get("value"),
-            "source_coverage_ratio": Decimal(str(source_resolved)) / Decimal(str(len(items))) if items else Decimal("0"),
-            "direct_cost_parity_coverage": Decimal(str(direct_parity)) / Decimal(str(len(items))) if items else Decimal("0"),
-            "loaded_price_parity_coverage": Decimal(str(loaded_parity)) / Decimal(str(len(items))) if items else Decimal("0"),
-            "full_project_coverage": False,
+            "resource_source_coverage": resource_source_coverage,
+            "source_coverage_ratio": resource_source_coverage,
+            "direct_cost_parity_coverage": direct_cost_parity_coverage,
+            "loaded_price_parity_coverage": tender_loaded_price_parity_coverage,
+            "tender_loaded_price_parity_coverage": tender_loaded_price_parity_coverage,
+            "approval_project_parity_coverage": approval_project_parity_coverage,
+            "full_project_coverage": full_project_coverage,
         }
 
     def build_work_item_master(self, runtime: dict[str, Any] | None = None) -> dict[str, dict[str, Any]]:
@@ -586,6 +706,14 @@ class CalculationEngineV2:
         }
 
     def calculate_work_item(self, item: dict[str, Any]) -> dict[str, Any]:
+        warnings.warn(
+            "CalculationEngineV2.calculate_work_item is a legacy compatibility helper; use calculate_work_item_from_runtime for operational calculations.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return self._legacy_golden_calculation(item)
+
+    def _legacy_golden_calculation(self, item: dict[str, Any]) -> dict[str, Any]:
         payload = item.get("input", item) if isinstance(item, dict) and "input" in item and isinstance(item.get("input"), dict) else item
         category = str(item.get("category") or payload.get("category") or "default").strip() or "default"
         work_item_code = str(item.get("work_item") or item.get("code") or payload.get("work_item") or payload.get("code") or "").strip()

@@ -1,0 +1,2061 @@
+{
+  "source_spec": "CALCULATION_SPECIFICATION.md",
+  "workbook_totals": {
+    "approved_estimate_total": "4421407464",
+    "current_tender_total": "4128377433",
+    "snapshot_literal_total": "4142692903",
+    "current_tender_target": "4128377433"
+  },
+  "snapshot_ledger": {
+    "Dự thầu!J51": {
+      "value": "4142692903",
+      "classification": "literal_snapshot",
+      "is_unlinked_literal": true,
+      "note": "Independent historical snapshot; not a current formula target."
+    }
+  },
+  "work_item_master": {
+    "CF.11620": {
+      "code": "CF.11620",
+      "description": "Đo lưới khống chế mặt bằng. Đường chuyền cấp 2. Bộ thiết bị GPS (3 máy). ). ĐH cấp II",
+      "category": "topography",
+      "project_quantity": "8.0",
+      "unit": "điểm",
+      "source_cells": [
+        "Công trình!A16:AM16",
+        "Đơn giá chi tiết!A41:H71",
+        "Chiết tính!H91:H106",
+        "Giá tổng hợp!A15:M15"
+      ],
+      "status": "resolved",
+      "missing_dependencies": [],
+      "hsxl_coefficient": "1.0",
+      "source_provenance": [
+        {
+          "element": "material.A28.0341",
+          "value": "5139.0",
+          "source": "Đơn giá chi tiết!H43",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "material.A28.0008",
+          "value": "4500.0",
+          "source": "Đơn giá chi tiết!H44",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "material.A28.0089",
+          "value": "1800.0",
+          "source": "Đơn giá chi tiết!H45",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "material.A28.0026",
+          "value": "2000.0",
+          "source": "Đơn giá chi tiết!H46",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "material.A28.0296",
+          "value": "8962.8",
+          "source": "Đơn giá chi tiết!H47",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "material.A28.0298",
+          "value": "9091.0",
+          "source": "Đơn giá chi tiết!H48",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "material.Z999",
+          "value": "3149.3",
+          "source": "Đơn giá chi tiết!H49",
+          "classification": "FORMULA_DERIVED"
+        },
+        {
+          "element": "labour.NKS",
+          "value": "521982.8",
+          "source": "Đơn giá chi tiết!H52",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "labour.N3",
+          "value": "1330376.8",
+          "source": "Đơn giá chi tiết!H53",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "machine.M201.0022",
+          "value": "73479.6",
+          "source": "Đơn giá chi tiết!H56",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "machine.M999",
+          "value": "7348.0",
+          "source": "Đơn giá chi tiết!H57",
+          "classification": "FORMULA_DERIVED"
+        },
+        {
+          "element": "material_total",
+          "value": "34642.1",
+          "source": "Đơn giá chi tiết!H50",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "labour_total",
+          "value": "1852359.6",
+          "source": "Đơn giá chi tiết!H54",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "machine_total",
+          "value": "80827.6",
+          "source": "Đơn giá chi tiết!H58",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "direct_total",
+          "value": "1967829.3",
+          "source": "Chiết tính!H91",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "loaded_unit_price",
+          "value": "3808696.0",
+          "source": "Chiết tính!H106",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "rounding.price_rounding",
+          "value": "1",
+          "source": "Đầu vào!D39",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "rounding.total_rounding",
+          "value": "0",
+          "source": "Đầu vào!D41",
+          "classification": "SOURCE_VERIFIED"
+        }
+      ],
+      "resource_recipe": [
+        {
+          "resource_type": "material",
+          "code": "A28.0341",
+          "description": "Xi măng PCB30",
+          "unit": "kg",
+          "quantity": "3.0",
+          "unit_price": "1713.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F69",
+          "line_total": "5139.0",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0008",
+          "description": "Đá 1x2",
+          "unit": "m3",
+          "quantity": "0.01",
+          "unit_price": "450000.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F26",
+          "line_total": "4500.0",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0089",
+          "description": "Cát vàng (ML<2)",
+          "unit": "m3",
+          "quantity": "0.006",
+          "unit_price": "300000.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F12",
+          "line_total": "1800.0",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0026",
+          "description": "Đinh + dây thép",
+          "unit": "kg",
+          "quantity": "0.1",
+          "unit_price": "20000.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F32",
+          "line_total": "2000.0",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0296",
+          "description": "Sơn trắng + đỏ",
+          "unit": "kg",
+          "quantity": "0.2",
+          "unit_price": "44814.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F64",
+          "line_total": "8962.8",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0298",
+          "description": "Sổ đo",
+          "unit": "quyển",
+          "quantity": "1.0",
+          "unit_price": "9091.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F58",
+          "line_total": "9091.0",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "resource_type": "material",
+          "code": "Z999",
+          "description": "Vật liệu khác",
+          "unit": "%",
+          "quantity": "10.0",
+          "unit_price": "31492.8",
+          "source_sheet": "Đơn giá chi tiết",
+          "sheet_ref": "H49",
+          "line_total": "3149.3",
+          "classification": "FORMULA_DERIVED"
+        },
+        {
+          "resource_type": "labour",
+          "code": "NKS",
+          "description": "Kỹ sư",
+          "unit": "công",
+          "quantity": "1.76",
+          "unit_price": "348919.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F72",
+          "line_total": "521982.8",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "resource_type": "labour",
+          "code": "N3",
+          "description": "Nhân công nhóm 3",
+          "unit": "công",
+          "quantity": "4.39",
+          "unit_price": "356526.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F79",
+          "line_total": "1330376.8",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M201.0022",
+          "description": "Bộ thiết bị GPS G3100-R2",
+          "unit": "ca",
+          "quantity": "0.16",
+          "unit_price": "540291.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F87",
+          "line_total": "73479.6",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M999",
+          "description": "Máy khác",
+          "unit": "%",
+          "quantity": "10.0",
+          "unit_price": "73479.6",
+          "source_sheet": "Đơn giá chi tiết",
+          "sheet_ref": "H57",
+          "line_total": "7348.0",
+          "classification": "FORMULA_DERIVED"
+        }
+      ],
+      "direct_material_total": "34642.1",
+      "direct_labour_total": "1852359.6",
+      "direct_machine_total": "80827.6",
+      "direct_total": "1967829.3",
+      "loaded_unit_price": "3808696",
+      "workbook_component_trace": [
+        {
+          "row": 91,
+          "label": "Cộng chi phí trực tiếp (VL+NC+M)",
+          "symbol": "T",
+          "rate": "",
+          "value": 1967829.3
+        },
+        {
+          "row": 92,
+          "label": "CHI PHÍ GIÁN TIẾP",
+          "symbol": "",
+          "rate": "",
+          "value": 1111415.8
+        },
+        {
+          "row": 93,
+          "label": "Chi phí chung (NC x 60%)",
+          "symbol": "C",
+          "rate": "60%",
+          "value": 1111415.8
+        },
+        {
+          "row": 94,
+          "label": "Chi phí một số công việc không xác định được khối lượng từ thiết kế (T x 0%)",
+          "symbol": "TT",
+          "rate": "0%",
+          "value": 0.0
+        },
+        {
+          "row": 95,
+          "label": "Cộng chi phí gián tiếp (C + TT)",
+          "symbol": "GT",
+          "rate": "",
+          "value": 1111415.8
+        },
+        {
+          "row": 96,
+          "label": "THU NHẬP CHỊU THUẾ TÍNH TRƯỚC (T+GT) x 6%",
+          "symbol": "TL",
+          "rate": "6%",
+          "value": 184754.7
+        },
+        {
+          "row": 97,
+          "label": "CHI PHÍ PHỤC VỤ CÔNG TÁC KHẢO SÁT XD",
+          "symbol": "Cpvks",
+          "rate": "",
+          "value": 130560.0
+        },
+        {
+          "row": 98,
+          "label": "Chi phí lập phương án kỹ thuật khảo sát (T + GT + TL) x 1,5%",
+          "symbol": "Cpa",
+          "rate": "",
+          "value": 48960.0
+        },
+        {
+          "row": 99,
+          "label": "Chi phí lập báo cáo kết quả khảo sát (T + GT + TL) x 2,5%",
+          "symbol": "Cbc",
+          "rate": "",
+          "value": 81600.0
+        },
+        {
+          "row": 100,
+          "label": "Cộng chi phí phục vụ công tác khảo sát (Cpa + Cbc)",
+          "symbol": "",
+          "rate": "",
+          "value": 130560.0
+        },
+        {
+          "row": 101,
+          "label": "Chi phí khảo sát xây dựng trước thuế (T + GT + TL + Cpvks)",
+          "symbol": "G",
+          "rate": "",
+          "value": 3394559.8
+        },
+        {
+          "row": 102,
+          "label": "THUẾ GIÁ TRỊ GIA TĂNG (G x 10%)",
+          "symbol": "GTGT",
+          "rate": 0.1,
+          "value": 339456.0
+        },
+        {
+          "row": 103,
+          "label": "Chi phí khảo sát sau thuế (G + GTGT)",
+          "symbol": "Gks",
+          "rate": "",
+          "value": 3734015.8
+        },
+        {
+          "row": 104,
+          "label": "Chi phí nhà tạm để ở và điều hành thi công (Gks x 2%)",
+          "symbol": "LT",
+          "rate": 0.02,
+          "value": 74680.3
+        },
+        {
+          "row": 105,
+          "label": "Chi phí Dự phòng (Gks x 0%)",
+          "symbol": "Gdp",
+          "rate": "",
+          "value": 0.0
+        },
+        {
+          "row": 106,
+          "label": "Chi phí khảo sát xây dựng (Gks + LT + Gdp)",
+          "symbol": "",
+          "rate": "",
+          "value": 3808696.0
+        }
+      ]
+    },
+    "CC.21310": {
+      "code": "CC.21310",
+      "description": "Khoan xoay bơm rửa để lấy mẫu ở trên cạn. Độ sâu hố khoan từ 0m đến 100m. Cấp đất đá I -III",
+      "category": "geotechnical_drilling",
+      "project_quantity": "1583.0",
+      "unit": "m khoan",
+      "source_cells": [
+        "Công trình!A66:AM66",
+        "Đơn giá chi tiết!A194:H224",
+        "Chiết tính!H405:H420",
+        "Giá tổng hợp!A68:M68"
+      ],
+      "status": "resolved",
+      "missing_dependencies": [],
+      "hsxl_coefficient": "1.0",
+      "source_provenance": [
+        {
+          "element": "material.A28.0254",
+          "value": "8400.0",
+          "source": "Đơn giá chi tiết!H196",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "material.A28.0097",
+          "value": "1020.0",
+          "source": "Đơn giá chi tiết!H197",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "material.A28.0022",
+          "value": "825.0",
+          "source": "Đơn giá chi tiết!H198",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "material.A28.0172",
+          "value": "600.0",
+          "source": "Đơn giá chi tiết!H199",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "material.A28.0023",
+          "value": "400.0",
+          "source": "Đơn giá chi tiết!H200",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "material.A28.0177",
+          "value": "1800.0",
+          "source": "Đơn giá chi tiết!H201",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "material.A28.0178",
+          "value": "140.0",
+          "source": "Đơn giá chi tiết!H202",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "material.A28.0216",
+          "value": "8000.0",
+          "source": "Đơn giá chi tiết!H203",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "material.A28.0192",
+          "value": "14000.0",
+          "source": "Đơn giá chi tiết!H204",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "material.Z999",
+          "value": "3518.5",
+          "source": "Đơn giá chi tiết!H205",
+          "classification": "FORMULA_DERIVED"
+        },
+        {
+          "element": "labour.N3",
+          "value": "683941.7",
+          "source": "Đơn giá chi tiết!H208",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "machine.M201.0002",
+          "value": "10224.3",
+          "source": "Đơn giá chi tiết!H210",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "machine.M999",
+          "value": "204.5",
+          "source": "Đơn giá chi tiết!H211",
+          "classification": "FORMULA_DERIVED"
+        },
+        {
+          "element": "material_total",
+          "value": "38703.5",
+          "source": "Đơn giá chi tiết!H398",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "labour_total",
+          "value": "683941.7",
+          "source": "Đơn giá chi tiết!H400",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "machine_total",
+          "value": "10428.8",
+          "source": "Đơn giá chi tiết!H404",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "direct_total",
+          "value": "733074.0",
+          "source": "Chiết tính!H405",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "loaded_unit_price",
+          "value": "1414311.0",
+          "source": "Chiết tính!H420",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "rounding.price_rounding",
+          "value": "1",
+          "source": "Đầu vào!D39",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "rounding.total_rounding",
+          "value": "0",
+          "source": "Đầu vào!D41",
+          "classification": "SOURCE_VERIFIED"
+        }
+      ],
+      "resource_recipe": [
+        {
+          "resource_type": "material",
+          "code": "A28.0254",
+          "description": "Mũi khoan hợp kim",
+          "unit": "cái",
+          "quantity": "0.056",
+          "unit_price": "150000.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F42",
+          "line_total": "8400.0",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0097",
+          "description": "Cần khoan",
+          "unit": "m",
+          "quantity": "0.017",
+          "unit_price": "60000.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F15",
+          "line_total": "1020.0",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0022",
+          "description": "Đầu nối cần",
+          "unit": "bộ",
+          "quantity": "0.0055",
+          "unit_price": "150000.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F27",
+          "line_total": "825.0",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0172",
+          "description": "Ống chống",
+          "unit": "m",
+          "quantity": "0.03",
+          "unit_price": "20000.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F47",
+          "line_total": "600.0",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0023",
+          "description": "Đầu nối ống chống",
+          "unit": "cái",
+          "quantity": "0.01",
+          "unit_price": "40000.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F28",
+          "line_total": "400.0",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0177",
+          "description": "Ống mẫu đơn",
+          "unit": "m",
+          "quantity": "0.04",
+          "unit_price": "45000.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F50",
+          "line_total": "1800.0",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0178",
+          "description": "Ống mẫu kép",
+          "unit": "cái",
+          "quantity": "0.002",
+          "unit_price": "70000.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F51",
+          "line_total": "140.0",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0216",
+          "description": "Hộp nhựa đựng mẫu",
+          "unit": "cái",
+          "quantity": "0.4",
+          "unit_price": "20000.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F37",
+          "line_total": "8000.0",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0192",
+          "description": "Gỗ nhóm V",
+          "unit": "m3",
+          "quantity": "0.0035",
+          "unit_price": "4000000.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F34",
+          "line_total": "14000.0",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "resource_type": "material",
+          "code": "Z999",
+          "description": "Vật liệu khác",
+          "unit": "%",
+          "quantity": "10.0",
+          "unit_price": "35185.0",
+          "source_sheet": "Đơn giá chi tiết",
+          "sheet_ref": "H205",
+          "line_total": "3518.5",
+          "classification": "FORMULA_DERIVED"
+        },
+        {
+          "resource_type": "labour",
+          "code": "N3",
+          "description": "Nhân công nhóm 3",
+          "unit": "công",
+          "quantity": "2.03",
+          "unit_price": "356526.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F79",
+          "line_total": "683941.7",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M201.0002",
+          "description": "Máy khoan XY - 1A",
+          "unit": "ca",
+          "quantity": "0.1",
+          "unit_price": "108194.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F104",
+          "line_total": "10224.3",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M999",
+          "description": "Máy khác",
+          "unit": "%",
+          "quantity": "2.0",
+          "unit_price": "10224.3",
+          "source_sheet": "Đơn giá chi tiết",
+          "sheet_ref": "H211",
+          "line_total": "204.5",
+          "classification": "FORMULA_DERIVED"
+        }
+      ],
+      "direct_material_total": "38703.5",
+      "direct_labour_total": "683941.7",
+      "direct_machine_total": "10428.8",
+      "direct_total": "733074.0",
+      "loaded_unit_price": "1414311",
+      "workbook_component_trace": [
+        {
+          "row": 405,
+          "label": "Cộng chi phí trực tiếp (VL+NC+M)",
+          "symbol": "T",
+          "rate": "",
+          "value": 733074.0
+        },
+        {
+          "row": 406,
+          "label": "CHI PHÍ GIÁN TIẾP",
+          "symbol": "",
+          "rate": "",
+          "value": 410365.0
+        },
+        {
+          "row": 407,
+          "label": "Chi phí chung (NC x 60%)",
+          "symbol": "C",
+          "rate": "60%",
+          "value": 410365.0
+        },
+        {
+          "row": 408,
+          "label": "Chi phí một số công việc không xác định được khối lượng từ thiết kế (T x 0%)",
+          "symbol": "TT",
+          "rate": "0%",
+          "value": 0.0
+        },
+        {
+          "row": 409,
+          "label": "Cộng chi phí gián tiếp (C + TT)",
+          "symbol": "GT",
+          "rate": "",
+          "value": 410365.0
+        },
+        {
+          "row": 410,
+          "label": "THU NHẬP CHỊU THUẾ TÍNH TRƯỚC (T+GT) x 6%",
+          "symbol": "TL",
+          "rate": "6%",
+          "value": 68606.3
+        },
+        {
+          "row": 411,
+          "label": "CHI PHÍ PHỤC VỤ CÔNG TÁC KHẢO SÁT XD",
+          "symbol": "Cpvks",
+          "rate": "",
+          "value": 48481.8
+        },
+        {
+          "row": 412,
+          "label": "Chi phí lập phương án kỹ thuật khảo sát (T + GT + TL) x 1,5%",
+          "symbol": "Cpa",
+          "rate": "",
+          "value": 18180.7
+        },
+        {
+          "row": 413,
+          "label": "Chi phí lập báo cáo kết quả khảo sát (T + GT + TL) x 2,5%",
+          "symbol": "Cbc",
+          "rate": "",
+          "value": 30301.1
+        },
+        {
+          "row": 414,
+          "label": "Cộng chi phí phục vụ công tác khảo sát (Cpa + Cbc)",
+          "symbol": "",
+          "rate": "",
+          "value": 48481.8
+        },
+        {
+          "row": 415,
+          "label": "Chi phí khảo sát xây dựng trước thuế (T + GT + TL + Cpvks)",
+          "symbol": "G",
+          "rate": "",
+          "value": 1260527.1
+        },
+        {
+          "row": 416,
+          "label": "THUẾ GIÁ TRỊ GIA TĂNG (G x 10%)",
+          "symbol": "GTGT",
+          "rate": 0.1,
+          "value": 126052.7
+        },
+        {
+          "row": 417,
+          "label": "Chi phí khảo sát sau thuế (G + GTGT)",
+          "symbol": "Gks",
+          "rate": "",
+          "value": 1386579.8
+        },
+        {
+          "row": 418,
+          "label": "Chi phí nhà tạm để ở và điều hành thi công (Gks x 2%)",
+          "symbol": "LT",
+          "rate": 0.02,
+          "value": 27731.6
+        },
+        {
+          "row": 419,
+          "label": "Chi phí Dự phòng (Gks x 0%)",
+          "symbol": "Gdp",
+          "rate": "",
+          "value": 0.0
+        },
+        {
+          "row": 420,
+          "label": "Chi phí khảo sát xây dựng (Gks + LT + Gdp)",
+          "symbol": "",
+          "rate": "",
+          "value": 1414311.0
+        }
+      ]
+    },
+    "DC.02001": {
+      "code": "DC.02001",
+      "description": "Thí nghiệm cơ lý hóa của đất trong phòng thí nghiệm, chỉ tiêu khối lượng riêng",
+      "category": "laboratory",
+      "project_quantity": "338.0",
+      "unit": "1 chỉ tiêu",
+      "source_cells": [
+        "Công trình!A77:AM77",
+        "Đơn giá chi tiết!A281:H311",
+        "Chiết tính!H600:H615",
+        "Giá tổng hợp!A83:M83"
+      ],
+      "status": "resolved",
+      "missing_dependencies": [],
+      "hsxl_coefficient": "1.0",
+      "source_provenance": [
+        {
+          "element": "material.A0001",
+          "value": "29386.4",
+          "source": "Đơn giá chi tiết!H283",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "material.A0008",
+          "value": "8500.0",
+          "source": "Đơn giá chi tiết!H284",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "material.A0044",
+          "value": "1000.0",
+          "source": "Đơn giá chi tiết!H285",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "material.Z999",
+          "value": "3888.6",
+          "source": "Đơn giá chi tiết!H286",
+          "classification": "FORMULA_DERIVED"
+        },
+        {
+          "element": "labour.N4",
+          "value": "289379.9",
+          "source": "Đơn giá chi tiết!H289",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "machine.M202.0014",
+          "value": "24114.5",
+          "source": "Đơn giá chi tiết!H291",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "machine.M202.0018",
+          "value": "27.9",
+          "source": "Đơn giá chi tiết!H292",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "machine.M006",
+          "value": "19.6",
+          "source": "Đơn giá chi tiết!H293",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "machine.M999",
+          "value": "1208.1",
+          "source": "Đơn giá chi tiết!H294",
+          "classification": "FORMULA_DERIVED"
+        },
+        {
+          "element": "material_total",
+          "value": "42775.0",
+          "source": "Đơn giá chi tiết!H591",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "labour_total",
+          "value": "289379.9",
+          "source": "Đơn giá chi tiết!H593",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "machine_total",
+          "value": "25370.1",
+          "source": "Đơn giá chi tiết!H599",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "direct_total",
+          "value": "357525.0",
+          "source": "Chiết tính!H600",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "loaded_unit_price",
+          "value": "634808.0",
+          "source": "Chiết tính!H615",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "rounding.price_rounding",
+          "value": "1",
+          "source": "Đầu vào!D39",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "rounding.total_rounding",
+          "value": "0",
+          "source": "Đầu vào!D41",
+          "classification": "SOURCE_VERIFIED"
+        }
+      ],
+      "resource_recipe": [
+        {
+          "resource_type": "material",
+          "code": "A0001",
+          "description": "Điện năng",
+          "unit": "kWh",
+          "quantity": "17.44",
+          "unit_price": "1685.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F29",
+          "line_total": "29386.4",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "resource_type": "material",
+          "code": "A0008",
+          "description": "Nước cất",
+          "unit": "lít",
+          "quantity": "0.5",
+          "unit_price": "17000.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F45",
+          "line_total": "8500.0",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "resource_type": "material",
+          "code": "A0044",
+          "description": "Khay men",
+          "unit": "cái",
+          "quantity": "0.05",
+          "unit_price": "20000.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F39",
+          "line_total": "1000.0",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "resource_type": "material",
+          "code": "Z999",
+          "description": "Vật liệu khác",
+          "unit": "%",
+          "quantity": "10.0",
+          "unit_price": "38886.4",
+          "source_sheet": "Đơn giá chi tiết",
+          "sheet_ref": "H286",
+          "line_total": "3888.6",
+          "classification": "FORMULA_DERIVED"
+        },
+        {
+          "resource_type": "labour",
+          "code": "N4",
+          "description": "Nhân công nhóm 4",
+          "unit": "công",
+          "quantity": "0.76",
+          "unit_price": "380763.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F82",
+          "line_total": "289379.9",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M202.0014",
+          "description": "Tủ sấy",
+          "unit": "ca",
+          "quantity": "2.125",
+          "unit_price": "11348.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F113",
+          "line_total": "24114.5",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M202.0018",
+          "description": "Máy hút ẩm",
+          "unit": "ca",
+          "quantity": "0.003",
+          "unit_price": "9287.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F103",
+          "line_total": "27.9",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M006",
+          "description": "Cân kỹ thuật",
+          "unit": "ca",
+          "quantity": "0.003",
+          "unit_price": "6521.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F88",
+          "line_total": "19.6",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M999",
+          "description": "Máy khác",
+          "unit": "%",
+          "quantity": "5.0",
+          "unit_price": "24162.0",
+          "source_sheet": "Đơn giá chi tiết",
+          "sheet_ref": "H294",
+          "line_total": "1208.1",
+          "classification": "FORMULA_DERIVED"
+        }
+      ],
+      "direct_material_total": "42775.0",
+      "direct_labour_total": "289379.9",
+      "direct_machine_total": "25370.1",
+      "direct_total": "357525.0",
+      "loaded_unit_price": "634808",
+      "workbook_component_trace": [
+        {
+          "row": 600,
+          "label": "Cộng chi phí trực tiếp (VL+NC+M)",
+          "symbol": "T",
+          "rate": "",
+          "value": 357525.0
+        },
+        {
+          "row": 601,
+          "label": "CHI PHÍ GIÁN TIẾP",
+          "symbol": "",
+          "rate": "",
+          "value": 173627.9
+        },
+        {
+          "row": 602,
+          "label": "Chi phí chung (NC x 60%)",
+          "symbol": "C",
+          "rate": "60%",
+          "value": 173627.9
+        },
+        {
+          "row": 603,
+          "label": "Chi phí một số công việc không xác định được khối lượng từ thiết kế (T x 0%)",
+          "symbol": "TT",
+          "rate": "0%",
+          "value": 0.0
+        },
+        {
+          "row": 604,
+          "label": "Cộng chi phí gián tiếp (C + TT)",
+          "symbol": "GT",
+          "rate": "",
+          "value": 173627.9
+        },
+        {
+          "row": 605,
+          "label": "THU NHẬP CHỊU THUẾ TÍNH TRƯỚC (T+GT) x 6%",
+          "symbol": "TL",
+          "rate": "6%",
+          "value": 31869.2
+        },
+        {
+          "row": 606,
+          "label": "CHI PHÍ PHỤC VỤ CÔNG TÁC KHẢO SÁT XD",
+          "symbol": "Cpvks",
+          "rate": "",
+          "value": 14075.6
+        },
+        {
+          "row": 607,
+          "label": "Chi phí lập phương án kỹ thuật khảo sát (T + GT + TL) x 1,5%",
+          "symbol": "Cpa",
+          "rate": "",
+          "value": 0.0
+        },
+        {
+          "row": 608,
+          "label": "Chi phí lập báo cáo kết quả khảo sát (T + GT + TL) x 2,5%",
+          "symbol": "Cbc",
+          "rate": "",
+          "value": 14075.6
+        },
+        {
+          "row": 609,
+          "label": "Cộng chi phí phục vụ công tác khảo sát (Cpa + Cbc)",
+          "symbol": "",
+          "rate": "",
+          "value": 14075.6
+        },
+        {
+          "row": 610,
+          "label": "Chi phí khảo sát xây dựng trước thuế (T + GT + TL + Cpvks)",
+          "symbol": "G",
+          "rate": "",
+          "value": 577097.7
+        },
+        {
+          "row": 611,
+          "label": "THUẾ GIÁ TRỊ GIA TĂNG (G x 10%)",
+          "symbol": "GTGT",
+          "rate": 0.1,
+          "value": 57709.8
+        },
+        {
+          "row": 612,
+          "label": "Chi phí khảo sát sau thuế (G + GTGT)",
+          "symbol": "Gks",
+          "rate": "",
+          "value": 634807.5
+        },
+        {
+          "row": 613,
+          "label": "Chi phí nhà tạm để ở và điều hành thi công (Gks x 0%)",
+          "symbol": "LT",
+          "rate": "",
+          "value": 0.0
+        },
+        {
+          "row": 614,
+          "label": "Chi phí Dự phòng (Gks x 0%)",
+          "symbol": "Gdp",
+          "rate": "",
+          "value": 0.0
+        },
+        {
+          "row": 615,
+          "label": "Chi phí khảo sát xây dựng (Gks + LT + Gdp)",
+          "symbol": "",
+          "rate": "",
+          "value": 634808.0
+        }
+      ]
+    },
+    "KS.4/8": {
+      "code": "KS.4/8",
+      "description": "Khảo sát vị trí, lắp đặt và vận hành camera (03 vị trí và 06 mặt cắt)",
+      "category": "traffic_survey",
+      "project_quantity": "",
+      "unit": "Công",
+      "source_cells": [
+        "Công trình!A113:AM113",
+        "Đơn giá chi tiết!A681:H711",
+        "Chiết tính!H1452:H1467",
+        "Giá tổng hợp!A128:M128"
+      ],
+      "status": "partially_resolved",
+      "missing_dependencies": [
+        "labour.UNRESOLVED.KS4_8.LABOUR"
+      ],
+      "hsxl_coefficient": "1.0",
+      "source_provenance": [
+        {
+          "element": "labour.UNRESOLVED.KS4_8.LABOUR",
+          "value": "298700.0",
+          "source": "Đơn giá chi tiết!H683",
+          "classification": "EXTERNAL_UNRESOLVED"
+        },
+        {
+          "element": "material_total",
+          "value": "0",
+          "source": "Đơn giá chi tiết!H1452",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "labour_total",
+          "value": "298700.0",
+          "source": "Đơn giá chi tiết!H1451",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "machine_total",
+          "value": "0",
+          "source": "Đơn giá chi tiết!H1452",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "direct_total",
+          "value": "298700.0",
+          "source": "Chiết tính!H1452",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "loaded_unit_price",
+          "value": "584015.0",
+          "source": "Chiết tính!H1467",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "rounding.price_rounding",
+          "value": "1",
+          "source": "Đầu vào!D39",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "rounding.total_rounding",
+          "value": "0",
+          "source": "Đầu vào!D41",
+          "classification": "SOURCE_VERIFIED"
+        }
+      ],
+      "resource_recipe": [
+        {
+          "resource_type": "labour",
+          "code": "UNRESOLVED.KS4_8.LABOUR",
+          "description": "Nhân công",
+          "unit": "",
+          "quantity": "1.0",
+          "unit_price": "298700.0",
+          "source_sheet": "Đơn giá chi tiết",
+          "sheet_ref": "H683",
+          "line_total": "298700.0",
+          "classification": "EXTERNAL_UNRESOLVED"
+        }
+      ],
+      "direct_material_total": "0",
+      "direct_labour_total": "298700.0",
+      "direct_machine_total": "0",
+      "direct_total": "298700.0",
+      "loaded_unit_price": "584015",
+      "workbook_component_trace": [
+        {
+          "row": 1452,
+          "label": "Cộng chi phí trực tiếp (VL+NC+M)",
+          "symbol": "T",
+          "rate": "",
+          "value": 298700.0
+        },
+        {
+          "row": 1453,
+          "label": "CHI PHÍ GIÁN TIẾP",
+          "symbol": "",
+          "rate": "",
+          "value": 182207.0
+        },
+        {
+          "row": 1454,
+          "label": "Chi phí chung (NC x 60%)",
+          "symbol": "C",
+          "rate": "60%",
+          "value": 179220.0
+        },
+        {
+          "row": 1455,
+          "label": "Chi phí một số công việc không xác định được khối lượng từ thiết kế (T x 1%)",
+          "symbol": "TT",
+          "rate": "1%",
+          "value": 2987.0
+        },
+        {
+          "row": 1456,
+          "label": "Cộng chi phí gián tiếp (C + TT)",
+          "symbol": "GT",
+          "rate": "",
+          "value": 182207.0
+        },
+        {
+          "row": 1457,
+          "label": "THU NHẬP CHỊU THUẾ TÍNH TRƯỚC (T+GT) x 6%",
+          "symbol": "TL",
+          "rate": "6%",
+          "value": 28854.4
+        },
+        {
+          "row": 1458,
+          "label": "CHI PHÍ PHỤC VỤ CÔNG TÁC KHẢO SÁT XD",
+          "symbol": "Cpvks",
+          "rate": "",
+          "value": 20390.4
+        },
+        {
+          "row": 1459,
+          "label": "Chi phí lập phương án kỹ thuật khảo sát (T + GT + TL) x 1,5%",
+          "symbol": "Cpa",
+          "rate": "",
+          "value": 7646.4
+        },
+        {
+          "row": 1460,
+          "label": "Chi phí lập báo cáo kết quả khảo sát (T + GT + TL) x 2,5%",
+          "symbol": "Cbc",
+          "rate": "",
+          "value": 12744.0
+        },
+        {
+          "row": 1461,
+          "label": "Cộng chi phí phục vụ công tác khảo sát (Cpa + Cbc)",
+          "symbol": "",
+          "rate": "",
+          "value": 20390.4
+        },
+        {
+          "row": 1462,
+          "label": "Chi phí khảo sát xây dựng trước thuế (T + GT + TL + Cpvks)",
+          "symbol": "G",
+          "rate": "",
+          "value": 530151.8
+        },
+        {
+          "row": 1463,
+          "label": "THUẾ GIÁ TRỊ GIA TĂNG (G x 8%)",
+          "symbol": "GTGT",
+          "rate": 0.08,
+          "value": 42412.1
+        },
+        {
+          "row": 1464,
+          "label": "Chi phí khảo sát sau thuế (G + GTGT)",
+          "symbol": "Gks",
+          "rate": "",
+          "value": 572563.9
+        },
+        {
+          "row": 1465,
+          "label": "Chi phí nhà tạm để ở và điều hành thi công (Gks x 2%)",
+          "symbol": "LT",
+          "rate": 0.02,
+          "value": 11451.3
+        },
+        {
+          "row": 1466,
+          "label": "Chi phí Dự phòng (Gks x 0%)",
+          "symbol": "Gdp",
+          "rate": "",
+          "value": 0.0
+        },
+        {
+          "row": 1467,
+          "label": "Chi phí khảo sát xây dựng (Gks + LT + Gdp)",
+          "symbol": "",
+          "rate": "",
+          "value": 584015.0
+        }
+      ]
+    },
+    "CF.21120": {
+      "code": "CF.21120",
+      "description": "Định vì và cắm cọc GPMB. Cấp địa hình II",
+      "category": "gmpb_stake",
+      "project_quantity": "",
+      "unit": "mốc",
+      "source_cells": [
+        "Công trình!A120:AM120",
+        "Đơn giá chi tiết!A700:H730",
+        "Chiết tính!H1566:H1581",
+        "Giá tổng hợp!A139:M139"
+      ],
+      "status": "resolved",
+      "missing_dependencies": [],
+      "hsxl_coefficient": "1.0",
+      "source_provenance": [
+        {
+          "element": "material.A28.0341",
+          "value": "22269.0",
+          "source": "Đơn giá chi tiết!H702",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "material.A28.0008",
+          "value": "18000.0",
+          "source": "Đơn giá chi tiết!H703",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "material.A28.0089",
+          "value": "7800.0",
+          "source": "Đơn giá chi tiết!H704",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "material.A28.0026",
+          "value": "2000.0",
+          "source": "Đơn giá chi tiết!H705",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "material.A28.0296",
+          "value": "2.3",
+          "source": "Đơn giá chi tiết!H706",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "material.A28.0298",
+          "value": "4545.5",
+          "source": "Đơn giá chi tiết!H707",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "material.Z999",
+          "value": "5461.7",
+          "source": "Đơn giá chi tiết!H708",
+          "classification": "FORMULA_DERIVED"
+        },
+        {
+          "element": "labour.NKS",
+          "value": "275646.0",
+          "source": "Đơn giá chi tiết!H711",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "labour.N3",
+          "value": "702356.2",
+          "source": "Đơn giá chi tiết!H712",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "machine.M201.0021",
+          "value": "25000.0",
+          "source": "Đơn giá chi tiết!H715",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "machine.M999",
+          "value": "2500.0",
+          "source": "Đơn giá chi tiết!H716",
+          "classification": "FORMULA_DERIVED"
+        },
+        {
+          "element": "material_total",
+          "value": "60078.5",
+          "source": "Đơn giá chi tiết!H1557",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "labour_total",
+          "value": "978002.2",
+          "source": "Đơn giá chi tiết!H1561",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "machine_total",
+          "value": "27500.0",
+          "source": "Đơn giá chi tiết!H1565",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "direct_total",
+          "value": "1065580.7",
+          "source": "Chiết tính!H1566",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "loaded_unit_price",
+          "value": "2045481.0",
+          "source": "Chiết tính!H1581",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "rounding.price_rounding",
+          "value": "1",
+          "source": "Đầu vào!D39",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "rounding.total_rounding",
+          "value": "0",
+          "source": "Đầu vào!D41",
+          "classification": "SOURCE_VERIFIED"
+        }
+      ],
+      "resource_recipe": [
+        {
+          "resource_type": "material",
+          "code": "A28.0341",
+          "description": "Xi măng PCB30",
+          "unit": "kg",
+          "quantity": "13.0",
+          "unit_price": "1713.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F69",
+          "line_total": "22269.0",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0008",
+          "description": "Đá 1x2",
+          "unit": "m3",
+          "quantity": "0.04",
+          "unit_price": "450000.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F26",
+          "line_total": "18000.0",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0089",
+          "description": "Cát vàng (ML<2)",
+          "unit": "m3",
+          "quantity": "0.026",
+          "unit_price": "300000.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F12",
+          "line_total": "7800.0",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0026",
+          "description": "Đinh + dây thép",
+          "unit": "kg",
+          "quantity": "0.1",
+          "unit_price": "20000.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F32",
+          "line_total": "2000.0",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0296",
+          "description": "Sơn trắng + đỏ",
+          "unit": "kg",
+          "quantity": "0.05",
+          "unit_price": "45.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F63",
+          "line_total": "2.3",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0298",
+          "description": "Sổ đo",
+          "unit": "quyển",
+          "quantity": "0.5",
+          "unit_price": "9091.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F58",
+          "line_total": "4545.5",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "resource_type": "material",
+          "code": "Z999",
+          "description": "Vật liệu khác",
+          "unit": "%",
+          "quantity": "10.0",
+          "unit_price": "54616.8",
+          "source_sheet": "Đơn giá chi tiết",
+          "sheet_ref": "H708",
+          "line_total": "5461.7",
+          "classification": "FORMULA_DERIVED"
+        },
+        {
+          "resource_type": "labour",
+          "code": "NKS",
+          "description": "Kỹ sư",
+          "unit": "công",
+          "quantity": "0.79",
+          "unit_price": "348919.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F72",
+          "line_total": "275646.0",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "resource_type": "labour",
+          "code": "N3",
+          "description": "Nhân công nhóm 3",
+          "unit": "công",
+          "quantity": "1.97",
+          "unit_price": "356526.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F79",
+          "line_total": "702356.2",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M201.0021",
+          "description": "Máy toàn đạc điện tử",
+          "unit": "ca",
+          "quantity": "0.17",
+          "unit_price": "147059.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F108",
+          "line_total": "25000.0",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M999",
+          "description": "Máy khác",
+          "unit": "%",
+          "quantity": "10.0",
+          "unit_price": "25000.0",
+          "source_sheet": "Đơn giá chi tiết",
+          "sheet_ref": "H716",
+          "line_total": "2500.0",
+          "classification": "FORMULA_DERIVED"
+        }
+      ],
+      "direct_material_total": "60078.5",
+      "direct_labour_total": "978002.2",
+      "direct_machine_total": "27500.0",
+      "direct_total": "1065580.7",
+      "loaded_unit_price": "2045481",
+      "workbook_component_trace": [
+        {
+          "row": 1566,
+          "label": "Cộng chi phí trực tiếp (VL+NC+M)",
+          "symbol": "T",
+          "rate": "",
+          "value": 1065580.7
+        },
+        {
+          "row": 1567,
+          "label": "CHI PHÍ GIÁN TIẾP",
+          "symbol": "",
+          "rate": "",
+          "value": 618768.7
+        },
+        {
+          "row": 1568,
+          "label": "Chi phí chung (NC x 60%)",
+          "symbol": "C",
+          "rate": "60%",
+          "value": 586801.3
+        },
+        {
+          "row": 1569,
+          "label": "Chi phí một số công việc không xác định được khối lượng từ thiết kế (T x 3%)",
+          "symbol": "TT",
+          "rate": "3%",
+          "value": 31967.4
+        },
+        {
+          "row": 1570,
+          "label": "Cộng chi phí gián tiếp (C + TT)",
+          "symbol": "GT",
+          "rate": "",
+          "value": 618768.7
+        },
+        {
+          "row": 1571,
+          "label": "THU NHẬP CHỊU THUẾ TÍNH TRƯỚC (T+GT) x 6%",
+          "symbol": "TL",
+          "rate": "6%",
+          "value": 101061.0
+        },
+        {
+          "row": 1572,
+          "label": "CHI PHÍ PHỤC VỤ CÔNG TÁC KHẢO SÁT XD",
+          "symbol": "Cpvks",
+          "rate": "",
+          "value": 71416.5
+        },
+        {
+          "row": 1573,
+          "label": "Chi phí lập phương án kỹ thuật khảo sát (T + GT + TL) x 1,5%",
+          "symbol": "Cpa",
+          "rate": "",
+          "value": 26781.2
+        },
+        {
+          "row": 1574,
+          "label": "Chi phí lập báo cáo kết quả khảo sát (T + GT + TL) x 2,5%",
+          "symbol": "Cbc",
+          "rate": "",
+          "value": 44635.3
+        },
+        {
+          "row": 1575,
+          "label": "Cộng chi phí phục vụ công tác khảo sát (Cpa + Cbc)",
+          "symbol": "",
+          "rate": "",
+          "value": 71416.5
+        },
+        {
+          "row": 1576,
+          "label": "Chi phí khảo sát xây dựng trước thuế (T + GT + TL + Cpvks)",
+          "symbol": "G",
+          "rate": "",
+          "value": 1856826.9
+        },
+        {
+          "row": 1577,
+          "label": "THUẾ GIÁ TRỊ GIA TĂNG (G x 8%)",
+          "symbol": "GTGT",
+          "rate": 0.08,
+          "value": 148546.2
+        },
+        {
+          "row": 1578,
+          "label": "Chi phí khảo sát sau thuế (G + GTGT)",
+          "symbol": "Gks",
+          "rate": "",
+          "value": 2005373.1
+        },
+        {
+          "row": 1579,
+          "label": "Chi phí nhà tạm để ở và điều hành thi công (Gks x 2%)",
+          "symbol": "LT",
+          "rate": 0.02,
+          "value": 40107.5
+        },
+        {
+          "row": 1580,
+          "label": "Chi phí Dự phòng (Gks x 0%)",
+          "symbol": "Gdp",
+          "rate": "",
+          "value": 0.0
+        },
+        {
+          "row": 1581,
+          "label": "Chi phí khảo sát xây dựng (Gks + LT + Gdp)",
+          "symbol": "",
+          "rate": "",
+          "value": 2045481.0
+        }
+      ]
+    },
+    "AG.11112": {
+      "code": "AG.11112",
+      "description": "BT đúc sẵn cọc, cột đá 1x2 M.200 (độ sụt 2-4)  (0.2*0.2*1)m3",
+      "category": "gmpb_marker",
+      "project_quantity": "",
+      "unit": "m3",
+      "source_cells": [
+        "Công trình!A142:AM142",
+        "Đơn giá chi tiết!A743:H773",
+        "Chiết tính!H1653:H1668",
+        "Giá tổng hợp!A149:M149"
+      ],
+      "status": "resolved",
+      "missing_dependencies": [],
+      "hsxl_coefficient": "1.0",
+      "source_provenance": [
+        {
+          "element": "material.A24.0796A",
+          "value": "292065.2",
+          "source": "Đơn giá chi tiết!H745",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "material.A24.0180",
+          "value": "214368.0",
+          "source": "Đơn giá chi tiết!H746",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "material.A24.0008",
+          "value": "468554.5",
+          "source": "Đơn giá chi tiết!H747",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "material.A24.0524",
+          "value": "1857.5",
+          "source": "Đơn giá chi tiết!H748",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "material.Z999",
+          "value": "4884.2",
+          "source": "Đơn giá chi tiết!H749",
+          "classification": "FORMULA_DERIVED"
+        },
+        {
+          "element": "labour.N2.30",
+          "value": "364303.6",
+          "source": "Đơn giá chi tiết!H752",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "machine.M104.0102",
+          "value": "42428.0",
+          "source": "Đơn giá chi tiết!H754",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "machine.M112.1301",
+          "value": "72208.6",
+          "source": "Đơn giá chi tiết!H755",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "material_total",
+          "value": "981729.4",
+          "source": "Đơn giá chi tiết!H1646",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "labour_total",
+          "value": "364303.6",
+          "source": "Đơn giá chi tiết!H1648",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "machine_total",
+          "value": "114636.6",
+          "source": "Đơn giá chi tiết!H1652",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "direct_total",
+          "value": "1460669.6",
+          "source": "Chiết tính!H1653",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "loaded_unit_price",
+          "value": "2919165.0",
+          "source": "Chiết tính!H1668",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "rounding.price_rounding",
+          "value": "1",
+          "source": "Đầu vào!D39",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "element": "rounding.total_rounding",
+          "value": "0",
+          "source": "Đầu vào!D41",
+          "classification": "SOURCE_VERIFIED"
+        }
+      ],
+      "resource_recipe": [
+        {
+          "resource_type": "material",
+          "code": "A24.0796A",
+          "description": "Xi măng PCB40",
+          "unit": "kg",
+          "quantity": "262.885",
+          "unit_price": "1111.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F70",
+          "line_total": "292065.2",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "resource_type": "material",
+          "code": "A24.0180",
+          "description": "Cát vàng (ML>2)",
+          "unit": "m3",
+          "quantity": "0.53592",
+          "unit_price": "400000.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F13",
+          "line_total": "214368.0",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "resource_type": "material",
+          "code": "A24.0008",
+          "description": "Đá 1x2",
+          "unit": "m3",
+          "quantity": "0.884065",
+          "unit_price": "530000.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F25",
+          "line_total": "468554.5",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "resource_type": "material",
+          "code": "A24.0524",
+          "description": "Nước",
+          "unit": "lít",
+          "quantity": "185.745",
+          "unit_price": "10.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F44",
+          "line_total": "1857.5",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "resource_type": "material",
+          "code": "Z999",
+          "description": "Vât liệu khác",
+          "unit": "%",
+          "quantity": "0.5",
+          "unit_price": "976845.2",
+          "source_sheet": "Đơn giá chi tiết",
+          "sheet_ref": "H749",
+          "line_total": "4884.2",
+          "classification": "FORMULA_DERIVED"
+        },
+        {
+          "resource_type": "labour",
+          "code": "N2.30",
+          "description": "Nhân công 3,0/7 - Nhóm 2",
+          "unit": "công",
+          "quantity": "1.37",
+          "unit_price": "265915.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F75",
+          "line_total": "364303.6",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M104.0102",
+          "description": "Máy trộn 250l",
+          "unit": "ca",
+          "quantity": "0.095",
+          "unit_price": "446610.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F110",
+          "line_total": "42428.0",
+          "classification": "SOURCE_VERIFIED"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M112.1301",
+          "description": "Máy đầm dùi 1,5 KW",
+          "unit": "ca",
+          "quantity": "0.18",
+          "unit_price": "401159.0",
+          "source_sheet": "Giá tháng",
+          "sheet_ref": "F100",
+          "line_total": "72208.6",
+          "classification": "SOURCE_VERIFIED"
+        }
+      ],
+      "direct_material_total": "981729.4",
+      "direct_labour_total": "364303.6",
+      "direct_machine_total": "114636.6",
+      "direct_total": "1460669.6",
+      "loaded_unit_price": "2919165",
+      "workbook_component_trace": [
+        {
+          "row": 1653,
+          "label": "Cộng chi phí trực tiếp (VL+NC+M)",
+          "symbol": "T",
+          "rate": "",
+          "value": 1460669.6
+        },
+        {
+          "row": 1654,
+          "label": "CHI PHÍ GIÁN TIẾP",
+          "symbol": "",
+          "rate": "",
+          "value": 920221.9
+        },
+        {
+          "row": 1655,
+          "label": "Chi phí chung (T x 60%)",
+          "symbol": "C",
+          "rate": "60%",
+          "value": 876401.8
+        },
+        {
+          "row": 1656,
+          "label": "Chi phí một số công việc không xác định được khối lượng từ thiết kế (T x 3%)",
+          "symbol": "TT",
+          "rate": "3%",
+          "value": 43820.1
+        },
+        {
+          "row": 1657,
+          "label": "Cộng chi phí gián tiếp (C + TT)",
+          "symbol": "GT",
+          "rate": "",
+          "value": 920221.9
+        },
+        {
+          "row": 1658,
+          "label": "THU NHẬP CHỊU THUẾ TÍNH TRƯỚC (T+GT) x 6%",
+          "symbol": "TL",
+          "rate": "6%",
+          "value": 142853.5
+        },
+        {
+          "row": 1659,
+          "label": "CHI PHÍ PHỤC VỤ CÔNG TÁC KHẢO SÁT XD",
+          "symbol": "Cpvks",
+          "rate": "",
+          "value": 126187.3
+        },
+        {
+          "row": 1660,
+          "label": "Chi phí lập phương án kỹ thuật khảo sát (T + GT + TL) x 2%",
+          "symbol": "Cpa",
+          "rate": "",
+          "value": 50474.9
+        },
+        {
+          "row": 1661,
+          "label": "Chi phí lập báo cáo kết quả khảo sát (T + GT + TL) x 3%",
+          "symbol": "Cbc",
+          "rate": "",
+          "value": 75712.4
+        },
+        {
+          "row": 1662,
+          "label": "Cộng chi phí phục vụ công tác khảo sát (Cpa + Cbc)",
+          "symbol": "",
+          "rate": "",
+          "value": 126187.3
+        },
+        {
+          "row": 1663,
+          "label": "Chi phí khảo sát xây dựng trước thuế (T + GT + TL + Cpvks)",
+          "symbol": "G",
+          "rate": "",
+          "value": 2649932.3
+        },
+        {
+          "row": 1664,
+          "label": "THUẾ GIÁ TRỊ GIA TĂNG (G x 8%)",
+          "symbol": "GTGT",
+          "rate": 0.08,
+          "value": 211994.6
+        },
+        {
+          "row": 1665,
+          "label": "Chi phí khảo sát sau thuế (G + GTGT)",
+          "symbol": "Gks",
+          "rate": "",
+          "value": 2861926.9
+        },
+        {
+          "row": 1666,
+          "label": "Chi phí nhà tạm để ở và điều hành thi công (Gks x 2%)",
+          "symbol": "LT",
+          "rate": 0.02,
+          "value": 57238.5
+        },
+        {
+          "row": 1667,
+          "label": "Chi phí Dự phòng (Gks x 0%)",
+          "symbol": "Gdp",
+          "rate": "",
+          "value": 0.0
+        },
+        {
+          "row": 1668,
+          "label": "Chi phí khảo sát xây dựng (Gks + LT + Gdp)",
+          "symbol": "",
+          "rate": "",
+          "value": 2919165.0
+        }
+      ]
+    }
+  }
+}

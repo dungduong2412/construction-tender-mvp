@@ -423,6 +423,7 @@ def test_train2_upload_requires_auth_signature_and_size(monkeypatch):
 def test_train2_upload_uses_azure_bridge_when_azure_mode_selected(monkeypatch):
     monkeypatch.setenv("TRAIN2_UPLOAD_AUTH_TOKEN", "token")
     monkeypatch.setenv("TRAIN2_PARSER_PROVIDER", "azure")
+    monkeypatch.setenv("MOCK_PARSER", "false")
     monkeypatch.setenv("AZURE_DOC_INTEL_ENDPOINT", "https://azure.example.test")
     monkeypatch.setenv("AZURE_DOC_INTEL_KEY", "secret")
     monkeypatch.delenv("TRAIN2_PARSER_API_ENDPOINT", raising=False)
@@ -469,6 +470,63 @@ def test_train2_upload_uses_azure_bridge_when_azure_mode_selected(monkeypatch):
     assert body["integration_label"] == "azure_document_intelligence"
     assert called["azure"] == 1
     assert called["http"] == 0
+
+
+@pytest.mark.parametrize("mock_value", [None, "true", "1", "yes", ""])
+def test_train2_upload_azure_mode_requires_explicit_mock_off(monkeypatch, mock_value):
+    monkeypatch.setenv("TRAIN2_UPLOAD_AUTH_TOKEN", "token")
+    monkeypatch.setenv("TRAIN2_PARSER_PROVIDER", "azure")
+    monkeypatch.setenv("AZURE_DOC_INTEL_ENDPOINT", "https://azure.example.test")
+    monkeypatch.setenv("AZURE_DOC_INTEL_KEY", "secret")
+    if mock_value is None:
+        monkeypatch.delenv("MOCK_PARSER", raising=False)
+    else:
+        monkeypatch.setenv("MOCK_PARSER", mock_value)
+
+    called = {"azure": 0}
+
+    async def fake_azure(*args, **kwargs):
+        called["azure"] += 1
+        raise AssertionError("azure parser must not run when MOCK_PARSER is not explicitly false")
+
+    monkeypatch.setattr(PIPELINE, "start_from_azure_parser", fake_azure)
+
+    with TestClient(app) as client:
+        resp = client.post(
+            "/api/train1/runs/upload",
+            headers={"Authorization": "Bearer token"},
+            files={"file": ("sample.pdf", b"%PDF-1.4\nabc", "application/pdf")},
+        )
+
+    assert resp.status_code == 503
+    assert "MOCK_PARSER" in resp.text
+    assert called["azure"] == 0
+
+
+def test_train2_azure_parser_error_response_is_sanitized(monkeypatch):
+    monkeypatch.setenv("TRAIN2_UPLOAD_AUTH_TOKEN", "token")
+    monkeypatch.setenv("TRAIN2_PARSER_PROVIDER", "azure")
+    monkeypatch.setenv("MOCK_PARSER", "false")
+    monkeypatch.setenv("AZURE_DOC_INTEL_ENDPOINT", "https://azure.example.test")
+    monkeypatch.setenv("AZURE_DOC_INTEL_KEY", "secret")
+
+    async def fake_azure(*args, **kwargs):
+        from parser_adapter.provider_neutral import ParserProviderAuthError
+
+        raise ParserProviderAuthError("Azure rejected token secret-123")
+
+    monkeypatch.setattr(PIPELINE, "start_from_azure_parser", fake_azure)
+
+    with TestClient(app) as client:
+        resp = client.post(
+            "/api/train1/runs/upload",
+            headers={"Authorization": "Bearer token"},
+            files={"file": ("sample.pdf", b"%PDF-1.4\nabc", "application/pdf")},
+        )
+
+    assert resp.status_code == 502
+    assert "secret-123" not in resp.text
+    assert "Azure parser authentication failed" in resp.text
 
 
 def test_train2_manual_correction_retains_source_evidence():

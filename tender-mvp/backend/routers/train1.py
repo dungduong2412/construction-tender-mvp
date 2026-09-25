@@ -29,6 +29,10 @@ def _parser_provider_mode() -> str:
     return "http_json"
 
 
+def _mock_parser_disabled_explicitly() -> bool:
+    return os.getenv("MOCK_PARSER", "").strip().lower() == "false"
+
+
 def _require_train_auth(authorization: str | None) -> None:
     expected_token = os.getenv("TRAIN2_UPLOAD_AUTH_TOKEN", "").strip()
     if not expected_token:
@@ -81,6 +85,9 @@ async def start_run_from_upload(file: UploadFile = File(...), authorization: str
 
     provider_mode = _parser_provider_mode()
 
+    if provider_mode == "azure" and not _mock_parser_disabled_explicitly():
+        raise HTTPException(status_code=503, detail="LIVE INTEGRATION BLOCKED: MOCK_PARSER must be explicitly false for Azure parser mode")
+
     max_upload_bytes = int(os.getenv("TRAIN2_MAX_UPLOAD_BYTES", str(10 * 1024 * 1024)))
     chunks: list[bytes] = []
     total_bytes = 0
@@ -114,13 +121,13 @@ async def start_run_from_upload(file: UploadFile = File(...), authorization: str
         try:
             return await PIPELINE.start_from_azure_parser(pdf_bytes=pdf_bytes)
         except ParserProviderAuthError as exc:
-            raise HTTPException(status_code=502, detail=str(exc)) from exc
+            raise HTTPException(status_code=502, detail="Azure parser authentication failed") from exc
         except ParserProviderTimeoutError as exc:
-            raise HTTPException(status_code=504, detail=str(exc)) from exc
+            raise HTTPException(status_code=504, detail="Azure parser timed out") from exc
         except ParserProviderContractError as exc:
-            raise HTTPException(status_code=422, detail=str(exc)) from exc
+            raise HTTPException(status_code=422, detail="Azure parser response contract invalid") from exc
         except (ParserProviderError, Train2PipelineError) as exc:
-            raise HTTPException(status_code=502, detail=str(exc)) from exc
+            raise HTTPException(status_code=502, detail="Azure parser request failed") from exc
 
     endpoint = os.getenv("TRAIN2_PARSER_API_ENDPOINT", "").strip()
     api_key = os.getenv("TRAIN2_PARSER_API_KEY", "").strip() or None

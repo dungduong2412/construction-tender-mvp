@@ -43,6 +43,22 @@ class ParserAdapterError(Exception):
     pass
 
 
+class ParserAdapterAuthError(ParserAdapterError):
+    pass
+
+
+class ParserAdapterTimeoutError(ParserAdapterError):
+    pass
+
+
+class ParserAdapterContractError(ParserAdapterError):
+    pass
+
+
+class ParserAdapterTransportError(ParserAdapterError):
+    pass
+
+
 class ParserAdapter:
     """
     Submits a PDF to Azure Document Intelligence (or returns mock fixture).
@@ -72,9 +88,7 @@ class ParserAdapter:
         endpoint = _azure_endpoint()
         key = _azure_key()
         if not endpoint or not key:
-            raise ParserAdapterError(
-                "AZURE_DOC_INTEL_ENDPOINT and AZURE_DOC_INTEL_KEY must be set when MOCK_PARSER=false"
-            )
+            raise ParserAdapterContractError("Azure parser configuration is incomplete")
         url = (
             f"{endpoint.rstrip('/')}/formrecognizer/documentModels/"
             f"{MODEL_ID}:analyze?api-version={API_VERSION}"
@@ -84,14 +98,19 @@ class ParserAdapter:
             "Content-Type": "application/pdf",
         }
         async with httpx.AsyncClient(timeout=60) as client:
-            resp = await client.post(url, content=pdf_bytes, headers=headers)
+            try:
+                resp = await client.post(url, content=pdf_bytes, headers=headers)
+            except httpx.TimeoutException as exc:
+                raise ParserAdapterTimeoutError("Azure parser submit timed out") from exc
+            except httpx.HTTPError as exc:
+                raise ParserAdapterTransportError("Azure parser submit transport error") from exc
             if resp.status_code != 202:
-                raise ParserAdapterError(
-                    f"Azure API submit failed: {resp.status_code} {resp.text[:400]}"
-                )
+                if resp.status_code in {401, 403}:
+                    raise ParserAdapterAuthError(f"Azure parser submit failed with status {resp.status_code}")
+                raise ParserAdapterContractError(f"Azure parser submit failed with status {resp.status_code}")
             operation_url = resp.headers.get("Operation-Location", "")
             if not operation_url:
-                raise ParserAdapterError("Azure API did not return Operation-Location header")
+                raise ParserAdapterContractError("Azure parser submit response did not include Operation-Location")
 
             return await self._poll(client, operation_url)
 
@@ -100,16 +119,21 @@ class ParserAdapter:
         headers = {"Ocp-Apim-Subscription-Key": _azure_key()}
         for attempt in range(60):  # max ~5 minutes
             await asyncio.sleep(5)
-            resp = await client.get(operation_url, headers=headers)
+            try:
+                resp = await client.get(operation_url, headers=headers)
+            except httpx.TimeoutException as exc:
+                raise ParserAdapterTimeoutError("Azure parser poll timed out") from exc
+            except httpx.HTTPError as exc:
+                raise ParserAdapterTransportError("Azure parser poll transport error") from exc
             if resp.status_code != 200:
-                raise ParserAdapterError(
-                    f"Azure API poll failed: {resp.status_code} {resp.text[:400]}"
-                )
+                if resp.status_code in {401, 403}:
+                    raise ParserAdapterAuthError(f"Azure parser poll failed with status {resp.status_code}")
+                raise ParserAdapterContractError(f"Azure parser poll failed with status {resp.status_code}")
             result = resp.json()
             status = result.get("status", "")
             if status == "succeeded":
                 return result
             if status == "failed":
-                raise ParserAdapterError(f"Azure analysis failed: {result}")
+                raise ParserAdapterContractError("Azure parser analysis failed")
             # running / notStarted — keep polling
-        raise ParserAdapterError("Azure analysis timed out after 60 poll attempts")
+        raise ParserAdapterTimeoutError("Azure parser analysis timed out after 60 poll attempts")

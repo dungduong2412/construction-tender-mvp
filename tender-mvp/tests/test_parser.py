@@ -209,6 +209,11 @@ class TestAzureBridge:
         first_row = azure_bridge_payload["rows"][0]
         assert first_row["evidence"]
         assert first_row["evidence"][0]["locator"].startswith("p1:tbl1:r")
+        assert first_row["evidence"][0]["page"] == 1
+        assert first_row["evidence"][0]["table"] == 1
+        assert first_row["evidence"][0]["row"] == 1
+        assert first_row["evidence"][0]["column"] == 0
+        assert isinstance(first_row["evidence"][0]["polygon"], list)
 
         line_item = next(row for row in azure_bridge_payload["rows"] if row["quantity_raw"] == "29,5")
         assert line_item["unit_raw"] == "ha"
@@ -216,12 +221,72 @@ class TestAzureBridge:
         assert line_item["ai_suggestions"] == []
         assert "quantity" not in line_item
 
+    def test_missing_cells_do_not_shift_later_values(self):
+        from parser_adapter.azure_bridge import azure_analyze_result_to_parser_payload
+
+        raw = {
+            "status": "succeeded",
+            "analyzeResult": {
+                "pages": [
+                    {
+                        "pageNumber": 1,
+                        "tables": [
+                            {
+                                "cells": [
+                                    {"rowIndex": 0, "columnIndex": 0, "kind": "columnHeader", "content": "STT", "boundingRegions": [{"pageNumber": 1, "polygon": [0, 0, 1, 1]}]},
+                                    {"rowIndex": 0, "columnIndex": 1, "kind": "columnHeader", "content": "NỘI DUNG", "boundingRegions": [{"pageNumber": 1, "polygon": [0, 0, 1, 1]}]},
+                                    {"rowIndex": 0, "columnIndex": 2, "kind": "columnHeader", "content": "ĐVT", "boundingRegions": [{"pageNumber": 1, "polygon": [0, 0, 1, 1]}]},
+                                    {"rowIndex": 0, "columnIndex": 3, "kind": "columnHeader", "content": "KLG", "boundingRegions": [{"pageNumber": 1, "polygon": [0, 0, 1, 1]}]},
+                                    {"rowIndex": 1, "columnIndex": 0, "kind": "content", "content": "1", "boundingRegions": [{"pageNumber": 1, "polygon": [10, 10, 20, 10, 20, 20, 10, 20]}]},
+                                    {"rowIndex": 1, "columnIndex": 1, "kind": "content", "content": "Item A", "boundingRegions": [{"pageNumber": 1, "polygon": [20, 10, 60, 10, 60, 20, 20, 20]}]},
+                                    {"rowIndex": 1, "columnIndex": 3, "kind": "content", "content": "7", "boundingRegions": [{"pageNumber": 1, "polygon": [60, 10, 80, 10, 80, 20, 60, 20]}]},
+                                    {"rowIndex": 2, "columnIndex": 0, "kind": "content", "content": "2", "boundingRegions": [{"pageNumber": 1, "polygon": [10, 30, 20, 30, 20, 40, 10, 40]}]},
+                                    {"rowIndex": 2, "columnIndex": 1, "kind": "content", "content": "Item B", "boundingRegions": [{"pageNumber": 1, "polygon": [20, 30, 60, 30, 60, 40, 20, 40]}]},
+                                    {"rowIndex": 2, "columnIndex": 2, "kind": "content", "content": "m", "boundingRegions": [{"pageNumber": 1, "polygon": [60, 30, 70, 30, 70, 40, 60, 40]}]},
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+        }
+
+        payload = azure_analyze_result_to_parser_payload(raw, "doc-1")
+        rows = {row["row_id"]: row for row in payload["rows"]}
+        first = next(row for row in payload["rows"] if row["description_vi"] == "Item A")
+        second = next(row for row in payload["rows"] if row["description_vi"] == "Item B")
+
+        assert first["unit_raw"] == ""
+        assert first["quantity_raw"] == "7"
+        assert second["unit_raw"] == "m"
+        assert second["quantity_raw"] == ""
+        assert first["evidence"][-1]["column"] == 3
+        assert second["evidence"][-1]["column"] == 2
+
     def test_malformed_azure_response_is_rejected(self):
         from parser_adapter.azure_bridge import azure_analyze_result_to_parser_payload
         from parser_adapter.provider_neutral import ParserProviderContractError
 
         with pytest.raises(ParserProviderContractError):
             azure_analyze_result_to_parser_payload({"status": "succeeded", "analyzeResult": {"pages": "bad"}}, "bad-doc")
+
+        with pytest.raises(ParserProviderContractError):
+            azure_analyze_result_to_parser_payload(
+                {
+                    "status": "succeeded",
+                    "analyzeResult": {
+                        "pages": [
+                            {
+                                "pageNumber": 1,
+                                "tables": [
+                                    {"cells": "bad"},
+                                ],
+                            }
+                        ]
+                    },
+                },
+                "bad-doc",
+            )
 
 
 @pytest.mark.asyncio
@@ -260,3 +325,58 @@ async def test_azure_adapter_submit_poll_round_trip(monkeypatch):
     assert result["status"] == "succeeded"
     assert result["analyzeResult"] == {"pages": [], "tables": []}
     assert calls["poll"] == 2
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "adapter_exc,expected_type",
+    [
+        ("auth", "ParserProviderAuthError"),
+        ("timeout", "ParserProviderTimeoutError"),
+        ("transport", "ParserProviderError"),
+        ("contract", "ParserProviderContractError"),
+    ],
+)
+async def test_azure_bridge_translates_adapter_failures(monkeypatch, adapter_exc, expected_type):
+    from parser_adapter.adapter import (
+        ParserAdapter,
+        ParserAdapterAuthError,
+        ParserAdapterContractError,
+        ParserAdapterTimeoutError,
+        ParserAdapterTransportError,
+    )
+    from parser_adapter.azure_bridge import AzureDocumentIntelligenceProvider
+    from parser_adapter.provider_neutral import (
+        ParserProviderAuthError,
+        ParserProviderContractError,
+        ParserProviderError,
+        ParserProviderTimeoutError,
+    )
+
+    def raise_exc(*args, **kwargs):
+        mapping = {
+            "auth": ParserAdapterAuthError("secret 123"),
+            "timeout": ParserAdapterTimeoutError("secret 456"),
+            "transport": ParserAdapterTransportError("secret 789"),
+            "contract": ParserAdapterContractError("secret 000"),
+        }
+        raise mapping[adapter_exc]
+
+    monkeypatch.setenv("MOCK_PARSER", "false")
+    monkeypatch.setenv("AZURE_DOC_INTEL_ENDPOINT", "https://azure.example.test")
+    monkeypatch.setenv("AZURE_DOC_INTEL_KEY", "secret")
+    monkeypatch.setattr(ParserAdapter, "analyze", raise_exc)
+
+    provider = AzureDocumentIntelligenceProvider()
+
+    if expected_type == "ParserProviderAuthError":
+        expected = ParserProviderAuthError
+    elif expected_type == "ParserProviderTimeoutError":
+        expected = ParserProviderTimeoutError
+    elif expected_type == "ParserProviderContractError":
+        expected = ParserProviderContractError
+    else:
+        expected = ParserProviderError
+
+    with pytest.raises(expected):
+        await provider.analyze(b"%PDF-1.4\n1 0 obj\n<<>>\nendobj\ntrailer\n<<>>\n%%EOF")

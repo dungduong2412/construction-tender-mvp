@@ -32,6 +32,11 @@ class ParserEvidence(BaseModel):
     type: str
     locator: str
     text: str = ""
+    page: int | None = None
+    table: int | None = None
+    row: int | None = None
+    column: int | None = None
+    polygon: list[float] = Field(default_factory=list)
 
 
 class ParserSuggestion(BaseModel):

@@ -335,6 +335,7 @@ class Train1Pipeline:
             decision: MappingDecision = self.mapper.decide(
                 row_id=row_id,
                 row_type=row_type,
+                description_vi=description_vi,
                 unit_raw=unit_raw,
                 quantity_raw=quantity_raw,
                 quantity=quantity,
@@ -354,6 +355,10 @@ class Train1Pipeline:
             tender_unit_price = None
             tender_extension = None
             approval_unit_price = None
+            converted_quantity = None
+            quantity_factor = decision.quantity_factor
+            source_unit = decision.source_unit
+            master_unit = decision.master_unit
 
             if mapping_status == "resolved" and canonical_code is not None and quantity is not None:
                 item_result = self.engine.calculate_work_item_from_runtime(canonical_code, runtime)
@@ -367,7 +372,9 @@ class Train1Pipeline:
                     tender_unit = item_result["tender_rounded_unit_price"]
                     loaded_unit_price = str(loaded_unit)
                     tender_unit_price = str(tender_unit)
-                    tender_extension_value = (tender_unit * quantity).quantize(Decimal("1"))
+                    effective_quantity = (quantity * quantity_factor).quantize(Decimal("0.0001"))
+                    converted_quantity = str(effective_quantity)
+                    tender_extension_value = (tender_unit * effective_quantity).quantize(Decimal("1"))
                     tender_extension = str(tender_extension_value)
                     tender_partial += tender_extension_value
 
@@ -383,9 +390,9 @@ class Train1Pipeline:
                             "machine": Decimal("0"),
                         },
                     )
-                    bucket["material"] += item_result["direct_material_total"] * quantity
-                    bucket["labour"] += item_result["direct_labour_total"] * quantity
-                    bucket["machine"] += item_result["direct_machine_total"] * quantity
+                    bucket["material"] += item_result["direct_material_total"] * effective_quantity
+                    bucket["labour"] += item_result["direct_labour_total"] * effective_quantity
+                    bucket["machine"] += item_result["direct_machine_total"] * effective_quantity
 
                     # Per-row display only.
                     approval_rules = self.engine.approval_rules_for(category, work_item, runtime=runtime, approval_group=approval_group)
@@ -409,6 +416,11 @@ class Train1Pipeline:
                     "unit_raw": unit_raw,
                     "quantity_raw": quantity_raw,
                     "quantity": str(quantity) if quantity is not None else None,
+                    "source_quantity": quantity_raw,
+                    "converted_quantity": converted_quantity,
+                    "quantity_factor": str(quantity_factor),
+                    "source_unit": source_unit,
+                    "master_unit": master_unit,
                     "evidence": evidence,
                     "corrections": corrections,
                     "mapping_status": mapping_status,

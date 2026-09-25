@@ -7,8 +7,10 @@ from pathlib import Path
 
 import httpx
 import pytest
+from fastapi.testclient import TestClient
 from openpyxl import load_workbook
 
+from main import app
 from integration_train1.pipeline import (
     REAL_RESPONSE_FIXTURE_PATH,
     Train1Pipeline,
@@ -66,6 +68,30 @@ def test_train2_low_confidence_unique_match_requires_review():
 
     row = payload["rows"][0]
     assert row["mapping_status"] == "low_confidence_review_required"
+    assert payload["status"] == "INCOMPLETE"
+
+
+def test_train2_missing_source_unit_requires_review_not_auto_accept():
+    pipeline = Train1Pipeline()
+    parsed = {
+        "document_id": "missing-unit",
+        "rows": [
+            {
+                "row_id": "mu-1",
+                "row_type": "line_item",
+                "description_vi": "Đo lưới khống chế mặt bằng đường chuyền cấp 2",
+                "unit_raw": "",
+                "quantity_raw": "1",
+                "page": 1,
+                "evidence": [{"type": "pdf_span", "locator": "p1:l1", "text": "missing unit"}],
+                "ai_suggestions": [{"code": "CF.11620", "confidence": 0.99, "evidence": "strong"}],
+            }
+        ],
+    }
+    payload = pipeline.start_from_parsed_payload(parsed)
+
+    row = payload["rows"][0]
+    assert row["mapping_status"] == "unit_verification_required"
     assert payload["status"] == "INCOMPLETE"
 
 
@@ -178,6 +204,31 @@ def test_train2_duplicate_canonical_codes_are_preserved_per_row():
     assert rows["d1"]["canonical_code"] == "CF.11620"
     assert rows["d2"]["canonical_code"] == "CF.11620"
     assert rows["d1"]["tender_extension"] != rows["d2"]["tender_extension"]
+
+
+def test_train2_generates_candidates_from_description_without_ai_hints():
+    pipeline = Train1Pipeline()
+    parsed = {
+        "document_id": "generated-candidates",
+        "rows": [
+            {
+                "row_id": "gc-1",
+                "row_type": "line_item",
+                "description_vi": "Định vì và cắm cọc GPMB cấp địa hình II",
+                "unit_raw": "mốc",
+                "quantity_raw": "2",
+                "page": 1,
+                "evidence": [{"type": "pdf_span", "locator": "p1:l1", "text": "GPMB"}],
+                "ai_suggestions": [],
+            }
+        ],
+    }
+    payload = pipeline.start_from_parsed_payload(parsed)
+    row = payload["rows"][0]
+
+    assert row["candidates"], "semantic candidate generation must run without ai_suggestions"
+    assert row["mapping_status"] == "resolved"
+    assert row["canonical_code"] == "CF.21120"
 
 
 def test_train2_aggregate_first_approval_for_group_matches_independent_calculation():
@@ -324,6 +375,48 @@ def test_parser_http_timeout(monkeypatch):
     provider = HttpJsonProvider(endpoint="https://example.test/parser")
     with pytest.raises(ParserProviderTimeoutError):
         _run(provider.analyze(b"%PDF"))
+
+
+def test_train2_upload_requires_endpoint_no_fixture_fallback(monkeypatch):
+    monkeypatch.delenv("TRAIN2_PARSER_API_ENDPOINT", raising=False)
+    monkeypatch.setenv("TRAIN2_UPLOAD_AUTH_TOKEN", "token")
+
+    with TestClient(app) as client:
+        resp = client.post(
+            "/api/train1/runs/upload",
+            headers={"Authorization": "Bearer token"},
+            files={"file": ("sample.pdf", b"%PDF-1.4\nabc", "application/pdf")},
+        )
+
+    assert resp.status_code == 503
+    assert "TRAIN2_PARSER_API_ENDPOINT" in resp.text
+
+
+def test_train2_upload_requires_auth_signature_and_size(monkeypatch):
+    monkeypatch.setenv("TRAIN2_PARSER_API_ENDPOINT", "https://example.test/parser")
+    monkeypatch.setenv("TRAIN2_UPLOAD_AUTH_TOKEN", "token")
+    monkeypatch.setenv("TRAIN2_MAX_UPLOAD_BYTES", "16")
+
+    with TestClient(app) as client:
+        no_auth = client.post(
+            "/api/train1/runs/upload",
+            files={"file": ("sample.pdf", b"%PDF-1.4\nabc", "application/pdf")},
+        )
+        assert no_auth.status_code == 401
+
+        bad_sig = client.post(
+            "/api/train1/runs/upload",
+            headers={"Authorization": "Bearer token"},
+            files={"file": ("sample.pdf", b"NOTPDF", "application/pdf")},
+        )
+        assert bad_sig.status_code == 400
+
+        too_big = client.post(
+            "/api/train1/runs/upload",
+            headers={"Authorization": "Bearer token"},
+            files={"file": ("sample.pdf", b"%PDF-1.4\n0123456789ABCDEFZZ", "application/pdf")},
+        )
+        assert too_big.status_code == 413
 
 
 def test_train2_manual_correction_retains_source_evidence():

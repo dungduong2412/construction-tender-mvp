@@ -4,6 +4,7 @@ import os
 
 from fastapi import APIRouter, HTTPException
 from fastapi import File, UploadFile
+from fastapi import Header
 from fastapi.responses import Response
 from pydantic import BaseModel
 
@@ -40,9 +41,19 @@ async def start_run_from_recorded_real_fixture():
 
 
 @router.post("/runs/upload")
-async def start_run_from_upload(file: UploadFile = File(...)):
+async def start_run_from_upload(file: UploadFile = File(...), authorization: str | None = Header(default=None)):
     if not file.filename or not file.filename.lower().endswith(".pdf"):
         raise HTTPException(status_code=400, detail="Only PDF files are accepted")
+
+    expected_token = os.getenv("TRAIN2_UPLOAD_AUTH_TOKEN", "").strip()
+    if not expected_token:
+        raise HTTPException(status_code=503, detail="LIVE INTEGRATION BLOCKED: TRAIN2_UPLOAD_AUTH_TOKEN is not configured")
+
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Missing Bearer authorization token")
+    supplied_token = authorization.split(" ", 1)[1].strip()
+    if supplied_token != expected_token:
+        raise HTTPException(status_code=401, detail="Invalid upload authorization token")
 
     endpoint = os.getenv("TRAIN2_PARSER_API_ENDPOINT", "").strip()
     api_key = os.getenv("TRAIN2_PARSER_API_KEY", "").strip() or None
@@ -57,17 +68,27 @@ async def start_run_from_upload(file: UploadFile = File(...)):
     if not pdf_bytes:
         raise HTTPException(status_code=400, detail="Uploaded PDF is empty")
 
+    max_upload_bytes = int(os.getenv("TRAIN2_MAX_UPLOAD_BYTES", str(10 * 1024 * 1024)))
+    if len(pdf_bytes) > max_upload_bytes:
+        raise HTTPException(status_code=413, detail=f"Uploaded PDF exceeds size limit ({max_upload_bytes} bytes)")
+
+    if not pdf_bytes.startswith(b"%PDF-"):
+        raise HTTPException(status_code=400, detail="Uploaded file does not have a valid PDF signature")
+
+    if not endpoint:
+        raise HTTPException(status_code=503, detail="LIVE INTEGRATION BLOCKED: TRAIN2_PARSER_API_ENDPOINT is not configured")
+    if not api_key:
+        raise HTTPException(status_code=503, detail="LIVE INTEGRATION BLOCKED: TRAIN2_PARSER_API_KEY is not configured")
+
     try:
-        if endpoint:
-            return await PIPELINE.start_from_parser_api(
-                pdf_bytes=pdf_bytes,
-                endpoint=endpoint,
-                api_key=api_key,
-                api_key_header=api_key_header,
-                api_key_prefix=api_key_prefix,
-                timeout_seconds=timeout_seconds,
-            )
-        return await PIPELINE.start_from_real_fixture()
+        return await PIPELINE.start_from_parser_api(
+            pdf_bytes=pdf_bytes,
+            endpoint=endpoint,
+            api_key=api_key,
+            api_key_header=api_key_header,
+            api_key_prefix=api_key_prefix,
+            timeout_seconds=timeout_seconds,
+        )
     except ParserProviderAuthError as exc:
         raise HTTPException(status_code=502, detail=str(exc)) from exc
     except ParserProviderTimeoutError as exc:

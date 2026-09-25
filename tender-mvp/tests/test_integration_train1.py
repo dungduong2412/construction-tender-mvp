@@ -379,6 +379,7 @@ def test_parser_http_timeout(monkeypatch):
 
 
 def test_train2_upload_requires_endpoint_no_fixture_fallback(monkeypatch):
+    monkeypatch.setenv("TRAIN2_PARSER_PROVIDER", "http_json")
     monkeypatch.delenv("TRAIN2_PARSER_API_ENDPOINT", raising=False)
     monkeypatch.setenv("TRAIN2_UPLOAD_AUTH_TOKEN", "token")
 
@@ -391,6 +392,38 @@ def test_train2_upload_requires_endpoint_no_fixture_fallback(monkeypatch):
 
     assert resp.status_code == 503
     assert "TRAIN2_PARSER_API_ENDPOINT" in resp.text
+
+
+@pytest.mark.parametrize(
+    "missing_key",
+    ["AZURE_DOC_INTEL_ENDPOINT", "AZURE_DOC_INTEL_KEY"],
+)
+def test_train2_upload_azure_mode_requires_azure_config(monkeypatch, missing_key):
+    monkeypatch.setenv("TRAIN2_UPLOAD_AUTH_TOKEN", "token")
+    monkeypatch.setenv("TRAIN2_PARSER_PROVIDER", "azure")
+    monkeypatch.setenv("MOCK_PARSER", "false")
+    monkeypatch.setenv("AZURE_DOC_INTEL_ENDPOINT", "https://azure.example.test")
+    monkeypatch.setenv("AZURE_DOC_INTEL_KEY", "secret")
+    monkeypatch.delenv(missing_key, raising=False)
+
+    called = {"azure": 0}
+
+    async def fake_azure(*args, **kwargs):
+        called["azure"] += 1
+        raise AssertionError("azure parser must not run when required Azure config is missing")
+
+    monkeypatch.setattr(PIPELINE, "start_from_azure_parser", fake_azure)
+
+    with TestClient(app) as client:
+        resp = client.post(
+            "/api/train1/runs/upload",
+            headers={"Authorization": "Bearer token"},
+            files={"file": ("sample.pdf", b"%PDF-1.4\nabc", "application/pdf")},
+        )
+
+    assert resp.status_code == 503
+    assert missing_key in resp.text
+    assert called["azure"] == 0
 
 
 def test_train2_upload_requires_auth_signature_and_size(monkeypatch):

@@ -22,6 +22,7 @@ from parser_adapter.provider_neutral import (
     ProviderNeutralParserAdapter,
     RecordedFixtureProvider,
 )
+from parser_adapter.azure_bridge import AzureDocumentIntelligenceProvider
 from pricing_engine.calculation_engine_v2 import CalculationEngineV2
 
 
@@ -109,6 +110,7 @@ class Train1Pipeline:
         api_key_header: str = "Authorization",
         api_key_prefix: str = "Bearer",
         timeout_seconds: float = 30.0,
+        live_integration_verified: bool = False,
     ) -> dict[str, Any]:
         provider = HttpJsonProvider(
             endpoint=endpoint,
@@ -119,7 +121,25 @@ class Train1Pipeline:
         )
         adapter = ProviderNeutralParserAdapter(provider)
         parsed = await adapter.parse(pdf_bytes)
-        return self.start_from_parsed_payload(parsed, live_integration_verified=True, integration_label="live_api")
+        return self.start_from_parsed_payload(
+            parsed,
+            live_integration_verified=live_integration_verified,
+            integration_label="normalized_http_json",
+        )
+
+    async def start_from_azure_parser(
+        self,
+        pdf_bytes: bytes,
+        live_integration_verified: bool = False,
+    ) -> dict[str, Any]:
+        provider = AzureDocumentIntelligenceProvider()
+        adapter = ProviderNeutralParserAdapter(provider)
+        parsed = await adapter.parse(pdf_bytes)
+        return self.start_from_parsed_payload(
+            parsed,
+            live_integration_verified=live_integration_verified,
+            integration_label="azure_document_intelligence",
+        )
 
     def start_from_parsed_payload(
         self,

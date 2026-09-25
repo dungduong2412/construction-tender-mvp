@@ -22,12 +22,21 @@ from typing import Any
 
 import httpx
 
-MOCK_PARSER = os.getenv("MOCK_PARSER", "true").lower() in ("1", "true", "yes")
-AZURE_ENDPOINT = os.getenv("AZURE_DOC_INTEL_ENDPOINT", "")
-AZURE_KEY = os.getenv("AZURE_DOC_INTEL_KEY", "")
 API_VERSION = "2024-02-29-preview"
 MODEL_ID = "prebuilt-layout"
 FIXTURE_PATH = Path(__file__).parent.parent.parent / "fixtures" / "bang_tien_luong_mock.json"
+
+
+def _mock_parser_enabled() -> bool:
+    return os.getenv("MOCK_PARSER", "true").lower() in ("1", "true", "yes")
+
+
+def _azure_endpoint() -> str:
+    return os.getenv("AZURE_DOC_INTEL_ENDPOINT", "").strip()
+
+
+def _azure_key() -> str:
+    return os.getenv("AZURE_DOC_INTEL_KEY", "").strip()
 
 
 class ParserAdapterError(Exception):
@@ -44,7 +53,7 @@ class ParserAdapter:
     """
 
     async def analyze(self, pdf_bytes: bytes) -> dict[str, Any]:
-        if MOCK_PARSER:
+        if _mock_parser_enabled():
             return self._load_mock()
         return await self._analyze_real(pdf_bytes)
 
@@ -60,16 +69,18 @@ class ParserAdapter:
 
     # ------------------------------------------------------------------
     async def _analyze_real(self, pdf_bytes: bytes) -> dict[str, Any]:
-        if not AZURE_ENDPOINT or not AZURE_KEY:
+        endpoint = _azure_endpoint()
+        key = _azure_key()
+        if not endpoint or not key:
             raise ParserAdapterError(
                 "AZURE_DOC_INTEL_ENDPOINT and AZURE_DOC_INTEL_KEY must be set when MOCK_PARSER=false"
             )
         url = (
-            f"{AZURE_ENDPOINT.rstrip('/')}/formrecognizer/documentModels/"
+            f"{endpoint.rstrip('/')}/formrecognizer/documentModels/"
             f"{MODEL_ID}:analyze?api-version={API_VERSION}"
         )
         headers = {
-            "Ocp-Apim-Subscription-Key": AZURE_KEY,
+            "Ocp-Apim-Subscription-Key": key,
             "Content-Type": "application/pdf",
         }
         async with httpx.AsyncClient(timeout=60) as client:
@@ -86,7 +97,7 @@ class ParserAdapter:
 
     async def _poll(self, client: httpx.AsyncClient, operation_url: str) -> dict[str, Any]:
         import asyncio
-        headers = {"Ocp-Apim-Subscription-Key": AZURE_KEY}
+        headers = {"Ocp-Apim-Subscription-Key": _azure_key()}
         for attempt in range(60):  # max ~5 minutes
             await asyncio.sleep(5)
             resp = await client.get(operation_url, headers=headers)

@@ -13,6 +13,7 @@ from openpyxl import load_workbook
 from main import app
 from integration_train1.pipeline import (
     REAL_RESPONSE_FIXTURE_PATH,
+    PIPELINE,
     Train1Pipeline,
     Train2PipelineError,
 )
@@ -417,6 +418,57 @@ def test_train2_upload_requires_auth_signature_and_size(monkeypatch):
             files={"file": ("sample.pdf", b"%PDF-1.4\n0123456789ABCDEFZZ", "application/pdf")},
         )
         assert too_big.status_code == 413
+
+
+def test_train2_upload_uses_azure_bridge_when_azure_mode_selected(monkeypatch):
+    monkeypatch.setenv("TRAIN2_UPLOAD_AUTH_TOKEN", "token")
+    monkeypatch.setenv("TRAIN2_PARSER_PROVIDER", "azure")
+    monkeypatch.setenv("AZURE_DOC_INTEL_ENDPOINT", "https://azure.example.test")
+    monkeypatch.setenv("AZURE_DOC_INTEL_KEY", "secret")
+    monkeypatch.delenv("TRAIN2_PARSER_API_ENDPOINT", raising=False)
+    monkeypatch.delenv("TRAIN2_PARSER_API_KEY", raising=False)
+
+    called = {"azure": 0, "http": 0}
+
+    async def fake_azure(pdf_bytes, live_integration_verified=False):
+        called["azure"] += 1
+        return {
+            "run_id": "azure-run-1",
+            "source_document_id": "azure-doc-intel-test",
+            "required_row_count": 0,
+            "resolved_required_row_count": 0,
+            "status": "COMPLETE",
+            "official_tender_total": None,
+            "official_approval_total": None,
+            "tender_partial_subtotal": "0",
+            "approval_partial_subtotal": "0",
+            "approval_group_components": {},
+            "blocked_rows": [],
+            "live_integration_verified": live_integration_verified,
+            "integration_label": "azure_document_intelligence",
+            "integration_note": None,
+            "rows": [],
+        }
+
+    async def fake_http(*args, **kwargs):
+        called["http"] += 1
+        raise AssertionError("normalized HTTP provider must not be used in azure mode")
+
+    monkeypatch.setattr(PIPELINE, "start_from_azure_parser", fake_azure)
+    monkeypatch.setattr(PIPELINE, "start_from_parser_api", fake_http)
+
+    with TestClient(app) as client:
+        resp = client.post(
+            "/api/train1/runs/upload",
+            headers={"Authorization": "Bearer token"},
+            files={"file": ("sample.pdf", b"%PDF-1.4\nabc", "application/pdf")},
+        )
+
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["integration_label"] == "azure_document_intelligence"
+    assert called["azure"] == 1
+    assert called["http"] == 0
 
 
 def test_train2_manual_correction_retains_source_evidence():

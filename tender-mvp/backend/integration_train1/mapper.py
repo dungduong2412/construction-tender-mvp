@@ -80,16 +80,39 @@ class Train2SemanticMapper:
         lhs = (a or "").strip().lower()
         rhs = (b or "").strip().lower()
         if not lhs or not rhs:
-            return True
+            return False
         return lhs == rhs
+
+    @staticmethod
+    def _rule_is_approved(rule: dict[str, Any]) -> bool:
+        if not isinstance(rule, dict):
+            return False
+        if str(rule.get("status") or "").strip().lower() == "approved":
+            return True
+        if bool(rule.get("approved")):
+            return True
+        provenance = str(rule.get("provenance") or "").strip().lower()
+        if "approved" in provenance:
+            return True
+        note = str(rule.get("note") or "").strip().lower()
+        if "approved" in note:
+            return True
+        return False
 
     @staticmethod
     def _find_verified_conversion(pdf_unit: str, master_unit: str, unit_rules: list[dict[str, Any]]) -> dict[str, Any] | None:
         lhs = (pdf_unit or "").strip().lower()
         rhs = (master_unit or "").strip().lower()
         for rule in unit_rules:
-            if (rule.get("from_unit") or "").strip().lower() == lhs and (rule.get("to_unit") or "").strip().lower() == rhs:
-                return rule
+            if not isinstance(rule, dict):
+                continue
+            if (rule.get("from_unit") or "").strip().lower() != lhs:
+                continue
+            if (rule.get("to_unit") or "").strip().lower() != rhs:
+                continue
+            if not Train2SemanticMapper._rule_is_approved(rule):
+                continue
+            return rule
         return None
 
     def decide(
@@ -195,6 +218,33 @@ class Train2SemanticMapper:
                     quantity_factor=Decimal("1"),
                     source_unit=None,
                     master_unit=str((work_master.get(code) or {}).get("unit") or "") or None,
+                )
+            if not effective_source_unit and manual_unit_confirmed:
+                return MappingDecision(
+                    mapping_status="unit_verification_required",
+                    canonical_code=None,
+                    confidence=None,
+                    mapping_evidence=None,
+                    reason="Checkbox alone does not create a unit value; original and corrected units must be explicit and compatible or converted by an approved rule",
+                    candidates=[],
+                    missing_dependencies=[],
+                    quantity_factor=Decimal("1"),
+                    source_unit=None,
+                    master_unit=str((work_master.get(code) or {}).get("unit") or "") or None,
+                )
+            master_unit = str((work_master.get(code) or {}).get("unit") or "").strip()
+            if not master_unit:
+                return MappingDecision(
+                    mapping_status="unit_verification_required",
+                    canonical_code=None,
+                    confidence=None,
+                    mapping_evidence=None,
+                    reason="Manual selected code is missing a canonical unit; source and canonical units must be explicit and compatible or converted by an approved rule",
+                    candidates=[],
+                    missing_dependencies=[],
+                    quantity_factor=Decimal("1"),
+                    source_unit=effective_source_unit or None,
+                    master_unit=None,
                 )
             candidate_map[code] = {
                 "code": code,

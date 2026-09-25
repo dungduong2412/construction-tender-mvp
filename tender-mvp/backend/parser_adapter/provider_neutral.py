@@ -54,6 +54,9 @@ class ParserRow(BaseModel):
     page: int = Field(ge=1)
     evidence: list[ParserEvidence] = Field(default_factory=list)
     ai_suggestions: list[ParserSuggestion] = Field(default_factory=list)
+    manual_selected_code: str | None = None
+    manual_unit_confirmed: bool = False
+    manual_unit_correction: str | None = None
 
 
 class ParserPayload(BaseModel):

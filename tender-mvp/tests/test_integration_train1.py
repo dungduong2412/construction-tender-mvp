@@ -479,9 +479,162 @@ def test_train2_manual_selection_requires_unit_confirmation_or_correction():
     assert row["mapping_status"] == "unit_verification_required"
 
 
+def test_train2_unit_confirmed_without_unit_remains_blocked():
+    pipeline = Train1Pipeline()
+    parsed = {
+        "document_id": "manual-empty-unit",
+        "rows": [
+            {
+                "row_id": "m3",
+                "row_type": "line_item",
+                "description_vi": "Ambiguous",
+                "unit_raw": "",
+                "quantity_raw": "1",
+                "manual_selected_code": "CF.21120",
+                "manual_unit_confirmed": True,
+                "manual_unit_correction": "",
+                "page": 1,
+                "evidence": [{"type": "pdf_span", "locator": "p1:l1", "text": "proof"}],
+                "ai_suggestions": [{"code": "CF.21120", "confidence": 0.9, "evidence": "hint"}],
+            }
+        ],
+    }
+    payload = pipeline.start_from_parsed_payload(parsed)
+    row = payload["rows"][0]
+    assert row["mapping_status"] == "unit_verification_required"
+
+
+def test_train2_manual_mapping_requires_canonical_unit_to_be_explicit():
+    pipeline = Train1Pipeline()
+    decision = pipeline.mapper.decide(
+        row_id="m4",
+        row_type="line_item",
+        description_vi="Ambiguous",
+        unit_raw="điểm",
+        quantity_raw="1",
+        quantity=Decimal("1"),
+        suggestions=[{"code": "CF.21120", "confidence": 0.9, "evidence": "hint"}],
+        work_master={"CF.21120": {"unit": ""}},
+        unit_rules=[],
+        manual_selected_code="CF.21120",
+        manual_unit_confirmed=True,
+        manual_unit_correction="",
+        allow_zero_quantity=False,
+    )
+    assert decision.mapping_status == "unit_verification_required"
+    assert decision.reason is not None
+
+
+def test_train2_conversion_requires_approved_provenance():
+    pipeline = Train1Pipeline()
+    pipeline._unit_rules.append({
+        "from_unit": "2diem",
+        "to_unit": "điểm",
+        "factor": 2,
+        "verified": True,
+        "note": "parser claim only",
+    })
+
+    parsed = {
+        "document_id": "conversion-no-provenance",
+        "rows": [
+            {
+                "row_id": "c1",
+                "row_type": "line_item",
+                "description_vi": "CF row",
+                "unit_raw": "2diem",
+                "quantity_raw": "3",
+                "page": 1,
+                "evidence": [{"type": "pdf_span", "locator": "p1:l1", "text": "CF"}],
+                "ai_suggestions": [{"code": "CF.11620", "confidence": 0.99, "evidence": "code"}],
+            }
+        ],
+    }
+    payload = pipeline.start_from_parsed_payload(parsed)
+    row = payload["rows"][0]
+    assert row["mapping_status"] == "unit_incompatible"
+    assert row["quantity_factor"] == "1"
+
+
+def test_train2_approved_conversion_changes_tender_and_approval_quantities():
+    pipeline = Train1Pipeline()
+    pipeline._unit_rules.append({
+        "from_unit": "2diem",
+        "to_unit": "điểm",
+        "factor": 2,
+        "approved": True,
+        "status": "approved",
+        "provenance": "reference XLS approved by cost control",
+    })
+
+    parsed = {
+        "document_id": "conversion-approved",
+        "rows": [
+            {
+                "row_id": "c2",
+                "row_type": "line_item",
+                "description_vi": "CF row",
+                "unit_raw": "2diem",
+                "quantity_raw": "3",
+                "page": 1,
+                "evidence": [{"type": "pdf_span", "locator": "p1:l1", "text": "CF"}],
+                "ai_suggestions": [{"code": "CF.11620", "confidence": 0.99, "evidence": "code"}],
+            }
+        ],
+    }
+    payload = pipeline.start_from_parsed_payload(parsed)
+    row = payload["rows"][0]
+    runtime = pipeline.engine.load_runtime_data()
+    cf = pipeline.engine.calculate_work_item_from_runtime("CF.11620", runtime)
+    expected_tender = (cf["tender_rounded_unit_price"] * Decimal("6")).quantize(Decimal("1"))
+    expected_approval = pipeline.engine._compute_loaded_components(
+        cf["direct_material_total"] * Decimal("6"),
+        cf["direct_labour_total"] * Decimal("6"),
+        cf["direct_machine_total"] * Decimal("6"),
+        pipeline.engine.approval_rules_for("topography", runtime=runtime, approval_group=runtime["work_item_master"]["CF.11620"]["approval_rule_group"]),
+    )["FINAL"]
+
+    assert row["mapping_status"] == "resolved"
+    assert row["quantity_factor"] == "2"
+    assert row["converted_quantity"] == "6.0000"
+    assert Decimal(row["tender_extension"]) == expected_tender
+    assert Decimal(payload["approval_partial_subtotal"]) == expected_approval
+
+
+def test_train2_manual_selection_requires_unit_confirmation_or_correction():
+    pipeline = Train1Pipeline()
+    parsed = {
+        "document_id": "manual-unit-check",
+        "rows": [
+            {
+                "row_id": "m2",
+                "row_type": "line_item",
+                "description_vi": "Ambiguous",
+                "unit_raw": "",
+                "quantity_raw": "1",
+                "page": 1,
+                "evidence": [{"type": "pdf_span", "locator": "p1:l1", "text": "proof"}],
+                "ai_suggestions": [{"code": "CF.21120", "confidence": 0.9, "evidence": "hint"}],
+            }
+        ],
+    }
+    payload = pipeline.start_from_parsed_payload(parsed)
+    updated = pipeline.apply_manual_mapping(payload["run_id"], "m2", "CF.21120", reason="manual")
+
+    row = updated["rows"][0]
+    assert row["mapping_status"] == "unit_verification_required"
+
+
 def test_train2_conversion_factor_applies_to_tender_and_approval_aggregate():
     pipeline = Train1Pipeline()
-    pipeline._unit_rules.append({"from_unit": "2diem", "to_unit": "điểm", "factor": 2, "verified": True})
+    pipeline._unit_rules.append({
+        "from_unit": "2diem",
+        "to_unit": "điểm",
+        "factor": 2,
+        "approved": True,
+        "status": "approved",
+        "provenance": "reference XLS approved by cost control",
+    })
 
     parsed = {
         "document_id": "conversion-aggregate",
@@ -525,7 +678,13 @@ def test_train2_conversion_factor_applies_to_tender_and_approval_aggregate():
 
 def test_train2_invalid_conversion_factor_blocked():
     pipeline = Train1Pipeline()
-    pipeline._unit_rules.append({"from_unit": "badunit", "to_unit": "điểm", "factor": 0, "verified": True})
+    pipeline._unit_rules.append({
+        "from_unit": "badunit",
+        "to_unit": "điểm",
+        "factor": 0,
+        "verified": True,
+        "note": "unapproved parser hint",
+    })
 
     parsed = {
         "document_id": "invalid-conversion",

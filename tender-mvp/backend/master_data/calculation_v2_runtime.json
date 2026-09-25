@@ -14,11 +14,108 @@
       "note": "Independent historical snapshot; not a current formula target."
     }
   },
+  "approval_project_rules": {
+    "gdp_rate": "0.10",
+    "rounding": "whole_dong"
+  },
+  "approval_category_rules": {
+    "topography": {
+      "vat_rate": "0.10",
+      "tt_rate": "0",
+      "lt_rate": "0.02"
+    },
+    "geotechnical_drilling": {
+      "vat_rate": "0.10",
+      "tt_rate": "0",
+      "lt_rate": "0.02"
+    },
+    "laboratory": {
+      "vat_rate": "0.10",
+      "tt_rate": "0",
+      "lt_rate": "0",
+      "disable_cpa": true
+    },
+    "traffic_survey": {
+      "vat_rate": "0.08",
+      "tt_rate": "0.01",
+      "lt_rate": "0.02"
+    },
+    "gmpb_stake": {
+      "vat_rate": "0.08",
+      "tt_rate": "0.03",
+      "lt_rate": "0.02"
+    },
+    "gmpb_marker": {
+      "vat_rate": "0.08",
+      "tt_rate": "0.03",
+      "lt_rate": "0.02",
+      "c_base": "T",
+      "cpa_rate": "0.02",
+      "cbc_rate": "0.03"
+    }
+  },
+  "approval_rule_groups": {
+    "topography_main": {
+      "category": "topography",
+      "approval_rules": {
+        "vat_rate": "0.10",
+        "tt_rate": "0",
+        "lt_rate": "0.02"
+      }
+    },
+    "geotechnical_main": {
+      "category": "geotechnical_drilling",
+      "approval_rules": {
+        "vat_rate": "0.10",
+        "tt_rate": "0",
+        "lt_rate": "0.02"
+      }
+    },
+    "laboratory_main": {
+      "category": "laboratory",
+      "approval_rules": {
+        "vat_rate": "0.10",
+        "tt_rate": "0",
+        "lt_rate": "0",
+        "disable_cpa": true
+      }
+    },
+    "traffic_main": {
+      "category": "traffic_survey",
+      "approval_rules": {
+        "vat_rate": "0.08",
+        "tt_rate": "0.01",
+        "lt_rate": "0.02"
+      }
+    },
+    "gmpb_stake_main": {
+      "category": "gmpb_stake",
+      "approval_rules": {
+        "vat_rate": "0.08",
+        "tt_rate": "0.03",
+        "lt_rate": "0.02"
+      }
+    },
+    "gmpb_marker_main": {
+      "category": "gmpb_marker",
+      "approval_rules": {
+        "vat_rate": "0.08",
+        "tt_rate": "0.03",
+        "lt_rate": "0.02",
+        "c_base": "T",
+        "cpa_rate": "0.02",
+        "cbc_rate": "0.03"
+      }
+    }
+  },
   "work_item_master": {
     "CF.11620": {
       "code": "CF.11620",
       "description": "Đo lưới khống chế mặt bằng. Đường chuyền cấp 2. Bộ thiết bị GPS (3 máy). ). ĐH cấp II",
       "category": "topography",
+      "approval_rule_group": "topography_main",
+      "tender_rounding_mode": "down_to_thousand",
+      "tender_unit_price": "3808000",
       "project_quantity": "8.0",
       "unit": "điểm",
       "source_cells": [
@@ -570,6 +667,9 @@
       "code": "CC.21310",
       "description": "Khoan xoay bơm rửa để lấy mẫu ở trên cạn. Độ sâu hố khoan từ 0m đến 100m. Cấp đất đá I -III",
       "category": "geotechnical_drilling",
+      "approval_rule_group": "geotechnical_main",
+      "tender_rounding_mode": "down_to_thousand",
+      "tender_unit_price": "1414000",
       "project_quantity": "1583.0",
       "unit": "m khoan",
       "source_cells": [
@@ -1187,6 +1287,9 @@
       "code": "DC.02001",
       "description": "Thí nghiệm cơ lý hóa của đất trong phòng thí nghiệm, chỉ tiêu khối lượng riêng",
       "category": "laboratory",
+      "approval_rule_group": "laboratory_main",
+      "tender_rounding_mode": "down_to_thousand",
+      "tender_unit_price": "634000",
       "project_quantity": "338.0",
       "unit": "1 chỉ tiêu",
       "source_cells": [
@@ -1671,6 +1774,9 @@
       "code": "KS.4/8",
       "description": "Khảo sát vị trí, lắp đặt và vận hành camera (03 vị trí và 06 mặt cắt)",
       "category": "traffic_survey",
+      "approval_rule_group": "traffic_main",
+      "tender_rounding_mode": "down_to_thousand",
+      "tender_unit_price": "584000",
       "project_quantity": "",
       "unit": "Công",
       "source_cells": [
@@ -1895,6 +2001,9 @@
       "code": "CF.21120",
       "description": "Định vì và cắm cọc GPMB. Cấp địa hình II",
       "category": "gmpb_stake",
+      "approval_rule_group": "gmpb_stake_main",
+      "tender_rounding_mode": "down_to_thousand",
+      "tender_unit_price": "2045000",
       "project_quantity": "",
       "unit": "mốc",
       "source_cells": [
@@ -2446,6 +2555,9 @@
       "code": "AG.11112",
       "description": "BT đúc sẵn cọc, cột đá 1x2 M.200 (độ sụt 2-4)  (0.2*0.2*1)m3",
       "category": "gmpb_marker",
+      "approval_rule_group": "gmpb_marker_main",
+      "tender_rounding_mode": "down_to_thousand",
+      "tender_unit_price": "2919000",
       "project_quantity": "",
       "unit": "m3",
       "source_cells": [

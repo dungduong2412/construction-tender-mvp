@@ -175,17 +175,53 @@ class CalculationEngineV2:
         },
     }
 
+    def _category_key(self, category: str) -> str:
+        return str(category or "default").lower().replace(" ", "_").replace("-", "_")
+
     def _rule_for_category(self, category: str) -> dict[str, Any]:
         merged = dict(self.CATEGORY_DEFAULTS)
-        category_key = category.lower().replace(" ", "_").replace("-", "_")
+        category_key = self._category_key(category)
         if category_key in self.CATEGORY_RULES:
             merged.update(self.CATEGORY_RULES[category_key])
         return merged
 
-    def approval_rules_for(self, category: str, item: dict[str, Any] | None = None) -> ApprovalCostRules:
+    def _approval_group_for_item(self, item: dict[str, Any]) -> str:
+        group_key = item.get("approval_rule_group") or item.get("calculation_group")
+        if group_key:
+            return str(group_key)
+        return self._category_key(str(item.get("category") or "default"))
+
+    def _normalise_decimal_rule_values(self, rules: dict[str, Any]) -> dict[str, Any]:
+        normalised = dict(rules)
+        for key in ["c_rate", "tt_rate", "vat_rate", "lt_rate", "cpa_rate", "cbc_rate", "gdp_rate"]:
+            if key in normalised and normalised[key] not in (None, ""):
+                normalised[key] = _d(normalised[key])
+        if "disable_cpa" in normalised:
+            disabled = bool(normalised.pop("disable_cpa"))
+            normalised["disabled_components"] = dict(normalised.get("disabled_components") or {})
+            normalised["disabled_components"]["cpa"] = disabled
+        return normalised
+
+    def approval_rules_for(
+        self,
+        category: str,
+        item: dict[str, Any] | None = None,
+        runtime: dict[str, Any] | None = None,
+        approval_group: str | None = None,
+    ) -> ApprovalCostRules:
         item = item or {}
-        overrides = dict(item.get("hsxl_rules") or {})
-        overrides.update(item.get("approval_rules") or {})
+        runtime = runtime or {}
+        category_key = self._category_key(category)
+
+        project_rules = self._normalise_decimal_rule_values(dict(runtime.get("approval_project_rules") or {}))
+        category_rules = self._normalise_decimal_rule_values(dict((runtime.get("approval_category_rules") or {}).get(category_key) or {}))
+
+        group_rules = {}
+        if approval_group:
+            raw_group = dict((runtime.get("approval_rule_groups") or {}).get(str(approval_group)) or {})
+            group_rules = self._normalise_decimal_rule_values(dict(raw_group.get("approval_rules") or {}))
+
+        overrides = self._normalise_decimal_rule_values(dict(item.get("approval_rules") or {}))
         category_rule = self._rule_for_category(category)
         approval_rule = ApprovalCostRules(
             {
@@ -194,6 +230,9 @@ class CalculationEngineV2:
                 "rounding": "whole_dong",
             }
         )
+        approval_rule.update(project_rules)
+        approval_rule.update(category_rules)
+        approval_rule.update(group_rules)
         for key in ["c_rate", "tt_rate", "vat_rate", "lt_rate", "cpa_rate", "cbc_rate", "gdp_rate"]:
             if key in overrides and overrides[key] not in (None, ""):
                 approval_rule[key] = _d(overrides[key])
@@ -209,11 +248,12 @@ class CalculationEngineV2:
         overrides = dict(item.get("hsxl_rules") or {})
         overrides.update(item.get("tender_rules") or {})
         category_rule = self._rule_for_category(category)
+        rounding_mode = item.get("tender_rounding_mode") or item.get("rounding_mode") or "down_to_thousand"
         tender_rule = TenderCostRules(
             {
                 **category_rule,
                 "gdp_rate": Decimal("0"),
-                "rounding": "down_to_thousand",
+                "rounding": str(rounding_mode),
             }
         )
         for key in ["c_rate", "tt_rate", "vat_rate", "lt_rate", "cpa_rate", "cbc_rate", "gdp_rate"]:
@@ -362,12 +402,20 @@ class CalculationEngineV2:
             return Decimal("0")
         mode = (rounding_mode or "down_to_thousand").strip()
         if mode == "down_to_thousand":
-            return value.quantize(Decimal("1000"), rounding=ROUND_DOWN)
+            return (value / Decimal("1000")).to_integral_value(rounding=ROUND_DOWN) * Decimal("1000")
         if mode == "whole_dong":
             return value.quantize(Decimal("1"), rounding=ROUND_HALF_UP)
         if mode == "to_1_decimal":
             return value.quantize(Decimal("0.1"), rounding=ROUND_HALF_UP)
         return value.quantize(Decimal("1"), rounding=ROUND_HALF_UP)
+
+    def _resolve_tender_rounded_workbook_price(self, item: dict[str, Any], loaded_price: Decimal | None, rule: dict[str, Any]) -> Decimal | None:
+        workbook_tender = item.get("tender_unit_price")
+        if workbook_tender is not None:
+            return _d(workbook_tender)
+        if loaded_price is None:
+            return None
+        return self._round_tender_unit_price(loaded_price, rule.get("rounding"))
 
     def calculate_work_item_from_runtime(self, work_item_code: str, runtime: dict[str, Any] | None = None) -> dict[str, Any]:
         runtime = runtime or self.load_runtime_data()
@@ -457,6 +505,7 @@ class CalculationEngineV2:
         if workbook_loaded_price is None:
             workbook_loaded_price = item.get("tender_loaded_price") or item.get("final_loaded_price")
         workbook_loaded_price = _d(workbook_loaded_price) if workbook_loaded_price is not None else None
+        workbook_tender_rounded_price = self._resolve_tender_rounded_workbook_price(item, workbook_loaded_price, rule)
 
         workbook_direct_total = _d(item.get("direct_total", 0)) if item.get("direct_total") is not None else None
 
@@ -472,10 +521,13 @@ class CalculationEngineV2:
             "loaded_unit_price": loaded_price,
             "tender_rounded_unit_price": tender_rounded_price,
             "tender_unit_price": tender_rounded_price,
+            "tender_rounding_mode": rule.get("rounding"),
             "workbook_direct_total": workbook_direct_total,
             "direct_total_parity": None if direct_total is None or workbook_direct_total is None else direct_total - workbook_direct_total,
             "workbook_loaded_unit_price": workbook_loaded_price,
             "loaded_unit_price_parity": None if loaded_price is None or workbook_loaded_price is None else loaded_price - workbook_loaded_price,
+            "workbook_tender_unit_price": workbook_tender_rounded_price,
+            "tender_unit_price_parity": None if tender_rounded_price is None or workbook_tender_rounded_price is None else tender_rounded_price - workbook_tender_rounded_price,
             "source_cells": item.get("source_cells", []),
             "trace": trace,
             "missing_dependencies": missing_dependencies,
@@ -672,49 +724,72 @@ class CalculationEngineV2:
                 "status": result.get("calculation_status"),
                 "direct_total": result.get("direct_total"),
                 "loaded_unit_price": result.get("loaded_unit_price"),
+                "tender_unit_price": result.get("tender_rounded_unit_price"),
                 "direct_extension": None if result.get("direct_total") is None else quantity * result["direct_total"],
-                "tender_extension": None if result.get("loaded_unit_price") is None else quantity * result["loaded_unit_price"],
+                "tender_extension": None if result.get("tender_rounded_unit_price") is None else quantity * result["tender_rounded_unit_price"],
             }
         return boq
 
     def calculate_approval_estimate(self, runtime: dict[str, Any] | None = None) -> dict[str, Any]:
         runtime = runtime or self.load_runtime_data()
         items = self._normalise_runtime_items(runtime)
-        category_totals: dict[str, dict[str, Decimal]] = {}
+        group_totals: dict[str, dict[str, Any]] = {}
         blocked_items: list[str] = []
+        blocked_item_details: list[dict[str, Any]] = []
         for code, item in items.items():
             result = self.calculate_work_item_from_runtime(code, runtime)
             if result.get("calculation_status") != "resolved":
                 blocked_items.append(code)
+                blocked_item_details.append(
+                    {
+                        "work_item_code": code,
+                        "category": str(item.get("category") or "default"),
+                        "status": "blocked",
+                        "missing_dependencies": list(result.get("missing_dependencies") or []),
+                    }
+                )
                 continue
             category = str(item.get("category") or "default")
-            category_totals.setdefault(
-                category,
+            group_key = self._approval_group_for_item(item)
+            group_totals.setdefault(
+                group_key,
                 {
+                    "category": category,
                     "material": Decimal("0"),
                     "labour": Decimal("0"),
                     "machine": Decimal("0"),
                 },
             )
             qty = _d(item.get("project_quantity") or item.get("quantity") or 0)
-            category_totals[category]["material"] += result["direct_material_total"] * qty
-            category_totals[category]["labour"] += result["direct_labour_total"] * qty
-            category_totals[category]["machine"] += result["direct_machine_total"] * qty
+            group_totals[group_key]["material"] += result["direct_material_total"] * qty
+            group_totals[group_key]["labour"] += result["direct_labour_total"] * qty
+            group_totals[group_key]["machine"] += result["direct_machine_total"] * qty
 
+        approval_group_components: dict[str, dict[str, Decimal]] = {}
         approval_components: dict[str, dict[str, Decimal]] = {}
-        approved_total = Decimal("0")
-        for category, totals in category_totals.items():
-            rule = self.approval_rules_for(category, items.get(next((k for k, v in items.items() if str(v.get("category") or "default") == category), None), {}))
+        partial_subtotal = Decimal("0")
+        for group_key, totals in group_totals.items():
+            category = str(totals.get("category") or "default")
+            rule = self.approval_rules_for(category, runtime=runtime, approval_group=group_key)
             components = self._compute_loaded_components(totals["material"], totals["labour"], totals["machine"], rule)
-            approval_components[category] = components
-            approved_total += components["FINAL"]
+            approval_group_components[group_key] = components
+            if category not in approval_components:
+                approval_components[category] = {name: Decimal("0") for name in components.keys()}
+            for key, value in components.items():
+                approval_components[category][key] += value
+            partial_subtotal += components["FINAL"]
 
         status = "COMPLETE" if not blocked_items else "INCOMPLETE"
+        official_total = partial_subtotal if status == "COMPLETE" else None
         return {
             "project_boq": self.build_project_boq(runtime),
+            "approval_group_components": approval_group_components,
             "category_components": approval_components,
-            "approved_estimate_total": approved_total,
+            "approved_estimate_partial_subtotal": partial_subtotal,
+            "approved_estimate_total": official_total,
             "blocked_items": blocked_items,
+            "blocked_item_details": blocked_item_details,
+            "official_total_available": status == "COMPLETE",
             "status": status,
             "snapshot_is_unlinked_literal": bool((runtime.get("snapshot_ledger") or {}).get("Dự thầu!J51", {}).get("is_unlinked_literal", True)),
         }
@@ -722,21 +797,34 @@ class CalculationEngineV2:
     def calculate_tender_estimate(self, runtime: dict[str, Any] | None = None) -> dict[str, Any]:
         runtime = runtime or self.load_runtime_data()
         items = self._normalise_runtime_items(runtime)
-        tender_total = Decimal("0")
+        tender_partial_subtotal = Decimal("0")
         blocked_items: list[str] = []
+        blocked_item_details: list[dict[str, Any]] = []
         for code, item in items.items():
             result = self.calculate_work_item_from_runtime(code, runtime)
             if result.get("calculation_status") != "resolved":
                 blocked_items.append(code)
+                blocked_item_details.append(
+                    {
+                        "work_item_code": code,
+                        "category": str(item.get("category") or "default"),
+                        "status": "blocked",
+                        "missing_dependencies": list(result.get("missing_dependencies") or []),
+                    }
+                )
                 continue
             qty = _d(item.get("project_quantity") or item.get("quantity") or 0)
             rounded_unit_price = result.get("tender_rounded_unit_price") or result.get("loaded_unit_price")
-            tender_total += qty * rounded_unit_price
+            tender_partial_subtotal += qty * rounded_unit_price
         status = "COMPLETE" if not blocked_items else "INCOMPLETE"
+        official_total = tender_partial_subtotal if status == "COMPLETE" else None
         return {
             "project_boq": self.build_project_boq(runtime),
-            "tender_total": tender_total,
+            "tender_partial_subtotal": tender_partial_subtotal,
+            "tender_total": official_total,
             "blocked_items": blocked_items,
+            "blocked_item_details": blocked_item_details,
+            "official_total_available": status == "COMPLETE",
             "status": status,
         }
 

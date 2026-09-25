@@ -1,5 +1,6 @@
 import json
 import sys
+import copy
 from decimal import Decimal
 from pathlib import Path
 
@@ -317,7 +318,7 @@ def test_project_quantity_changes_extension_not_unit_price():
 
     base_tender = engine.calculate_tender_estimate(runtime)
     mut_tender = engine.calculate_tender_estimate(mutated_runtime)
-    assert mut_tender["tender_total"] != base_tender["tender_total"]
+    assert mut_tender["tender_partial_subtotal"] != base_tender["tender_partial_subtotal"]
 
 
 def test_hsxl_edits_change_component_bases_not_generic_multiplier():
@@ -346,8 +347,10 @@ def test_aggregate_first_approval_and_unit_first_tender_use_fresh_calculations()
     approval = engine.calculate_approval_estimate(runtime)
     tender = engine.calculate_tender_estimate(runtime)
 
-    assert approval["approved_estimate_total"] > Decimal("0")
-    assert tender["tender_total"] > Decimal("0")
+    assert approval["approved_estimate_partial_subtotal"] > Decimal("0")
+    assert tender["tender_partial_subtotal"] > Decimal("0")
+    assert approval["approved_estimate_total"] is None
+    assert tender["tender_total"] is None
     assert "KS.4/8" in approval["blocked_items"]
     assert "KS.4/8" in tender["blocked_items"]
 
@@ -361,8 +364,8 @@ def test_aggregate_first_approval_and_unit_first_tender_use_fresh_calculations()
     approval_mut = engine.calculate_approval_estimate(mutated_runtime)
     tender_mut = engine.calculate_tender_estimate(mutated_runtime)
 
-    assert approval_mut["approved_estimate_total"] != approval["approved_estimate_total"]
-    assert tender_mut["tender_total"] != tender["tender_total"]
+    assert approval_mut["approved_estimate_partial_subtotal"] != approval["approved_estimate_partial_subtotal"]
+    assert tender_mut["tender_partial_subtotal"] != tender["tender_partial_subtotal"]
 
 
 def test_explicit_approval_and_tender_cost_rules_are_separated_and_coverage_has_all_dimensions():
@@ -409,24 +412,34 @@ def test_approval_uses_contingency_and_tender_excludes_it():
     assert tender["status"] == "INCOMPLETE"
     assert approval["category_components"]["topography"]["Gdp"] > Decimal("0")
     assert abs(approval["category_components"]["topography"]["Gdp"] - (approval["category_components"]["topography"]["Gks"] * Decimal("0.10"))) <= Decimal("0.1")
-    assert tender["tender_total"] < approval["approved_estimate_total"]
+    assert tender["tender_partial_subtotal"] < approval["approved_estimate_partial_subtotal"]
 
 
 def test_branch_scoped_mutations_only_affect_the_matching_total():
     engine = CalculationEngineV2()
     runtime = engine.load_runtime_data()
 
+    item_base = engine.calculate_work_item_from_runtime("CF.11620", runtime)
     approval_base = engine.calculate_approval_estimate(runtime)
     tender_base = engine.calculate_tender_estimate(runtime)
 
-    approval_runtime = engine.apply_runtime_mutation(runtime, {"work_item_code": "CF.11620", "approval_rules": {"gdp_rate": "0.20"}})
-    tender_runtime = engine.apply_runtime_mutation(runtime, {"work_item_code": "CF.11620", "tender_rules": {"gtgt_rate": "0.20"}})
+    approval_runtime = copy.deepcopy(runtime)
+    approval_runtime["approval_rule_groups"]["topography_main"]["approval_rules"]["gdp_rate"] = "0.20"
+    tender_runtime = engine.apply_runtime_mutation(runtime, {"work_item_code": "CF.11620", "tender_rules": {"vat_rate": "0.20"}})
 
+    item_tender_mut = engine.calculate_work_item_from_runtime("CF.11620", tender_runtime)
     approval_mut = engine.calculate_approval_estimate(approval_runtime)
     tender_mut = engine.calculate_tender_estimate(tender_runtime)
+    approval_from_tender_mut = engine.calculate_approval_estimate(tender_runtime)
+    tender_from_approval_mut = engine.calculate_tender_estimate(approval_runtime)
 
-    assert approval_mut["approved_estimate_total"] != approval_base["approved_estimate_total"]
-    assert tender_mut["tender_total"] == tender_base["tender_total"]
+    assert item_tender_mut["components"]["VAT"] != item_base["components"]["VAT"]
+    assert item_tender_mut["loaded_unit_price"] != item_base["loaded_unit_price"]
+    assert tender_mut["tender_partial_subtotal"] != tender_base["tender_partial_subtotal"]
+
+    assert approval_from_tender_mut["approved_estimate_partial_subtotal"] == approval_base["approved_estimate_partial_subtotal"]
+    assert approval_mut["approved_estimate_partial_subtotal"] != approval_base["approved_estimate_partial_subtotal"]
+    assert tender_from_approval_mut["tender_partial_subtotal"] == tender_base["tender_partial_subtotal"]
 
 
 def test_unresolved_required_items_mark_totals_incomplete():
@@ -439,8 +452,14 @@ def test_unresolved_required_items_mark_totals_incomplete():
 
     assert approval["status"] == "INCOMPLETE"
     assert tender["status"] == "INCOMPLETE"
+    assert approval["approved_estimate_total"] is None
+    assert tender["tender_total"] is None
+    assert approval["approved_estimate_partial_subtotal"] > Decimal("0")
+    assert tender["tender_partial_subtotal"] > Decimal("0")
     assert "CF.11620" in approval["blocked_items"]
     assert "CF.11620" in tender["blocked_items"]
+    assert any(entry["work_item_code"] == "CF.11620" for entry in approval["blocked_item_details"])
+    assert any(entry["work_item_code"] == "CF.11620" for entry in tender["blocked_item_details"])
 
 
 def test_coverage_report_never_claims_full_project_parity_for_six_rep_items():
@@ -451,3 +470,52 @@ def test_coverage_report_never_claims_full_project_parity_for_six_rep_items():
     assert coverage["total_work_items"] == 6
     assert coverage["approval_project_parity_coverage"] == Decimal("0")
     assert coverage["full_project_coverage"] is False
+
+
+def test_approval_group_rules_are_order_independent_and_do_not_use_first_item_overrides():
+    engine = CalculationEngineV2()
+    runtime = engine.load_runtime_data()
+
+    runtime_with_groups = copy.deepcopy(runtime)
+    cf_item = runtime_with_groups["work_item_master"]["CF.11620"]
+    cf_item["approval_rule_group"] = "topography_hi_contingency"
+    runtime_with_groups["approval_rule_groups"]["topography_hi_contingency"] = {
+        "category": "topography",
+        "approval_rules": {
+            "gdp_rate": "0.20",
+        },
+    }
+
+    reversed_runtime = copy.deepcopy(runtime_with_groups)
+    reversed_runtime["work_item_master"] = dict(reversed(list(runtime_with_groups["work_item_master"].items())))
+
+    normal = engine.calculate_approval_estimate(runtime_with_groups)
+    reordered = engine.calculate_approval_estimate(reversed_runtime)
+
+    assert normal["approved_estimate_partial_subtotal"] == reordered["approved_estimate_partial_subtotal"]
+    assert normal["category_components"]["topography"]["Gdp"] == reordered["category_components"]["topography"]["Gdp"]
+
+
+def test_rounding_is_verified_per_item_for_chiet_tinh_and_du_thau_paths():
+    engine = CalculationEngineV2()
+    runtime = engine.load_runtime_data()
+
+    expectations = {
+        "CF.11620": {"loaded": Decimal("3808696"), "tender": Decimal("3808000"), "qty": Decimal("8")},
+        "CC.21310": {"loaded": Decimal("1414311"), "tender": Decimal("1414000"), "qty": Decimal("1583")},
+        "DC.02001": {"loaded": Decimal("634808"), "tender": Decimal("634000"), "qty": Decimal("338")},
+        "KS.4/8": {"loaded": None, "tender": None, "qty": Decimal("0")},
+        "CF.21120": {"loaded": Decimal("2045481"), "tender": Decimal("2045000"), "qty": Decimal("0")},
+        "AG.11112": {"loaded": Decimal("2919165"), "tender": Decimal("2919000"), "qty": Decimal("0")},
+    }
+
+    boq = engine.build_project_boq(runtime)
+    for code, expected in expectations.items():
+        row = engine.calculate_work_item_from_runtime(code, runtime)
+        if expected["loaded"] is None:
+            assert row["calculation_status"] == "blocked"
+            continue
+        assert row["loaded_unit_price"] == expected["loaded"]
+        assert row["tender_rounded_unit_price"] == expected["tender"]
+        assert row["tender_unit_price_parity"] == Decimal("0")
+        assert boq[code]["tender_extension"] == expected["tender"] * expected["qty"]

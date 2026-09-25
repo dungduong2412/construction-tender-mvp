@@ -1,0 +1,48 @@
+{
+  "document_id": "train1-fixture-001",
+  "provider": "recorded-fixture",
+  "rows": [
+    {
+      "row_id": "r1",
+      "row_type": "line_item",
+      "description_vi": "Đo lưới khống chế mặt bằng đường chuyền cấp 2",
+      "unit_raw": "điểm",
+      "quantity_raw": "8",
+      "page": 1,
+      "evidence": [
+        {"type": "pdf_span", "locator": "p1:l15", "text": "Đo lưới khống chế mặt bằng"}
+      ],
+      "ai_suggestions": [
+        {"code": "CF.11620", "confidence": 0.98, "evidence": "text+unit match", "source": "ai"}
+      ]
+    },
+    {
+      "row_id": "r2",
+      "row_type": "line_item",
+      "description_vi": "Khoan xoay bơm rửa lấy mẫu ở trên cạn",
+      "unit_raw": "m khoan",
+      "quantity_raw": "1583",
+      "page": 1,
+      "evidence": [
+        {"type": "pdf_span", "locator": "p1:l25", "text": "Khoan xoay bơm rửa"}
+      ],
+      "ai_suggestions": [
+        {"code": "CC.21310", "confidence": 0.96, "evidence": "code phrase match", "source": "ai"}
+      ]
+    },
+    {
+      "row_id": "r3",
+      "row_type": "line_item",
+      "description_vi": "Thí nghiệm cơ lý hóa của đất chỉ tiêu khối lượng riêng",
+      "unit_raw": "1 chỉ tiêu",
+      "quantity_raw": "338",
+      "page": 1,
+      "evidence": [
+        {"type": "pdf_span", "locator": "p1:l32", "text": "khối lượng riêng"}
+      ],
+      "ai_suggestions": [
+        {"code": "DC.02001", "confidence": 0.95, "evidence": "discipline+unit", "source": "ai"}
+      ]
+    }
+  ]
+}

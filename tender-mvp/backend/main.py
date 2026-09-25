@@ -12,7 +12,7 @@ from fastapi.staticfiles import StaticFiles
 
 from database import init_db
 from master_data.loader import load_master_data
-from routers import jobs, parser, review, export
+from routers import jobs, parser, review, export, train1
 
 load_dotenv()
 
@@ -42,6 +42,7 @@ app.include_router(jobs.router, prefix="/api/jobs", tags=["jobs"])
 app.include_router(parser.router, prefix="/api/parser", tags=["parser"])
 app.include_router(review.router, prefix="/api/review", tags=["review"])
 app.include_router(export.router, prefix="/api/export", tags=["export"])
+app.include_router(train1.router, prefix="/api/train1", tags=["train1"])
 
 # Serve frontend
 frontend_dir = os.path.join(os.path.dirname(__file__), "..", "frontend")

@@ -20,10 +20,28 @@ from integration_train1.pipeline import (
 router = APIRouter()
 
 
+def _require_train_auth(authorization: str | None) -> None:
+    expected_token = os.getenv("TRAIN2_UPLOAD_AUTH_TOKEN", "").strip()
+    if not expected_token:
+        raise HTTPException(status_code=503, detail="LIVE INTEGRATION BLOCKED: TRAIN2_UPLOAD_AUTH_TOKEN is not configured")
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Missing Bearer authorization token")
+    supplied_token = authorization.split(" ", 1)[1].strip()
+    if supplied_token != expected_token:
+        raise HTTPException(status_code=401, detail="Invalid upload authorization token")
+
+
+def _fixture_mode_enabled() -> bool:
+    env = os.getenv("APP_ENV", os.getenv("ENVIRONMENT", "")).strip().lower()
+    return env in {"", "local", "test", "testing", "dev", "development"}
+
+
 class ManualOverrideRequest(BaseModel):
     row_id: str
     canonical_code: str
     reason: str | None = None
+    unit_confirmed: bool = False
+    unit_correction: str | None = None
 
 
 class PriceMutationRequest(BaseModel):
@@ -31,29 +49,26 @@ class PriceMutationRequest(BaseModel):
 
 
 @router.post("/runs/fixture")
-async def start_run_from_fixture():
+async def start_run_from_fixture(authorization: str | None = Header(default=None)):
+    _require_train_auth(authorization)
+    if not _fixture_mode_enabled():
+        raise HTTPException(status_code=403, detail="Fixture mode is disabled outside local/test environments")
     return await PIPELINE.start_from_fixture()
 
 
 @router.post("/runs/real-fixture")
-async def start_run_from_recorded_real_fixture():
+async def start_run_from_recorded_real_fixture(authorization: str | None = Header(default=None)):
+    _require_train_auth(authorization)
+    if not _fixture_mode_enabled():
+        raise HTTPException(status_code=403, detail="Fixture mode is disabled outside local/test environments")
     return await PIPELINE.start_from_real_fixture()
 
 
 @router.post("/runs/upload")
 async def start_run_from_upload(file: UploadFile = File(...), authorization: str | None = Header(default=None)):
+    _require_train_auth(authorization)
     if not file.filename or not file.filename.lower().endswith(".pdf"):
         raise HTTPException(status_code=400, detail="Only PDF files are accepted")
-
-    expected_token = os.getenv("TRAIN2_UPLOAD_AUTH_TOKEN", "").strip()
-    if not expected_token:
-        raise HTTPException(status_code=503, detail="LIVE INTEGRATION BLOCKED: TRAIN2_UPLOAD_AUTH_TOKEN is not configured")
-
-    if not authorization or not authorization.startswith("Bearer "):
-        raise HTTPException(status_code=401, detail="Missing Bearer authorization token")
-    supplied_token = authorization.split(" ", 1)[1].strip()
-    if supplied_token != expected_token:
-        raise HTTPException(status_code=401, detail="Invalid upload authorization token")
 
     endpoint = os.getenv("TRAIN2_PARSER_API_ENDPOINT", "").strip()
     api_key = os.getenv("TRAIN2_PARSER_API_KEY", "").strip() or None
@@ -61,17 +76,28 @@ async def start_run_from_upload(file: UploadFile = File(...), authorization: str
     api_key_prefix = os.getenv("TRAIN2_PARSER_API_KEY_PREFIX", "Bearer")
     timeout_seconds = float(os.getenv("TRAIN2_PARSER_API_TIMEOUT_SECONDS", "30"))
 
+    max_upload_bytes = int(os.getenv("TRAIN2_MAX_UPLOAD_BYTES", str(10 * 1024 * 1024)))
+    chunks: list[bytes] = []
+    total_bytes = 0
+    chunk_size = 1024 * 1024
     try:
-        pdf_bytes = await file.read()
+        while True:
+            chunk = await file.read(chunk_size)
+            if not chunk:
+                break
+            total_bytes += len(chunk)
+            if total_bytes > max_upload_bytes:
+                raise HTTPException(status_code=413, detail=f"Uploaded PDF exceeds size limit ({max_upload_bytes} bytes)")
+            chunks.append(chunk)
+    except HTTPException:
+        raise
     except Exception as exc:
         raise HTTPException(status_code=400, detail="Failed to read uploaded PDF") from exc
-    if not pdf_bytes:
+
+    if total_bytes == 0:
         raise HTTPException(status_code=400, detail="Uploaded PDF is empty")
 
-    max_upload_bytes = int(os.getenv("TRAIN2_MAX_UPLOAD_BYTES", str(10 * 1024 * 1024)))
-    if len(pdf_bytes) > max_upload_bytes:
-        raise HTTPException(status_code=413, detail=f"Uploaded PDF exceeds size limit ({max_upload_bytes} bytes)")
-
+    pdf_bytes = b"".join(chunks)
     if not pdf_bytes.startswith(b"%PDF-"):
         raise HTTPException(status_code=400, detail="Uploaded file does not have a valid PDF signature")
 
@@ -100,7 +126,8 @@ async def start_run_from_upload(file: UploadFile = File(...), authorization: str
 
 
 @router.get("/runs/{run_id}/review")
-async def get_review(run_id: str):
+async def get_review(run_id: str, authorization: str | None = Header(default=None)):
+    _require_train_auth(authorization)
     try:
         return PIPELINE.get_review(run_id)
     except KeyError as exc:
@@ -108,15 +135,24 @@ async def get_review(run_id: str):
 
 
 @router.post("/runs/{run_id}/override")
-async def override_mapping(run_id: str, req: ManualOverrideRequest):
+async def override_mapping(run_id: str, req: ManualOverrideRequest, authorization: str | None = Header(default=None)):
+    _require_train_auth(authorization)
     try:
-        return PIPELINE.apply_manual_mapping(run_id, req.row_id, req.canonical_code, req.reason)
+        return PIPELINE.apply_manual_mapping(
+            run_id,
+            req.row_id,
+            req.canonical_code,
+            req.reason,
+            unit_confirmed=req.unit_confirmed,
+            unit_correction=req.unit_correction,
+        )
     except KeyError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
 
 
 @router.post("/runs/{run_id}/mutate-prices")
-async def mutate_prices(run_id: str, req: PriceMutationRequest):
+async def mutate_prices(run_id: str, req: PriceMutationRequest, authorization: str | None = Header(default=None)):
+    _require_train_auth(authorization)
     try:
         return PIPELINE.mutate_runtime_prices(run_id, req.price_updates)
     except KeyError as exc:
@@ -124,7 +160,8 @@ async def mutate_prices(run_id: str, req: PriceMutationRequest):
 
 
 @router.get("/runs/{run_id}/export.xlsx")
-async def export_xlsx(run_id: str):
+async def export_xlsx(run_id: str, authorization: str | None = Header(default=None)):
+    _require_train_auth(authorization)
     try:
         content = PIPELINE.export_excel(run_id)
     except KeyError as exc:

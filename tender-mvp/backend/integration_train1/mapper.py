@@ -105,8 +105,12 @@ class Train2SemanticMapper:
         work_master: dict[str, dict[str, Any]],
         unit_rules: list[dict[str, Any]],
         manual_selected_code: str | None,
+        manual_unit_confirmed: bool,
+        manual_unit_correction: str | None,
         allow_zero_quantity: bool,
     ) -> MappingDecision:
+        effective_source_unit = (manual_unit_correction or unit_raw or "").strip()
+
         if row_type != "line_item":
             return MappingDecision(
                 mapping_status="non_billable",
@@ -117,7 +121,7 @@ class Train2SemanticMapper:
                 candidates=[],
                 missing_dependencies=[],
                 quantity_factor=Decimal("1"),
-                source_unit=(unit_raw or "").strip() or None,
+                source_unit=effective_source_unit or None,
                 master_unit=None,
             )
 
@@ -131,7 +135,7 @@ class Train2SemanticMapper:
                 candidates=[],
                 missing_dependencies=[],
                 quantity_factor=Decimal("1"),
-                source_unit=(unit_raw or "").strip() or None,
+                source_unit=effective_source_unit or None,
                 master_unit=None,
             )
         if quantity < 0:
@@ -144,7 +148,7 @@ class Train2SemanticMapper:
                 candidates=[],
                 missing_dependencies=[],
                 quantity_factor=Decimal("1"),
-                source_unit=(unit_raw or "").strip() or None,
+                source_unit=effective_source_unit or None,
                 master_unit=None,
             )
         if quantity == 0 and not allow_zero_quantity:
@@ -157,13 +161,14 @@ class Train2SemanticMapper:
                 candidates=[],
                 missing_dependencies=[],
                 quantity_factor=Decimal("1"),
-                source_unit=(unit_raw or "").strip() or None,
+                source_unit=effective_source_unit or None,
                 master_unit=None,
             )
 
         candidate_map: dict[str, dict[str, Any]] = self._generate_catalog_candidates(description_vi, work_master)
 
         if manual_selected_code:
+            candidate_map = {}
             code = manual_selected_code.strip()
             if code not in work_master:
                 return MappingDecision(
@@ -174,6 +179,22 @@ class Train2SemanticMapper:
                     reason="Manual selected code is not in verified WorkItemMaster",
                     candidates=[],
                     missing_dependencies=[],
+                    quantity_factor=Decimal("1"),
+                    source_unit=effective_source_unit or None,
+                    master_unit=None,
+                )
+            if not effective_source_unit and not manual_unit_confirmed:
+                return MappingDecision(
+                    mapping_status="unit_verification_required",
+                    canonical_code=None,
+                    confidence=None,
+                    mapping_evidence=None,
+                    reason="Manual code selection requires explicit source unit confirmation or correction",
+                    candidates=[],
+                    missing_dependencies=[],
+                    quantity_factor=Decimal("1"),
+                    source_unit=None,
+                    master_unit=str((work_master.get(code) or {}).get("unit") or "") or None,
                 )
             candidate_map[code] = {
                 "code": code,
@@ -206,11 +227,11 @@ class Train2SemanticMapper:
                 candidates=[],
                 missing_dependencies=[],
                 quantity_factor=Decimal("1"),
-                source_unit=(unit_raw or "").strip() or None,
+                source_unit=effective_source_unit or None,
                 master_unit=None,
             )
 
-        source_unit_missing = not (unit_raw or "").strip()
+        source_unit_missing = not effective_source_unit
         if source_unit_missing and not manual_selected_code:
             return MappingDecision(
                 mapping_status="unit_verification_required",
@@ -244,13 +265,40 @@ class Train2SemanticMapper:
         for code, hint in sorted(candidate_map.items()):
             master = work_master.get(code) or {}
             master_unit = str(master.get("unit") or "")
-            unit_match = self._units_equal(unit_raw, master_unit)
+            unit_match = self._units_equal(effective_source_unit, master_unit)
             conversion_rule = None
             conversion_factor = Decimal("1")
             if not unit_match:
-                conversion_rule = self._find_verified_conversion(unit_raw, master_unit, unit_rules)
+                conversion_rule = self._find_verified_conversion(effective_source_unit, master_unit, unit_rules)
                 if conversion_rule is not None:
-                    conversion_factor = Decimal(str(conversion_rule.get("factor") or "1"))
+                    try:
+                        conversion_factor = Decimal(str(conversion_rule.get("factor")))
+                    except Exception:
+                        return MappingDecision(
+                            mapping_status="invalid_conversion_factor",
+                            canonical_code=None,
+                            confidence=None,
+                            mapping_evidence=None,
+                            reason=f"Invalid conversion factor for {effective_source_unit}->{master_unit}",
+                            candidates=candidates,
+                            missing_dependencies=[],
+                            quantity_factor=Decimal("1"),
+                            source_unit=effective_source_unit or None,
+                            master_unit=master_unit.strip() or None,
+                        )
+                    if conversion_factor <= Decimal("0"):
+                        return MappingDecision(
+                            mapping_status="invalid_conversion_factor",
+                            canonical_code=None,
+                            confidence=None,
+                            mapping_evidence=None,
+                            reason=f"Invalid conversion factor for {effective_source_unit}->{master_unit}: {conversion_factor}",
+                            candidates=candidates,
+                            missing_dependencies=[],
+                            quantity_factor=Decimal("1"),
+                            source_unit=effective_source_unit or None,
+                            master_unit=master_unit.strip() or None,
+                        )
             compatible = unit_match or conversion_rule is not None
             if compatible:
                 compatible_codes.append(code)
@@ -264,7 +312,7 @@ class Train2SemanticMapper:
                     "conversion_rule": conversion_rule,
                     "conversion_factor": str(conversion_factor),
                     "compatible": compatible,
-                    "source_unit": (unit_raw or "").strip() or None,
+                    "source_unit": effective_source_unit or None,
                     "master_unit": master_unit.strip() or None,
                 }
             )
@@ -279,7 +327,7 @@ class Train2SemanticMapper:
                 candidates=candidates,
                 missing_dependencies=[],
                 quantity_factor=Decimal("1"),
-                source_unit=(unit_raw or "").strip() or None,
+                source_unit=effective_source_unit or None,
                 master_unit=None,
             )
 
@@ -293,7 +341,7 @@ class Train2SemanticMapper:
                 candidates=candidates,
                 missing_dependencies=[],
                 quantity_factor=Decimal("1"),
-                source_unit=(unit_raw or "").strip() or None,
+                source_unit=effective_source_unit or None,
                 master_unit=None,
             )
 

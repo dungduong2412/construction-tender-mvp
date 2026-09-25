@@ -42,8 +42,8 @@ def test_train2_parser_fixture_to_excel_numeric_and_complete_flag():
     review = wb["Train1-Review"]
     summary = wb["Train1-Summary"]
 
-    assert isinstance(review["D2"].value, (int, float))
-    assert isinstance(review["I2"].value, (int, float))
+    assert isinstance(review["F2"].value, (int, float))
+    assert isinstance(review["L2"].value, (int, float))
     assert isinstance(summary["B2"].value, (int, float))
 
 
@@ -440,12 +440,148 @@ def test_train2_manual_correction_retains_source_evidence():
         ],
     }
     payload = pipeline.start_from_parsed_payload(parsed)
-    updated = pipeline.apply_manual_mapping(payload["run_id"], "m1", "CF.21120", reason="user decision")
+    updated = pipeline.apply_manual_mapping(
+        payload["run_id"],
+        "m1",
+        "CF.21120",
+        reason="user decision",
+        unit_confirmed=True,
+        unit_correction="mốc",
+    )
 
     row = updated["rows"][0]
     assert row["mapping_status"] == "resolved"
     assert row["corrections"]
     assert row["corrections"][-1]["retained_evidence"][0]["text"] == "proof"
+
+
+def test_train2_manual_selection_requires_unit_confirmation_or_correction():
+    pipeline = Train1Pipeline()
+    parsed = {
+        "document_id": "manual-unit-check",
+        "rows": [
+            {
+                "row_id": "m2",
+                "row_type": "line_item",
+                "description_vi": "Ambiguous",
+                "unit_raw": "",
+                "quantity_raw": "1",
+                "page": 1,
+                "evidence": [{"type": "pdf_span", "locator": "p1:l1", "text": "proof"}],
+                "ai_suggestions": [{"code": "CF.21120", "confidence": 0.9, "evidence": "hint"}],
+            }
+        ],
+    }
+    payload = pipeline.start_from_parsed_payload(parsed)
+    updated = pipeline.apply_manual_mapping(payload["run_id"], "m2", "CF.21120", reason="manual")
+
+    row = updated["rows"][0]
+    assert row["mapping_status"] == "unit_verification_required"
+
+
+def test_train2_conversion_factor_applies_to_tender_and_approval_aggregate():
+    pipeline = Train1Pipeline()
+    pipeline._unit_rules.append({"from_unit": "2diem", "to_unit": "điểm", "factor": 2, "verified": True})
+
+    parsed = {
+        "document_id": "conversion-aggregate",
+        "rows": [
+            {
+                "row_id": "c1",
+                "row_type": "line_item",
+                "description_vi": "CF row",
+                "unit_raw": "2diem",
+                "quantity_raw": "3",
+                "page": 1,
+                "evidence": [{"type": "pdf_span", "locator": "p1:l1", "text": "CF"}],
+                "ai_suggestions": [{"code": "CF.11620", "confidence": 0.99, "evidence": "code"}],
+            }
+        ],
+    }
+    payload = pipeline.start_from_parsed_payload(parsed)
+    row = payload["rows"][0]
+
+    assert row["mapping_status"] == "resolved"
+    assert row["quantity_factor"] == "2"
+    assert row["converted_quantity"] == "6.0000"
+
+    runtime = pipeline.engine.load_runtime_data()
+    cf = pipeline.engine.calculate_work_item_from_runtime("CF.11620", runtime)
+    expected_tender_extension = (cf["tender_rounded_unit_price"] * Decimal("6")).quantize(Decimal("1"))
+
+    work_item = runtime["work_item_master"]["CF.11620"]
+    group = work_item["approval_rule_group"]
+    rules = pipeline.engine.approval_rules_for("topography", runtime=runtime, approval_group=group)
+    expected_approval = pipeline.engine._compute_loaded_components(
+        cf["direct_material_total"] * Decimal("6"),
+        cf["direct_labour_total"] * Decimal("6"),
+        cf["direct_machine_total"] * Decimal("6"),
+        rules,
+    )["FINAL"]
+
+    assert Decimal(row["tender_extension"]) == expected_tender_extension
+    assert Decimal(payload["approval_partial_subtotal"]) == expected_approval
+
+
+def test_train2_invalid_conversion_factor_blocked():
+    pipeline = Train1Pipeline()
+    pipeline._unit_rules.append({"from_unit": "badunit", "to_unit": "điểm", "factor": 0, "verified": True})
+
+    parsed = {
+        "document_id": "invalid-conversion",
+        "rows": [
+            {
+                "row_id": "ic1",
+                "row_type": "line_item",
+                "description_vi": "CF row",
+                "unit_raw": "badunit",
+                "quantity_raw": "1",
+                "page": 1,
+                "evidence": [{"type": "pdf_span", "locator": "p1:l1", "text": "CF"}],
+                "ai_suggestions": [{"code": "CF.11620", "confidence": 0.99, "evidence": "code"}],
+            }
+        ],
+    }
+
+    payload = pipeline.start_from_parsed_payload(parsed)
+    row = payload["rows"][0]
+    assert row["mapping_status"] == "invalid_conversion_factor"
+    assert payload["status"] == "INCOMPLETE"
+
+
+def test_train2_all_endpoints_require_auth_and_fixture_is_env_gated(monkeypatch):
+    monkeypatch.setenv("TRAIN2_UPLOAD_AUTH_TOKEN", "token")
+
+    with TestClient(app) as client:
+        fixture_no_auth = client.post("/api/train1/runs/fixture")
+        assert fixture_no_auth.status_code == 401
+
+        monkeypatch.setenv("APP_ENV", "prod")
+        fixture_prod = client.post("/api/train1/runs/fixture", headers={"Authorization": "Bearer token"})
+        assert fixture_prod.status_code == 403
+
+        monkeypatch.setenv("APP_ENV", "test")
+        fixture_ok = client.post("/api/train1/runs/fixture", headers={"Authorization": "Bearer token"})
+        assert fixture_ok.status_code == 200
+        run_id = fixture_ok.json()["run_id"]
+
+        review_no_auth = client.get(f"/api/train1/runs/{run_id}/review")
+        assert review_no_auth.status_code == 401
+
+        override_no_auth = client.post(
+            f"/api/train1/runs/{run_id}/override",
+            json={"row_id": "row-1", "canonical_code": "CF.11620"},
+        )
+        assert override_no_auth.status_code == 401
+
+        mutate_no_auth = client.post(
+            f"/api/train1/runs/{run_id}/mutate-prices",
+            json={"price_updates": {"VL.CAT": "123"}},
+        )
+        assert mutate_no_auth.status_code == 401
+
+        export_no_auth = client.get(f"/api/train1/runs/{run_id}/export.xlsx")
+        assert export_no_auth.status_code == 401
 
 
 @pytest.mark.skipif(not REAL_RESPONSE_FIXTURE_PATH.exists(), reason="Recorded real response fixture missing")

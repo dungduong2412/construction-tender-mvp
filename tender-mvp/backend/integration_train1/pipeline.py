@@ -160,7 +160,15 @@ class Train1Pipeline:
             raise KeyError(f"Run not found: {run_id}")
         return {"run_id": run_id, **run.review}
 
-    def apply_manual_mapping(self, run_id: str, row_id: str, canonical_code: str, reason: str | None = None) -> dict[str, Any]:
+    def apply_manual_mapping(
+        self,
+        run_id: str,
+        row_id: str,
+        canonical_code: str,
+        reason: str | None = None,
+        unit_confirmed: bool = False,
+        unit_correction: str | None = None,
+    ) -> dict[str, Any]:
         run = self._runs.get(run_id)
         if run is None:
             raise KeyError(f"Run not found: {run_id}")
@@ -177,11 +185,18 @@ class Train1Pipeline:
                 "canonical_code": canonical_code,
                 "reason": reason or "manual review override",
                 "retained_evidence": list(target.get("evidence") or []),
+                "source_unit_original": target.get("unit_raw"),
+                "quantity_original": target.get("quantity_raw"),
+                "unit_confirmed": unit_confirmed,
+                "unit_correction": unit_correction,
             }
         )
         target["corrections"] = history
         target["manual_selected_code"] = canonical_code
         target["manual_override_evidence"] = reason or "manual_override"
+        target["manual_unit_confirmed"] = bool(unit_confirmed)
+        if unit_correction is not None:
+            target["manual_unit_correction"] = str(unit_correction)
 
         run.parsed_rows = rows
         run.review = self._build_review(
@@ -245,8 +260,11 @@ class Train1Pipeline:
         ws.append([
             "row_id",
             "description_vi",
-            "unit",
-            "quantity",
+            "source_unit",
+            "master_unit",
+            "source_quantity",
+            "converted_quantity",
+            "quantity_factor",
             "mapping_status",
             "canonical_code",
             "loaded_unit_price",
@@ -260,8 +278,11 @@ class Train1Pipeline:
                 [
                     row["row_id"],
                     row["description_vi"],
-                    row["unit_raw"],
-                    float(_d(row["quantity"])) if row["quantity"] is not None else None,
+                    row.get("source_unit") or row["unit_raw"],
+                    row.get("master_unit"),
+                    row.get("source_quantity"),
+                    float(_d(row["converted_quantity"])) if row.get("converted_quantity") not in {None, ""} else None,
+                    float(_d(row["quantity_factor"])) if row.get("quantity_factor") not in {None, ""} else None,
                     row["mapping_status"],
                     row.get("canonical_code"),
                     float(_d(row["loaded_unit_price"])) if row.get("loaded_unit_price") is not None else None,
@@ -328,6 +349,8 @@ class Train1Pipeline:
             suggestions = list(row.get("ai_suggestions") or [])
             corrections = list(row.get("corrections") or [])
             manual_selected_code = str(row.get("manual_selected_code") or "").strip()
+            manual_unit_confirmed = bool(row.get("manual_unit_confirmed"))
+            manual_unit_correction = row.get("manual_unit_correction")
 
             if row_type == "line_item":
                 required_rows += 1
@@ -343,6 +366,8 @@ class Train1Pipeline:
                 work_master=work_master,
                 unit_rules=self._unit_rules,
                 manual_selected_code=manual_selected_code,
+                manual_unit_confirmed=manual_unit_confirmed,
+                manual_unit_correction=str(manual_unit_correction) if manual_unit_correction is not None else None,
                 allow_zero_quantity=self.allow_zero_quantity,
             )
 

@@ -1,19 +1,37 @@
 from __future__ import annotations
 
 import copy
+import json
+import os
 import uuid
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from typing import Any
 
 from openpyxl import Workbook
 
-from parser_adapter.provider_neutral import ProviderNeutralParserAdapter, RecordedFixtureProvider
+from integration_train1.mapper import MappingDecision, Train2SemanticMapper
+from parser_adapter.provider_neutral import (
+    HttpJsonProvider,
+    ParserPayload,
+    ParserProviderAuthError,
+    ParserProviderContractError,
+    ParserProviderError,
+    ParserProviderTimeoutError,
+    ProviderNeutralParserAdapter,
+    RecordedFixtureProvider,
+)
 from pricing_engine.calculation_engine_v2 import CalculationEngineV2
 
 
 FIXTURE_PATH = Path(__file__).resolve().parent.parent.parent / "fixtures" / "parser_api_recorded_train1.json"
+REAL_RESPONSE_FIXTURE_PATH = Path(__file__).resolve().parent.parent.parent / "fixtures" / "parser_api_recorded_real_response.json"
+UNIT_RULES_PATH = Path(__file__).resolve().parent.parent.parent / "master-data" / "unit_rules_v1.json"
+
+
+class Train2PipelineError(Exception):
+    pass
 
 
 def _d(value: Any) -> Decimal:
@@ -27,21 +45,13 @@ def _parse_quantity(raw: str) -> Decimal | None:
         return None
     text = str(raw).strip()
     if not text:
-        return Decimal("0")
+        return None
     if "," in text:
         text = text.replace(".", "").replace(",", ".")
     try:
         return Decimal(text)
     except InvalidOperation:
         return None
-
-
-def _unit_compatible(lhs: str, rhs: str) -> bool:
-    a = (lhs or "").strip().lower()
-    b = (rhs or "").strip().lower()
-    if not a or not b:
-        return True
-    return a == b
 
 
 @dataclass
@@ -56,22 +66,88 @@ class Train1Run:
 class Train1Pipeline:
     def __init__(self):
         self.engine = CalculationEngineV2()
+        self.mapper = Train2SemanticMapper(
+            confidence_threshold=Decimal(str(os.getenv("TRAIN2_CONFIDENCE_THRESHOLD", "0.85")))
+        )
+        self.allow_zero_quantity = os.getenv("TRAIN2_ALLOW_ZERO_QUANTITY", "false").lower() in {"1", "true", "yes"}
         self._runs: dict[str, Train1Run] = {}
+        self._unit_rules = self._load_unit_rules()
+
+    def _load_unit_rules(self) -> list[dict[str, Any]]:
+        if not UNIT_RULES_PATH.exists():
+            return []
+        try:
+            payload = json.loads(UNIT_RULES_PATH.read_text(encoding="utf-8"))
+            if not isinstance(payload, list):
+                return []
+            return payload
+        except json.JSONDecodeError:
+            return []
 
     async def start_from_fixture(self, fixture_path: Path | None = None) -> dict[str, Any]:
         provider = RecordedFixtureProvider(fixture_path or FIXTURE_PATH)
         adapter = ProviderNeutralParserAdapter(provider)
         parsed = await adapter.parse()
-        return self.start_from_parsed_payload(parsed)
+        return self.start_from_parsed_payload(parsed, live_integration_verified=False, integration_label="fixture")
 
-    def start_from_parsed_payload(self, parsed: dict[str, Any]) -> dict[str, Any]:
+    async def start_from_real_fixture(self) -> dict[str, Any]:
+        provider = RecordedFixtureProvider(REAL_RESPONSE_FIXTURE_PATH)
+        adapter = ProviderNeutralParserAdapter(provider)
+        parsed = await adapter.parse()
+        return self.start_from_parsed_payload(
+            parsed,
+            live_integration_verified=False,
+            integration_label="recorded_real_response",
+            integration_note="Live parser endpoint unavailable; using recorded real-response fixture.",
+        )
+
+    async def start_from_parser_api(
+        self,
+        pdf_bytes: bytes,
+        endpoint: str,
+        api_key: str | None = None,
+        api_key_header: str = "Authorization",
+        api_key_prefix: str = "Bearer",
+        timeout_seconds: float = 30.0,
+    ) -> dict[str, Any]:
+        provider = HttpJsonProvider(
+            endpoint=endpoint,
+            api_key=api_key,
+            api_key_header=api_key_header,
+            api_key_prefix=api_key_prefix,
+            timeout_seconds=timeout_seconds,
+        )
+        adapter = ProviderNeutralParserAdapter(provider)
+        parsed = await adapter.parse(pdf_bytes)
+        return self.start_from_parsed_payload(parsed, live_integration_verified=True, integration_label="live_api")
+
+    def start_from_parsed_payload(
+        self,
+        parsed: dict[str, Any],
+        *,
+        live_integration_verified: bool = False,
+        integration_label: str = "fixture",
+        integration_note: str | None = None,
+    ) -> dict[str, Any]:
+        try:
+            payload = ParserPayload.model_validate(parsed)
+        except Exception as exc:
+            raise Train2PipelineError(f"Invalid parser payload: {exc}") from exc
+
         runtime = self.engine.load_runtime_data()
-        review = self._build_review(parsed, runtime)
+        payload_dict = payload.model_dump()
+        review = self._build_review(
+            payload_dict,
+            runtime,
+            live_integration_verified=live_integration_verified,
+            integration_label=integration_label,
+            integration_note=integration_note,
+        )
         run_id = str(uuid.uuid4())
         run = Train1Run(
             run_id=run_id,
-            source_document_id=str(parsed.get("document_id") or "fixture-document"),
-            parsed_rows=copy.deepcopy(parsed.get("rows", [])),
+            source_document_id=str(payload.document_id),
+            parsed_rows=copy.deepcopy(payload_dict.get("rows", [])),
             runtime=runtime,
             review=review,
         )
@@ -84,7 +160,7 @@ class Train1Pipeline:
             raise KeyError(f"Run not found: {run_id}")
         return {"run_id": run_id, **run.review}
 
-    def apply_manual_mapping(self, run_id: str, row_id: str, canonical_code: str) -> dict[str, Any]:
+    def apply_manual_mapping(self, run_id: str, row_id: str, canonical_code: str, reason: str | None = None) -> dict[str, Any]:
         run = self._runs.get(run_id)
         if run is None:
             raise KeyError(f"Run not found: {run_id}")
@@ -94,11 +170,27 @@ class Train1Pipeline:
         if target is None:
             raise KeyError(f"Row not found: {row_id}")
 
+        history = list(target.get("corrections") or [])
+        history.append(
+            {
+                "action": "manual_mapping",
+                "canonical_code": canonical_code,
+                "reason": reason or "manual review override",
+                "retained_evidence": list(target.get("evidence") or []),
+            }
+        )
+        target["corrections"] = history
         target["manual_selected_code"] = canonical_code
-        target["manual_override_evidence"] = "manual_override"
+        target["manual_override_evidence"] = reason or "manual_override"
 
         run.parsed_rows = rows
-        run.review = self._build_review({"document_id": run.source_document_id, "rows": rows}, run.runtime)
+        run.review = self._build_review(
+            {"document_id": run.source_document_id, "rows": rows},
+            run.runtime,
+            live_integration_verified=bool(run.review.get("live_integration_verified")),
+            integration_label=str(run.review.get("integration_label") or "fixture"),
+            integration_note=run.review.get("integration_note"),
+        )
         return {"run_id": run_id, **run.review}
 
     def mutate_runtime_prices(self, run_id: str, price_updates: dict[str, str]) -> dict[str, Any]:
@@ -112,7 +204,32 @@ class Train1Pipeline:
                 continue
             price_book[code]["unit_price"] = str(_d(new_price))
         run.runtime = mutated_runtime
-        run.review = self._build_review({"document_id": run.source_document_id, "rows": run.parsed_rows}, run.runtime)
+        run.review = self._build_review(
+            {"document_id": run.source_document_id, "rows": run.parsed_rows},
+            run.runtime,
+            live_integration_verified=bool(run.review.get("live_integration_verified")),
+            integration_label=str(run.review.get("integration_label") or "fixture"),
+            integration_note=run.review.get("integration_note"),
+        )
+        return {"run_id": run_id, **run.review}
+
+    def mutate_approval_group_rules(self, run_id: str, group_key: str, updates: dict[str, str]) -> dict[str, Any]:
+        run = self._runs.get(run_id)
+        if run is None:
+            raise KeyError(f"Run not found: {run_id}")
+        mutated_runtime = copy.deepcopy(run.runtime)
+        groups = mutated_runtime.setdefault("approval_rule_groups", {})
+        group = groups.setdefault(group_key, {})
+        rules = group.setdefault("approval_rules", {})
+        rules.update(updates)
+        run.runtime = mutated_runtime
+        run.review = self._build_review(
+            {"document_id": run.source_document_id, "rows": run.parsed_rows},
+            run.runtime,
+            live_integration_verified=bool(run.review.get("live_integration_verified")),
+            integration_label=str(run.review.get("integration_label") or "fixture"),
+            integration_note=run.review.get("integration_note"),
+        )
         return {"run_id": run_id, **run.review}
 
     def export_excel(self, run_id: str) -> bytes:
@@ -135,8 +252,6 @@ class Train1Pipeline:
             "loaded_unit_price",
             "tender_unit_price",
             "tender_extension",
-            "approval_unit_price",
-            "approval_extension",
             "confidence",
             "evidence",
         ])
@@ -146,14 +261,12 @@ class Train1Pipeline:
                     row["row_id"],
                     row["description_vi"],
                     row["unit_raw"],
-                    row["quantity_raw"],
+                    float(_d(row["quantity"])) if row["quantity"] is not None else None,
                     row["mapping_status"],
                     row.get("canonical_code"),
-                    row.get("loaded_unit_price"),
-                    row.get("tender_unit_price"),
-                    row.get("tender_extension"),
-                    row.get("approval_unit_price"),
-                    row.get("approval_extension"),
+                    float(_d(row["loaded_unit_price"])) if row.get("loaded_unit_price") is not None else None,
+                    float(_d(row["tender_unit_price"])) if row.get("tender_unit_price") is not None else None,
+                    float(_d(row["tender_extension"])) if row.get("tender_extension") is not None else None,
                     row.get("confidence"),
                     row.get("mapping_evidence"),
                 ]
@@ -161,21 +274,23 @@ class Train1Pipeline:
 
         ws2 = wb.create_sheet("Train1-Summary")
         ws2.append(["status", review["status"]])
-        ws2.append(["tender_partial_subtotal", review["tender_partial_subtotal"]])
-        ws2.append(["approval_partial_subtotal", review["approval_partial_subtotal"]])
-        ws2.append(["official_tender_total", review["official_tender_total"] if review["status"] == "COMPLETE" else None])
-        ws2.append(["official_approval_total", review["official_approval_total"] if review["status"] == "COMPLETE" else None])
+        ws2.append(["tender_partial_subtotal", float(_d(review["tender_partial_subtotal"]))])
+        ws2.append(["approval_partial_subtotal", float(_d(review["approval_partial_subtotal"]))])
+        ws2.append(["official_tender_total", float(_d(review["official_tender_total"])) if review["official_tender_total"] is not None else None])
+        ws2.append(["official_approval_total", float(_d(review["official_approval_total"])) if review["official_approval_total"] is not None else None])
 
         ws3 = wb.create_sheet("Train1-Unresolved")
         ws3.append(["row_id", "mapping_status", "reason", "missing_dependencies"])
         for row in review["rows"]:
             if row["mapping_status"] != "resolved":
-                ws3.append([
-                    row["row_id"],
-                    row["mapping_status"],
-                    row.get("reason"),
-                    ", ".join(row.get("missing_dependencies") or []),
-                ])
+                ws3.append(
+                    [
+                        row["row_id"],
+                        row["mapping_status"],
+                        row.get("reason"),
+                        ", ".join(row.get("missing_dependencies") or []),
+                    ]
+                )
 
         import io
 
@@ -183,14 +298,24 @@ class Train1Pipeline:
         wb.save(out)
         return out.getvalue()
 
-    def _build_review(self, parsed: dict[str, Any], runtime: dict[str, Any]) -> dict[str, Any]:
+    def _build_review(
+        self,
+        parsed: dict[str, Any],
+        runtime: dict[str, Any],
+        *,
+        live_integration_verified: bool,
+        integration_label: str,
+        integration_note: str | None,
+    ) -> dict[str, Any]:
         work_master = runtime.get("work_item_master") or {}
 
         rows_out: list[dict[str, Any]] = []
         tender_partial = Decimal("0")
-        approval_partial = Decimal("0")
         unresolved_required = 0
         required_rows = 0
+        blocked_rows: list[dict[str, Any]] = []
+
+        approval_group_accumulator: dict[str, dict[str, Any]] = {}
 
         for index, row in enumerate(parsed.get("rows", [])):
             row_id = str(row.get("row_id") or f"row-{index+1}")
@@ -201,65 +326,36 @@ class Train1Pipeline:
             quantity = _parse_quantity(quantity_raw)
             evidence = list(row.get("evidence") or [])
             suggestions = list(row.get("ai_suggestions") or [])
+            corrections = list(row.get("corrections") or [])
             manual_selected_code = str(row.get("manual_selected_code") or "").strip()
 
             if row_type == "line_item":
                 required_rows += 1
 
-            mapping_status = "resolved"
-            canonical_code: str | None = None
-            confidence = None
-            reason = None
-            missing_dependencies: list[str] = []
+            decision: MappingDecision = self.mapper.decide(
+                row_id=row_id,
+                row_type=row_type,
+                unit_raw=unit_raw,
+                quantity_raw=quantity_raw,
+                quantity=quantity,
+                suggestions=suggestions,
+                work_master=work_master,
+                unit_rules=self._unit_rules,
+                manual_selected_code=manual_selected_code,
+                allow_zero_quantity=self.allow_zero_quantity,
+            )
+
+            mapping_status = decision.mapping_status
+            canonical_code = decision.canonical_code
+            confidence = decision.confidence
+            reason = decision.reason
+            missing_dependencies = list(decision.missing_dependencies)
             loaded_unit_price = None
             tender_unit_price = None
             tender_extension = None
             approval_unit_price = None
-            approval_extension = None
 
-            unique_codes: dict[str, dict[str, Any]] = {}
-            if manual_selected_code:
-                if manual_selected_code in work_master:
-                    unique_codes[manual_selected_code] = {
-                        "code": manual_selected_code,
-                        "confidence": 1.0,
-                        "evidence": str(row.get("manual_override_evidence") or "manual_override"),
-                        "source": "manual",
-                    }
-                else:
-                    mapping_status = "mapping_unmatched"
-                    reason = "Manual code is not in verified WorkItemMaster"
-            if mapping_status == "resolved" and not manual_selected_code:
-                for s in suggestions:
-                    code = str(s.get("code") or "").strip()
-                    if not code:
-                        continue
-                    if code in work_master:
-                        unique_codes[code] = s
-
-            candidate_codes = sorted(unique_codes.keys())
-            compatible_codes = [
-                code for code in candidate_codes if _unit_compatible(unit_raw, str((work_master.get(code) or {}).get("unit") or ""))
-            ]
-
-            if row_type != "line_item":
-                mapping_status = "non_billable"
-                reason = "Non-billable row type"
-            elif quantity is None:
-                mapping_status = "invalid_quantity"
-                reason = "Quantity is unparseable"
-            elif not candidate_codes:
-                mapping_status = "mapping_unmatched"
-                reason = "No verified WorkItemMaster suggestion"
-            elif not compatible_codes:
-                mapping_status = "unit_incompatible"
-                reason = "Suggested code exists but unit is incompatible"
-            elif len(compatible_codes) > 1:
-                mapping_status = "mapping_ambiguous"
-                reason = "Multiple compatible verified codes require manual review"
-            else:
-                canonical_code = compatible_codes[0]
-                confidence = float(unique_codes[canonical_code].get("confidence") or 0)
+            if mapping_status == "resolved" and canonical_code is not None and quantity is not None:
                 item_result = self.engine.calculate_work_item_from_runtime(canonical_code, runtime)
                 if item_result.get("calculation_status") != "resolved":
                     mapping_status = "unsupported_blocking_item"
@@ -267,8 +363,31 @@ class Train1Pipeline:
                     missing_dependencies = list(item_result.get("missing_dependencies") or [])
                 else:
                     work_item = work_master.get(canonical_code) or {}
+                    loaded_unit = item_result["loaded_unit_price"]
+                    tender_unit = item_result["tender_rounded_unit_price"]
+                    loaded_unit_price = str(loaded_unit)
+                    tender_unit_price = str(tender_unit)
+                    tender_extension_value = (tender_unit * quantity).quantize(Decimal("1"))
+                    tender_extension = str(tender_extension_value)
+                    tender_partial += tender_extension_value
+
+                    # Aggregate-first approval accumulator (do not sum per-row loaded approval finals).
                     category = str(work_item.get("category") or "default")
-                    approval_group = str(work_item.get("approval_rule_group") or "") or None
+                    approval_group = str(work_item.get("approval_rule_group") or "") or self.engine._approval_group_for_item(work_item)
+                    bucket = approval_group_accumulator.setdefault(
+                        approval_group,
+                        {
+                            "category": category,
+                            "material": Decimal("0"),
+                            "labour": Decimal("0"),
+                            "machine": Decimal("0"),
+                        },
+                    )
+                    bucket["material"] += item_result["direct_material_total"] * quantity
+                    bucket["labour"] += item_result["direct_labour_total"] * quantity
+                    bucket["machine"] += item_result["direct_machine_total"] * quantity
+
+                    # Per-row display only.
                     approval_rules = self.engine.approval_rules_for(category, work_item, runtime=runtime, approval_group=approval_group)
                     approval_components = self.engine._compute_loaded_components(
                         item_result["direct_material_total"],
@@ -276,18 +395,11 @@ class Train1Pipeline:
                         item_result["direct_machine_total"],
                         approval_rules,
                     )
-                    loaded_unit_price = str(item_result.get("loaded_unit_price"))
-                    tender_unit_price = str(item_result.get("tender_rounded_unit_price"))
                     approval_unit_price = str(approval_components["FINAL"])
-                    tender_extension_value = (item_result["tender_rounded_unit_price"] * quantity).quantize(Decimal("1"))
-                    approval_extension_value = (approval_components["FINAL"] * quantity).quantize(Decimal("1"))
-                    tender_extension = str(tender_extension_value)
-                    approval_extension = str(approval_extension_value)
-                    tender_partial += tender_extension_value
-                    approval_partial += approval_extension_value
 
             if row_type == "line_item" and mapping_status != "resolved":
                 unresolved_required += 1
+                blocked_rows.append({"row_id": row_id, "mapping_status": mapping_status, "reason": reason})
 
             rows_out.append(
                 {
@@ -298,20 +410,40 @@ class Train1Pipeline:
                     "quantity_raw": quantity_raw,
                     "quantity": str(quantity) if quantity is not None else None,
                     "evidence": evidence,
+                    "corrections": corrections,
                     "mapping_status": mapping_status,
                     "canonical_code": canonical_code,
                     "confidence": confidence,
-                    "mapping_evidence": unique_codes.get(canonical_code, {}).get("evidence") if canonical_code else None,
-                    "candidate_codes": candidate_codes,
+                    "mapping_evidence": decision.mapping_evidence,
+                    "candidates": decision.candidates,
                     "reason": reason,
                     "missing_dependencies": missing_dependencies,
                     "loaded_unit_price": loaded_unit_price,
                     "tender_unit_price": tender_unit_price,
                     "tender_extension": tender_extension,
                     "approval_unit_price": approval_unit_price,
-                    "approval_extension": approval_extension,
                 }
             )
+
+        approval_partial = Decimal("0")
+        approval_group_components: dict[str, dict[str, str]] = {}
+        for group_key, totals in approval_group_accumulator.items():
+            category = str(totals["category"])
+            rules = self.engine.approval_rules_for(category, runtime=runtime, approval_group=group_key)
+            components = self.engine._compute_loaded_components(
+                totals["material"],
+                totals["labour"],
+                totals["machine"],
+                rules,
+            )
+            approval_partial += components["FINAL"]
+            approval_group_components[group_key] = {
+                "category": category,
+                "material": str(totals["material"]),
+                "labour": str(totals["labour"]),
+                "machine": str(totals["machine"]),
+                "final": str(components["FINAL"]),
+            }
 
         complete = required_rows > 0 and unresolved_required == 0
         return {
@@ -323,8 +455,24 @@ class Train1Pipeline:
             "official_approval_total": str(approval_partial) if complete else None,
             "tender_partial_subtotal": str(tender_partial),
             "approval_partial_subtotal": str(approval_partial),
+            "approval_group_components": approval_group_components,
+            "blocked_rows": blocked_rows,
+            "live_integration_verified": live_integration_verified,
+            "integration_label": integration_label,
+            "integration_note": integration_note,
             "rows": rows_out,
         }
 
 
 PIPELINE = Train1Pipeline()
+
+
+__all__ = [
+    "PIPELINE",
+    "Train1Pipeline",
+    "Train2PipelineError",
+    "ParserProviderError",
+    "ParserProviderAuthError",
+    "ParserProviderTimeoutError",
+    "ParserProviderContractError",
+]

@@ -297,15 +297,16 @@ async def test_azure_adapter_submit_poll_round_trip(monkeypatch):
     monkeypatch.setenv("AZURE_DOC_INTEL_ENDPOINT", "https://azure.example.test")
     monkeypatch.setenv("AZURE_DOC_INTEL_KEY", "secret")
 
-    submit_request = httpx.Request("POST", "https://azure.example.test/formrecognizer/documentModels/prebuilt-layout:analyze?api-version=2024-02-29-preview")
+    submit_request = httpx.Request("POST", "https://azure.example.test/documentintelligence/documentModels/prebuilt-layout:analyze?api-version=2024-11-30")
     poll_request = httpx.Request("GET", "https://azure.example.test/operations/123")
     submit_response = httpx.Response(202, headers={"Operation-Location": "https://azure.example.test/operations/123"}, request=submit_request)
     running_response = httpx.Response(200, json={"status": "running"}, request=poll_request)
     succeeded_response = httpx.Response(200, json={"status": "succeeded", "analyzeResult": {"pages": [], "tables": []}}, request=poll_request)
 
-    calls = {"poll": 0}
+    calls = {"poll": 0, "submit_url": None}
 
     async def fake_post(self, *args, **kwargs):
+        calls["submit_url"] = str(args[0])
         return submit_response
 
     async def fake_get(self, *args, **kwargs):
@@ -324,6 +325,7 @@ async def test_azure_adapter_submit_poll_round_trip(monkeypatch):
 
     assert result["status"] == "succeeded"
     assert result["analyzeResult"] == {"pages": [], "tables": []}
+    assert calls["submit_url"] == str(submit_request.url)
     assert calls["poll"] == 2
 
 

@@ -119,7 +119,10 @@ async def start_run_from_upload(file: UploadFile = File(...), authorization: str
         if not os.getenv("AZURE_DOC_INTEL_KEY", "").strip():
             raise HTTPException(status_code=503, detail="LIVE INTEGRATION BLOCKED: AZURE_DOC_INTEL_KEY is not configured")
         try:
-            return await PIPELINE.start_from_azure_parser(pdf_bytes=pdf_bytes)
+            return await PIPELINE.start_from_azure_parser(
+                pdf_bytes=pdf_bytes,
+                live_integration_verified=True,
+            )
         except ParserProviderAuthError as exc:
             raise HTTPException(status_code=502, detail="Azure parser authentication failed") from exc
         except ParserProviderTimeoutError as exc:

@@ -501,6 +501,7 @@ def test_train2_upload_uses_azure_bridge_when_azure_mode_selected(monkeypatch):
     assert resp.status_code == 200
     body = resp.json()
     assert body["integration_label"] == "azure_document_intelligence"
+    assert body["live_integration_verified"] is True
     assert called["azure"] == 1
     assert called["http"] == 0
 

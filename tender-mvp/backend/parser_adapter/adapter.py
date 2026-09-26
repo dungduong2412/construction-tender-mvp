@@ -4,8 +4,8 @@ Parser Adapter — wraps the Azure Document Intelligence API.
 CONTRACT
 --------
 Real mode (MOCK_PARSER=false):
-  POST {AZURE_DOC_INTEL_ENDPOINT}/formrecognizer/documentModels/prebuilt-layout:analyze
-       ?api-version=2024-02-29-preview
+  POST {AZURE_DOC_INTEL_ENDPOINT}/documentintelligence/documentModels/prebuilt-layout:analyze
+       ?api-version=2024-11-30
   → 202 Accepted, Operation-Location header for polling
   GET  {Operation-Location}
   → 200 {"status": "succeeded", "analyzeResult": {...}}
@@ -22,7 +22,7 @@ from typing import Any
 
 import httpx
 
-API_VERSION = "2024-02-29-preview"
+API_VERSION = "2024-11-30"
 MODEL_ID = "prebuilt-layout"
 FIXTURE_PATH = Path(__file__).parent.parent.parent / "fixtures" / "bang_tien_luong_mock.json"
 
@@ -90,7 +90,7 @@ class ParserAdapter:
         if not endpoint or not key:
             raise ParserAdapterContractError("Azure parser configuration is incomplete")
         url = (
-            f"{endpoint.rstrip('/')}/formrecognizer/documentModels/"
+            f"{endpoint.rstrip('/')}/documentintelligence/documentModels/"
             f"{MODEL_ID}:analyze?api-version={API_VERSION}"
         )
         headers = {

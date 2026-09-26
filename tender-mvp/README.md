@@ -95,6 +95,10 @@ See `.env.template` for all variables. Key ones:
 | `AZURE_DOC_INTEL_ENDPOINT` | — | Azure Document Intelligence endpoint URL |
 | `AZURE_DOC_INTEL_KEY` | — | Azure API key |
 | `OPENAI_API_KEY` | — | OpenAI API key |
+| `APP_ENV` | — | Set to `uat` to enable fail-closed UAT access protection |
+| `UAT_ACCESS_USERNAME` | `uat` | HTTP Basic username for the UAT UI and legacy routes |
+| `UAT_ACCESS_PASSWORD` | — | Required secret for UAT UI and legacy route access |
+| `TRAIN2_UPLOAD_AUTH_TOKEN` | — | Bearer token for V2 upload, review and export routes |
 | `DEMO_TENANT_ID` | `demo-tenant-001` | Fixed demo tenant |
 | `MASTER_DATA_VERSION` | `v1` | Master data version to load |
 
@@ -104,7 +108,7 @@ See `.env.template` for all variables. Key ones:
 
 See `GET /api/parser/contract` for the live contract documentation.
 
-**Submit:** `POST {AZURE_DOC_INTEL_ENDPOINT}/formrecognizer/documentModels/prebuilt-layout:analyze?api-version=2024-02-29-preview`  
+**Submit:** `POST {AZURE_DOC_INTEL_ENDPOINT}/documentintelligence/documentModels/prebuilt-layout:analyze?api-version=2024-11-30`
 - Body: raw PDF bytes  
 - Header: `Ocp-Apim-Subscription-Key: <key>`, `Content-Type: application/pdf`  
 - Response: `202 Accepted`, header `Operation-Location: <poll_url>`
@@ -112,6 +116,8 @@ See `GET /api/parser/contract` for the live contract documentation.
 **Poll:** `GET <Operation-Location>` → `{"status": "succeeded", "analyzeResult": {...}}`
 
 Set `MOCK_PARSER=true` to skip the real API and use the 4-page fixture.
+
+Railway can use the public `GET /health` endpoint for readiness. It reports only safe runtime metadata, including the Azure API version and mock-mode booleans; it never returns credentials.
 
 ---
 

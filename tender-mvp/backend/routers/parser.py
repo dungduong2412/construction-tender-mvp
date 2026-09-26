@@ -12,7 +12,7 @@ async def adapter_contract():
         "version": "1.0",
         "submit_endpoint": {
             "method": "POST",
-            "url": "{AZURE_DOC_INTEL_ENDPOINT}/formrecognizer/documentModels/prebuilt-layout:analyze?api-version=2024-02-29-preview",
+            "url": "{AZURE_DOC_INTEL_ENDPOINT}/documentintelligence/documentModels/prebuilt-layout:analyze?api-version=2024-11-30",
             "headers": {"Ocp-Apim-Subscription-Key": "<key>", "Content-Type": "application/pdf"},
             "body": "<raw PDF bytes>",
             "response": "202 Accepted, header: Operation-Location: <poll_url>",

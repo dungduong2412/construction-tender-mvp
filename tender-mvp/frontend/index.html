@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Construction Tender MVP — Bảng Tiên Lượng</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; background: #f0f2f5; color: #222; }
+    header { background: #1a3a6b; color: #fff; padding: 16px 24px; display: flex; align-items: center; gap: 16px; }
+    header h1 { margin: 0; font-size: 1.3rem; }
+    .badge { background: #e63946; color: #fff; font-size: 0.75rem; padding: 2px 8px; border-radius: 12px; }
+    main { max-width: 1400px; margin: 24px auto; padding: 0 16px; }
+
+    /* Upload card */
+    .card { background: #fff; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,.12); padding: 24px; margin-bottom: 20px; }
+    .card h2 { margin-top: 0; font-size: 1.1rem; color: #1a3a6b; }
+    .upload-zone { border: 2px dashed #1a3a6b; border-radius: 6px; padding: 32px; text-align: center; cursor: pointer; transition: background .2s; }
+    .upload-zone:hover { background: #eef3fb; }
+    .upload-zone input { display: none; }
+    .btn { background: #1a3a6b; color: #fff; border: none; border-radius: 5px; padding: 10px 22px; font-size: .95rem; cursor: pointer; transition: background .2s; }
+    .btn:hover { background: #2256a6; }
+    .btn:disabled { background: #aaa; cursor: not-allowed; }
+    .btn-sm { padding: 5px 12px; font-size: .82rem; }
+    .btn-green { background: #2a7a34; }
+    .btn-green:hover { background: #3aab45; }
+    .btn-red { background: #c0392b; }
+    .btn-red:hover { background: #e74c3c; }
+
+    /* Status bar */
+    #status-bar { padding: 10px 16px; border-radius: 6px; margin-bottom: 16px; display: none; font-weight: 600; }
+    .status-info { background: #d6e8ff; color: #1a3a6b; }
+    .status-warn { background: #fff3cd; color: #856404; }
+    .status-ok { background: #d4edda; color: #155724; }
+    .status-err { background: #f8d7da; color: #721c24; }
+
+    /* Review table */
+    #review-section { display: none; }
+    .table-wrapper { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+    thead th { background: #1a3a6b; color: #fff; padding: 8px 10px; text-align: left; white-space: nowrap; position: sticky; top: 0; }
+    tbody tr:nth-child(even) { background: #f8f9fa; }
+    tbody tr:hover { background: #e8f0fe; }
+    td { padding: 6px 10px; vertical-align: top; border-bottom: 1px solid #e5e5e5; }
+    .row-heading td { background: #d9e1f2; font-weight: 700; }
+    .row-metadata td { background: #fef9e7; font-style: italic; color: #666; }
+    .row-unresolved td { background: #fff0f0; }
+    .row-resolved td {}
+    .conf-high { color: #2a7a34; font-weight: 600; }
+    .conf-med { color: #856404; }
+    .conf-low { color: #c0392b; }
+    .badge-unresolved { background: #e74c3c; color: #fff; font-size: .72rem; padding: 1px 6px; border-radius: 10px; }
+    .badge-resolved { background: #27ae60; color: #fff; font-size: .72rem; padding: 1px 6px; border-radius: 10px; }
+    .badge-error { background: #95a5a6; color: #fff; font-size: .72rem; padding: 1px 6px; border-radius: 10px; }
+
+    /* Override modal */
+    #modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:100; align-items:center; justify-content:center; }
+    #modal-overlay.open { display:flex; }
+    #modal-box { background:#fff; border-radius:8px; padding:24px; width:440px; max-width:95vw; }
+    #modal-box h3 { margin-top:0; }
+    #modal-box label { display:block; margin-top:12px; font-size:.88rem; font-weight:600; }
+    #modal-box select, #modal-box input { width:100%; padding:7px; margin-top:4px; border:1px solid #ccc; border-radius:4px; }
+    .modal-actions { margin-top:18px; display:flex; gap:10px; justify-content:flex-end; }
+
+    /* Summary */
+    .summary-bar { display:flex; gap:20px; flex-wrap:wrap; align-items:center; margin-bottom:12px; }
+    .summary-bar .kpi { background:#eef3fb; border-radius:6px; padding:8px 16px; font-size:.9rem; }
+    .kpi .val { font-size:1.3rem; font-weight:700; color:#1a3a6b; }
+
+    #dl-btn { margin-top:8px; }
+  </style>
+</head>
+<body>
+<header>
+  <h1>🏗 Construction Tender MVP</h1>
+  <span class="badge">DEMO</span>
+</header>
+
+<main>
+  <!-- Upload card -->
+  <div class="card" id="upload-card">
+    <h2>1. Tải lên PDF Bảng Tiên Lượng</h2>
+    <div class="upload-zone" id="drop-zone" onclick="document.getElementById('pdf-input').click()">
+      <input type="file" id="pdf-input" accept=".pdf" />
+      <p style="margin:0;font-size:1rem;">Kéo thả hoặc <strong>click</strong> để chọn file PDF</p>
+      <p style="margin:6px 0 0;color:#666;font-size:.85rem;">Chỉ chấp nhận file .pdf</p>
+      <p id="selected-file" style="margin:8px 0 0;font-weight:600;color:#1a3a6b;"></p>
+    </div>
+    <button class="btn" id="upload-btn" style="margin-top:16px;">Xử lý PDF</button>
+  </div>
+
+  <!-- Status bar -->
+  <div id="status-bar"></div>
+
+  <!-- Review section -->
+  <div id="review-section">
+    <div class="card" style="padding:16px 24px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+        <h2 style="margin:0;">2. Kiểm tra & Xác nhận Bảng Tiên Lượng</h2>
+        <button class="btn btn-green" id="dl-btn">⬇ Tải xuống Excel (.xlsx)</button>
+      </div>
+      <div class="summary-bar" id="summary-bar" style="margin-top:12px;"></div>
+      <div id="draft-warn" style="display:none;background:#fff3cd;color:#856404;padding:8px 14px;border-radius:5px;margin-bottom:8px;font-weight:600;">
+        ⚠ CÒN CÁC KHOẢN CHƯA ĐỊNH GIÁ — BẢN IN NÀY LÀ DRAFT, KHÔNG DÙNG LÀM HỒ SƠ CHÍNH THỨC
+      </div>
+    </div>
+
+    <div class="card" style="padding:0;">
+      <div class="table-wrapper">
+        <table id="review-table">
+          <thead>
+            <tr>
+              <th>STT</th>
+              <th style="min-width:300px;">Nội dung công việc</th>
+              <th>ĐVT</th>
+              <th>Khối lượng</th>
+              <th style="min-width:160px;">Mã master / Mô tả master</th>
+              <th>Đơn giá (đ)</th>
+              <th>Thành tiền (đ)</th>
+              <th>Tin cậy</th>
+              <th>Trang</th>
+              <th>Trạng thái</th>
+              <th>Thao tác</th>
+            </tr>
+          </thead>
+          <tbody id="review-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Override modal -->
+<div id="modal-overlay">
+  <div id="modal-box">
+    <h3>Thay đổi thông tin hàng</h3>
+    <p id="modal-desc" style="color:#444;font-size:.9rem;"></p>
+    <label>Chọn mục master thay thế</label>
+    <select id="modal-master-sel">
+      <option value="">— Chưa chọn (unresolved) —</option>
+    </select>
+    <label>Đơn giá tùy chỉnh (để trống = dùng master)</label>
+    <input type="number" id="modal-price-input" placeholder="VD: 380000" />
+    <div class="modal-actions">
+      <button class="btn btn-red btn-sm" onclick="closeModal()">Hủy</button>
+      <button class="btn btn-sm" onclick="applyOverride()">Lưu thay đổi</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = '/api';
+let currentJobId = null;
+let currentRowId = null;
+let allCandidates = [];
+let pollTimer = null;
+
+// Drag-and-drop
+const dropZone = document.getElementById('drop-zone');
+const pdfInput = document.getElementById('pdf-input');
+const uploadBtn = document.getElementById('upload-btn');
+const selectedFileLbl = document.getElementById('selected-file');
+
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.style.background = '#dce8ff'; });
+dropZone.addEventListener('dragleave', () => { dropZone.style.background = ''; });
+dropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropZone.style.background = '';
+  const f = e.dataTransfer.files[0];
+  if (f && f.name.endsWith('.pdf')) { pdfInput.files = e.dataTransfer.files; onFileSelected(f); }
+  else { setStatus('Chỉ chấp nhận file .pdf', 'err'); }
+});
+pdfInput.addEventListener('change', () => {
+  if (pdfInput.files[0]) onFileSelected(pdfInput.files[0]);
+});
+
+pdfInput.addEventListener('input', () => {
+  if (pdfInput.files[0]) onFileSelected(pdfInput.files[0]);
+});
+
+function onFileSelected(f) {
+  selectedFileLbl.textContent = '📄 ' + f.name;
+  uploadBtn.disabled = false;
+}
+
+function syncUploadButtonState() {
+  const hasFile = !!(pdfInput.files && pdfInput.files.length > 0);
+  if (hasFile) {
+    selectedFileLbl.textContent = '📄 ' + pdfInput.files[0].name;
+  } else if (!selectedFileLbl.textContent) {
+    selectedFileLbl.textContent = '';
+  }
+  uploadBtn.disabled = !hasFile;
+}
+
+pdfInput.addEventListener('change', syncUploadButtonState);
+pdfInput.addEventListener('input', syncUploadButtonState);
+setInterval(syncUploadButtonState, 150);
+
+uploadBtn.addEventListener('click', async () => {
+  const file = pdfInput.files[0];
+  if (!file) {
+    setStatus('Vui lòng chọn một file PDF trước khi tải lên.', 'err');
+    return;
+  }
+  if (!file.name.toLowerCase().endsWith('.pdf')) {
+    setStatus('Chỉ chấp nhận file .pdf', 'err');
+    return;
+  }
+  uploadBtn.disabled = true;
+  setStatus('Đang tải lên…', 'info');
+  const fd = new FormData();
+  fd.append('file', file);
+  try {
+    const res = await fetch(`${API}/jobs/upload`, { method: 'POST', body: fd });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || res.statusText);
+    currentJobId = data.job_id;
+    setStatus(`Đã tải lên — Job ID: ${currentJobId} — Đang xử lý…`, 'info');
+    pollJob();
+  } catch (err) {
+    setStatus('Lỗi tải lên: ' + err.message, 'err');
+    uploadBtn.disabled = false;
+  }
+});
+
+function pollJob() {
+  if (pollTimer) clearInterval(pollTimer);
+  pollTimer = setInterval(async () => {
+    try {
+      const res = await fetch(`${API}/jobs/${currentJobId}`);
+      const data = await res.json();
+      const s = data.status;
+      if (['uploaded','parsing','mapping','pricing'].includes(s)) {
+        setStatus(`Đang xử lý… (${s})`, 'info');
+      } else if (s === 'needs_review') {
+        clearInterval(pollTimer);
+        setStatus(`⚠ DEMO / MOCK DATA — uploaded PDF content was not processed. Còn ${data.unresolved_count} khoản chưa định giá — vui lòng kiểm tra`, 'warn');
+        loadReview();
+      } else if (s === 'ready') {
+        clearInterval(pollTimer);
+        setStatus('✅ DEMO / MOCK DATA — uploaded PDF content was not processed. Tất cả khoản đã định giá — sẵn sàng xuất Excel', 'ok');
+        loadReview();
+      } else if (s === 'failed') {
+        clearInterval(pollTimer);
+        setStatus('❌ Lỗi xử lý: ' + (data.error_message || 'unknown'), 'err');
+      }
+    } catch (e) { /* network glitch, keep polling */ }
+  }, 2000);
+}
+
+async function loadReview() {
+  try {
+    const res = await fetch(`${API}/review/${currentJobId}/rows`);
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}: ${res.statusText || 'Unable to load review rows'}`);
+    }
+    const rows = await res.json();
+    if (!Array.isArray(rows)) {
+      throw new Error('Review response was not a valid list of rows.');
+    }
+    renderTable(rows);
+    document.getElementById('review-section').style.display = 'block';
+    document.getElementById('upload-card').style.display = 'none';
+  } catch (err) {
+    const reviewSection = document.getElementById('review-section');
+    const tbody = document.getElementById('review-tbody');
+    if (tbody) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="11" style="padding:16px;color:#721c24;font-weight:600;">
+            ❌ Không thể tải hoặc hiển thị bảng review: ${escHtml(err.message || 'Không rõ nguyên nhân')}
+          </td>
+        </tr>
+      `;
+    }
+    if (reviewSection) {
+      reviewSection.style.display = 'block';
+    }
+    setStatus(`❌ Lỗi xem bảng review: ${err.message || 'unknown error'} — DEMO / MOCK DATA`, 'err');
+  }
+}
+
+function renderTable(rows) {
+  const tbody = document.getElementById('review-tbody');
+  tbody.innerHTML = '';
+  let totalItems = 0, resolved = 0, unresolved = 0;
+  let grandTotal = 0, partialTotal = false;
+
+  rows.forEach(r => {
+    const tr = document.createElement('tr');
+    if (r.row_type === 'heading') {
+      tr.className = 'row-heading';
+      tr.innerHTML = `<td>${r.row_number}</td><td colspan="10"><strong>${r.description_vi}</strong></td>`;
+    } else if (r.row_type === 'metadata') {
+      tr.className = 'row-metadata';
+      tr.innerHTML = `<td>${r.row_number}</td><td colspan="10"><em>${r.description_vi}</em> <span style="color:#aaa;font-size:.8rem;">[metadata]</span></td>`;
+    } else {
+      totalItems++;
+      const priced = r.status === 'mapped_and_priced' && !!r.unit_price && !!r.extended_amount;
+      if (priced) {
+        resolved++;
+        grandTotal += parseFloat(r.extended_amount || 0);
+      } else {
+        unresolved++;
+        partialTotal = true;
+      }
+      tr.className = priced ? 'row-resolved' : 'row-unresolved';
+      const confHtml = confBadge(r.confidence);
+      const statusHtml = statusBadge(r.status, r.error_reason);
+      const masterHtml = r.master_code
+        ? `<span title="${escAttr(r.master_description || '')}">${r.master_code}</span>`
+        : '<em style="color:#999;">—</em>';
+      tr.innerHTML = `
+        <td>${r.row_number}</td>
+        <td>${escHtml(r.description_vi)}</td>
+        <td>${escHtml(r.unit)}</td>
+        <td>${escHtml(r.quantity_raw)}</td>
+        <td>${masterHtml}</td>
+        <td>${r.unit_price ? fmtNum(r.unit_price) : '—'}</td>
+        <td>${r.extended_amount ? fmtNum(r.extended_amount) : '—'}</td>
+        <td>${confHtml}</td>
+        <td>${r.page}</td>
+        <td>${statusHtml}</td>
+        <td><button class="btn btn-sm btn-edit" data-row-id="${escAttr(r.row_id)}">Sửa</button></td>
+      `;
+      const editBtn = tr.querySelector('.btn-edit');
+      if (editBtn) {
+        editBtn.addEventListener('click', () => openModal(r.row_id, r.description_vi));
+      }
+    }
+    tbody.appendChild(tr);
+  });
+
+  // Summary
+  const bar = document.getElementById('summary-bar');
+  bar.innerHTML = `
+    <div class="kpi"><div class="val">${totalItems}</div>Khoản mục</div>
+    <div class="kpi"><div class="val" style="color:#2a7a34;">${resolved}</div>Đã định giá</div>
+    <div class="kpi"><div class="val" style="color:#c0392b;">${unresolved}</div>Chưa định giá</div>
+    <div class="kpi"><div class="val">${partialTotal ? '(chưa đầy đủ)' : fmtNum(String(Math.round(grandTotal)))}</div>Tổng cộng (đ)</div>
+  `;
+  document.getElementById('draft-warn').style.display = partialTotal ? '' : 'none';
+
+  // Download btn
+  document.getElementById('dl-btn').onclick = () => {
+    window.location.href = `${API}/export/${currentJobId}/xlsx`;
+  };
+}
+
+// Modal
+async function openModal(rowId, desc) {
+  currentRowId = rowId;
+  document.getElementById('modal-desc').textContent = desc;
+  document.getElementById('modal-price-input').value = '';
+
+  const res = await fetch(`${API}/review/${currentJobId}/candidates/${rowId}`);
+  allCandidates = await res.json();
+  const sel = document.getElementById('modal-master-sel');
+  sel.innerHTML = '<option value="">— Chưa chọn (unresolved) —</option>';
+  allCandidates.forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c.id;
+    opt.textContent = `${c.item_code} — ${c.description_vi} (${c.unit}, ${fmtNum(String(c.unit_price))} đ)`;
+    sel.appendChild(opt);
+  });
+
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+  currentRowId = null;
+}
+
+async function applyOverride() {
+  const masterId = document.getElementById('modal-master-sel').value;
+  const price = document.getElementById('modal-price-input').value;
+
+  const overrides = [];
+  if (masterId) {
+    overrides.push({ row_id: currentRowId, field: 'master_item_id', old_value: null, new_value: masterId });
+  }
+  if (price) {
+    overrides.push({ row_id: currentRowId, field: 'unit_price', old_value: null, new_value: price });
+  }
+
+  for (const ov of overrides) {
+    await fetch(`${API}/review/${currentJobId}/override`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...ov, user: 'demo-user' }),
+    });
+  }
+  closeModal();
+  await loadReview();
+}
+
+// Helpers
+function setStatus(msg, type) {
+  const bar = document.getElementById('status-bar');
+  bar.textContent = msg;
+  bar.className = `status-${type}`;
+  bar.style.display = '';
+}
+
+function confBadge(conf) {
+  if (conf === null || conf === undefined) return '—';
+  const pct = Math.round(conf * 100);
+  const cls = conf >= 0.8 ? 'conf-high' : conf >= 0.5 ? 'conf-med' : 'conf-low';
+  return `<span class="${cls}">${pct}%</span>`;
+}
+
+function statusBadge(status, reason) {
+  if (status === 'mapped_and_priced') return '<span class="badge-resolved">OK</span>';
+  if (status === 'non_billable_heading' || status === 'non_billable_metadata') return `<span class="badge-error" title="${escAttr(reason||'')}">INFO</span>`;
+  if (status === 'mapping_ambiguous' || status === 'mapped_price_unavailable' || status === 'mapping_unresolved' || status === 'invalid_quantity_or_unit') return `<span class="badge-unresolved" title="${escAttr(reason||'')}">!</span>`;
+  return `<span class="badge-error" title="${escAttr(reason||'')}">ERR</span>`;
+}
+
+function fmtNum(s) {
+  const n = parseFloat(s);
+  if (isNaN(n)) return s;
+  return n.toLocaleString('vi-VN');
+}
+
+function escHtml(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function escAttr(s) { return escHtml(s).replace(/'/g, '&#39;'); }
+</script>
+</body>
+</html>

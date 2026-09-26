@@ -1,0 +1,34 @@
+{
+  "document_id": "real-response-sample-001",
+  "provider": "external-parser-api",
+  "rows": [
+    {
+      "row_id": "rr-1",
+      "row_type": "line_item",
+      "description_vi": "Đo lưới khống chế mặt bằng đường chuyền cấp 2",
+      "unit_raw": "điểm",
+      "quantity_raw": "8",
+      "page": 1,
+      "evidence": [
+        {"type": "pdf_span", "locator": "p1:tbl1:r15:c2", "text": "Đo lưới khống chế mặt bằng"}
+      ],
+      "ai_suggestions": [
+        {"code": "CF.11620", "confidence": 0.93, "evidence": "semantic similarity 0.93", "source": "ai"}
+      ]
+    },
+    {
+      "row_id": "rr-2",
+      "row_type": "line_item",
+      "description_vi": "Khoan xoay bơm rửa lấy mẫu ở trên cạn",
+      "unit_raw": "m khoan",
+      "quantity_raw": "1583",
+      "page": 1,
+      "evidence": [
+        {"type": "pdf_span", "locator": "p1:tbl1:r25:c2", "text": "Khoan xoay bơm rửa"}
+      ],
+      "ai_suggestions": [
+        {"code": "CC.21310", "confidence": 0.89, "evidence": "semantic similarity 0.89", "source": "ai"}
+      ]
+    }
+  ]
+}

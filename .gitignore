@@ -1,0 +1,30 @@
+# Python bytecode/cache
+__pycache__/
+*.py[cod]
+
+# Python build and venv artifacts
+.Python
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+
+# Environment files
+.env
+*.env
+
+# Test/cache/tooling
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# IDE
+.vscode/
+.idea/
+
+# Local generated outputs
+/tmp/
+*.xlsx
+*.log
+*.db

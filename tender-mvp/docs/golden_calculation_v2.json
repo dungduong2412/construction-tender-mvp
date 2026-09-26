@@ -1,0 +1,137 @@
+{
+  "source_spec": "CALCULATION_SPECIFICATION.md",
+  "workbook_totals": {
+    "approved_estimate_total": "4421407464",
+    "current_tender_total": "4128377433",
+    "snapshot_literal_total": "4142692903",
+    "current_tender_target": "4128377433"
+  },
+  "representative_items": [
+    {
+      "work_item": "CF.11620",
+      "category": "topography",
+      "source_cells": ["Công trình!A16:AM16", "Đơn giá chi tiết!A41:H58", "Giá tổng hợp!A15:M15"],
+      "input": {
+        "direct_material_total": "34642.1",
+        "direct_labour_total": "1852359.6",
+        "direct_machine_total": "80827.6",
+        "direct_total": "1967829.3",
+        "expected": {
+          "loaded_unit_price": "3808696"
+        }
+      },
+      "expected": {
+        "direct_material_total": "34642.1",
+        "direct_labour_total": "1852359.6",
+        "direct_machine_total": "80827.6",
+        "direct_total": "1967829.3",
+        "loaded_unit_price": "3808696"
+      }
+    },
+    {
+      "work_item": "CC.21310",
+      "category": "geotechnical_drilling",
+      "source_cells": ["Công trình!A66:AM66", "Đơn giá chi tiết!A??:H??", "Chiết tính!H405:H420"],
+      "input": {
+        "direct_material_total": "0",
+        "direct_labour_total": "0",
+        "direct_machine_total": "0",
+        "direct_total": "733074.0",
+        "expected": {
+          "loaded_unit_price": "1414311"
+        }
+      },
+      "expected": {
+        "direct_material_total": "0",
+        "direct_labour_total": "0",
+        "direct_machine_total": "0",
+        "direct_total": "733074.0",
+        "loaded_unit_price": "1414311"
+      }
+    },
+    {
+      "work_item": "DC.02001",
+      "category": "laboratory",
+      "source_cells": ["Công trình!A77:AM77", "Đơn giá chi tiết!A??:H??", "Chiết tính!H600:H615"],
+      "input": {
+        "direct_material_total": "0",
+        "direct_labour_total": "0",
+        "direct_machine_total": "0",
+        "direct_total": "357525.0",
+        "expected": {
+          "loaded_unit_price": "634808"
+        }
+      },
+      "expected": {
+        "direct_material_total": "0",
+        "direct_labour_total": "0",
+        "direct_machine_total": "0",
+        "direct_total": "357525.0",
+        "loaded_unit_price": "634808"
+      }
+    },
+    {
+      "work_item": "KS.4/8",
+      "category": "traffic_survey",
+      "source_cells": ["Công trình!A113:T113", "Chiết tính!H1452:H1467"],
+      "input": {
+        "direct_material_total": "0",
+        "direct_labour_total": "298700",
+        "direct_machine_total": "0",
+        "direct_total": "298700.0",
+        "expected": {
+          "loaded_unit_price": "584015"
+        }
+      },
+      "expected": {
+        "direct_material_total": "0",
+        "direct_labour_total": "298700",
+        "direct_machine_total": "0",
+        "direct_total": "298700.0",
+        "loaded_unit_price": "584015"
+      }
+    },
+    {
+      "work_item": "CF.21120",
+      "category": "gmpb_stake",
+      "source_cells": ["Công trình!A120:AM120", "Chiết tính!H1566:H1581"],
+      "input": {
+        "direct_material_total": "0",
+        "direct_labour_total": "0",
+        "direct_machine_total": "0",
+        "direct_total": "1065580.7",
+        "expected": {
+          "loaded_unit_price": "2045481"
+        }
+      },
+      "expected": {
+        "direct_material_total": "0",
+        "direct_labour_total": "0",
+        "direct_machine_total": "0",
+        "direct_total": "1065580.7",
+        "loaded_unit_price": "2045481"
+      }
+    },
+    {
+      "work_item": "AG.11112",
+      "category": "gmpb_marker",
+      "source_cells": ["Công trình!A142:AM142", "Chiết tính!H1653:H1668"],
+      "input": {
+        "direct_material_total": "0",
+        "direct_labour_total": "0",
+        "direct_machine_total": "0",
+        "direct_total": "1460669.6",
+        "expected": {
+          "loaded_unit_price": "2919165"
+        }
+      },
+      "expected": {
+        "direct_material_total": "0",
+        "direct_labour_total": "0",
+        "direct_machine_total": "0",
+        "direct_total": "1460669.6",
+        "loaded_unit_price": "2919165"
+      }
+    }
+  ]
+}

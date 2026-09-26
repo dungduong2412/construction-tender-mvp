@@ -1,0 +1,892 @@
+from __future__ import annotations
+
+import asyncio
+import io
+from decimal import Decimal
+from pathlib import Path
+
+import httpx
+import pytest
+from fastapi.testclient import TestClient
+from openpyxl import load_workbook
+
+from main import app
+from integration_train1.pipeline import (
+    REAL_RESPONSE_FIXTURE_PATH,
+    PIPELINE,
+    Train1Pipeline,
+    Train2PipelineError,
+)
+from parser_adapter.provider_neutral import (
+    HttpJsonProvider,
+    ParserProviderAuthError,
+    ParserProviderContractError,
+    ParserProviderTimeoutError,
+    ProviderNeutralParserAdapter,
+)
+
+
+def _run(coro):
+    return asyncio.run(coro)
+
+
+def test_train2_parser_fixture_to_excel_numeric_and_complete_flag():
+    pipeline = Train1Pipeline()
+    payload = _run(pipeline.start_from_real_fixture())
+
+    assert payload["source_document_id"] == "real-response-sample-001"
+    assert payload["live_integration_verified"] is False
+    assert payload["integration_label"] == "recorded_real_response"
+
+    xlsx = pipeline.export_excel(payload["run_id"])
+    wb = load_workbook(filename=io.BytesIO(xlsx))
+    review = wb["Train1-Review"]
+    summary = wb["Train1-Summary"]
+
+    assert isinstance(review["F2"].value, (int, float))
+    assert isinstance(review["L2"].value, (int, float))
+    assert isinstance(summary["B2"].value, (int, float))
+
+
+def test_train2_low_confidence_unique_match_requires_review():
+    pipeline = Train1Pipeline()
+    parsed = {
+        "document_id": "low-confidence",
+        "rows": [
+            {
+                "row_id": "lc-1",
+                "row_type": "line_item",
+                "description_vi": "row",
+                "unit_raw": "điểm",
+                "quantity_raw": "1",
+                "page": 1,
+                "evidence": [{"type": "pdf_span", "locator": "p1:l1", "text": "row"}],
+                "ai_suggestions": [{"code": "CF.11620", "confidence": 0.6, "evidence": "weak"}],
+            }
+        ],
+    }
+    payload = pipeline.start_from_parsed_payload(parsed)
+
+    row = payload["rows"][0]
+    assert row["mapping_status"] == "low_confidence_review_required"
+    assert payload["status"] == "INCOMPLETE"
+
+
+def test_train2_missing_source_unit_requires_review_not_auto_accept():
+    pipeline = Train1Pipeline()
+    parsed = {
+        "document_id": "missing-unit",
+        "rows": [
+            {
+                "row_id": "mu-1",
+                "row_type": "line_item",
+                "description_vi": "Đo lưới khống chế mặt bằng đường chuyền cấp 2",
+                "unit_raw": "",
+                "quantity_raw": "1",
+                "page": 1,
+                "evidence": [{"type": "pdf_span", "locator": "p1:l1", "text": "missing unit"}],
+                "ai_suggestions": [{"code": "CF.11620", "confidence": 0.99, "evidence": "strong"}],
+            }
+        ],
+    }
+    payload = pipeline.start_from_parsed_payload(parsed)
+
+    row = payload["rows"][0]
+    assert row["mapping_status"] == "unit_verification_required"
+    assert payload["status"] == "INCOMPLETE"
+
+
+def test_train2_invalid_units_and_quantities_block():
+    pipeline = Train1Pipeline()
+    parsed = {
+        "document_id": "invalids",
+        "rows": [
+            {
+                "row_id": "u-1",
+                "row_type": "line_item",
+                "description_vi": "unit mismatch",
+                "unit_raw": "kg",
+                "quantity_raw": "1",
+                "page": 1,
+                "evidence": [{"type": "pdf_span", "locator": "p1:l1", "text": "unit mismatch"}],
+                "ai_suggestions": [{"code": "CF.11620", "confidence": 0.95, "evidence": "code"}],
+            },
+            {
+                "row_id": "q-1",
+                "row_type": "line_item",
+                "description_vi": "invalid quantity",
+                "unit_raw": "điểm",
+                "quantity_raw": "abc",
+                "page": 1,
+                "evidence": [{"type": "pdf_span", "locator": "p1:l2", "text": "invalid qty"}],
+                "ai_suggestions": [{"code": "CF.11620", "confidence": 0.95, "evidence": "code"}],
+            },
+            {
+                "row_id": "q-2",
+                "row_type": "line_item",
+                "description_vi": "negative quantity",
+                "unit_raw": "điểm",
+                "quantity_raw": "-2",
+                "page": 1,
+                "evidence": [{"type": "pdf_span", "locator": "p1:l3", "text": "negative qty"}],
+                "ai_suggestions": [{"code": "CF.11620", "confidence": 0.95, "evidence": "code"}],
+            },
+        ],
+    }
+    payload = pipeline.start_from_parsed_payload(parsed)
+    statuses = {r["row_id"]: r["mapping_status"] for r in payload["rows"]}
+
+    assert statuses["u-1"] == "unit_incompatible"
+    assert statuses["q-1"] == "invalid_quantity"
+    assert statuses["q-2"] == "negative_quantity_blocked"
+
+
+def test_train2_duplicate_row_ids_rejected():
+    pipeline = Train1Pipeline()
+    parsed = {
+        "document_id": "dupe-rows",
+        "rows": [
+            {
+                "row_id": "dup",
+                "row_type": "line_item",
+                "description_vi": "A",
+                "unit_raw": "điểm",
+                "quantity_raw": "1",
+                "page": 1,
+                "evidence": [{"type": "pdf_span", "locator": "p1:l1", "text": "A"}],
+                "ai_suggestions": [{"code": "CF.11620", "confidence": 0.95, "evidence": "code"}],
+            },
+            {
+                "row_id": "dup",
+                "row_type": "line_item",
+                "description_vi": "B",
+                "unit_raw": "điểm",
+                "quantity_raw": "1",
+                "page": 1,
+                "evidence": [{"type": "pdf_span", "locator": "p1:l2", "text": "B"}],
+                "ai_suggestions": [{"code": "CF.11620", "confidence": 0.95, "evidence": "code"}],
+            },
+        ],
+    }
+    with pytest.raises(Train2PipelineError):
+        pipeline.start_from_parsed_payload(parsed)
+
+
+def test_train2_duplicate_canonical_codes_are_preserved_per_row():
+    pipeline = Train1Pipeline()
+    parsed = {
+        "document_id": "dup-code",
+        "rows": [
+            {
+                "row_id": "d1",
+                "row_type": "line_item",
+                "description_vi": "first",
+                "unit_raw": "điểm",
+                "quantity_raw": "8",
+                "page": 1,
+                "evidence": [{"type": "pdf_span", "locator": "p1:l1", "text": "first"}],
+                "ai_suggestions": [{"code": "CF.11620", "confidence": 0.95, "evidence": "code"}],
+            },
+            {
+                "row_id": "d2",
+                "row_type": "line_item",
+                "description_vi": "second",
+                "unit_raw": "điểm",
+                "quantity_raw": "10",
+                "page": 1,
+                "evidence": [{"type": "pdf_span", "locator": "p1:l2", "text": "second"}],
+                "ai_suggestions": [{"code": "CF.11620", "confidence": 0.95, "evidence": "code"}],
+            },
+        ],
+    }
+    payload = pipeline.start_from_parsed_payload(parsed)
+    rows = {r["row_id"]: r for r in payload["rows"]}
+
+    assert rows["d1"]["canonical_code"] == "CF.11620"
+    assert rows["d2"]["canonical_code"] == "CF.11620"
+    assert rows["d1"]["tender_extension"] != rows["d2"]["tender_extension"]
+
+
+def test_train2_generates_candidates_from_description_without_ai_hints():
+    pipeline = Train1Pipeline()
+    parsed = {
+        "document_id": "generated-candidates",
+        "rows": [
+            {
+                "row_id": "gc-1",
+                "row_type": "line_item",
+                "description_vi": "Định vì và cắm cọc GPMB cấp địa hình II",
+                "unit_raw": "mốc",
+                "quantity_raw": "2",
+                "page": 1,
+                "evidence": [{"type": "pdf_span", "locator": "p1:l1", "text": "GPMB"}],
+                "ai_suggestions": [],
+            }
+        ],
+    }
+    payload = pipeline.start_from_parsed_payload(parsed)
+    row = payload["rows"][0]
+
+    assert row["candidates"], "semantic candidate generation must run without ai_suggestions"
+    assert row["mapping_status"] == "resolved"
+    assert row["canonical_code"] == "CF.21120"
+
+
+def test_train2_aggregate_first_approval_for_group_matches_independent_calculation():
+    pipeline = Train1Pipeline()
+    parsed = {
+        "document_id": "approval-aggregate",
+        "rows": [
+            {
+                "row_id": "a1",
+                "row_type": "line_item",
+                "description_vi": "CF row 1",
+                "unit_raw": "điểm",
+                "quantity_raw": "1",
+                "page": 1,
+                "evidence": [{"type": "pdf_span", "locator": "p1:l1", "text": "CF"}],
+                "ai_suggestions": [{"code": "CF.11620", "confidence": 0.95, "evidence": "code"}],
+            },
+            {
+                "row_id": "a2",
+                "row_type": "line_item",
+                "description_vi": "CF row 2",
+                "unit_raw": "điểm",
+                "quantity_raw": "1",
+                "page": 1,
+                "evidence": [{"type": "pdf_span", "locator": "p1:l2", "text": "CF"}],
+                "ai_suggestions": [{"code": "CF.11620", "confidence": 0.95, "evidence": "code"}],
+            },
+        ],
+    }
+    payload = pipeline.start_from_parsed_payload(parsed)
+
+    runtime = pipeline.engine.load_runtime_data()
+    cf = pipeline.engine.calculate_work_item_from_runtime("CF.11620", runtime)
+    work_item = runtime["work_item_master"]["CF.11620"]
+    group = work_item["approval_rule_group"]
+    rules = pipeline.engine.approval_rules_for("topography", runtime=runtime, approval_group=group)
+    expected_components = pipeline.engine._compute_loaded_components(
+        cf["direct_material_total"] * Decimal("2"),
+        cf["direct_labour_total"] * Decimal("2"),
+        cf["direct_machine_total"] * Decimal("2"),
+        rules,
+    )
+
+    assert Decimal(payload["approval_partial_subtotal"]) == expected_components["FINAL"]
+
+
+def test_train2_tender_independence_from_approval_rule_mutation():
+    pipeline = Train1Pipeline()
+    parsed = {
+        "document_id": "independence",
+        "rows": [
+            {
+                "row_id": "i1",
+                "row_type": "line_item",
+                "description_vi": "CF",
+                "unit_raw": "điểm",
+                "quantity_raw": "8",
+                "page": 1,
+                "evidence": [{"type": "pdf_span", "locator": "p1:l1", "text": "CF"}],
+                "ai_suggestions": [{"code": "CF.11620", "confidence": 0.95, "evidence": "code"}],
+            }
+        ],
+    }
+    payload = pipeline.start_from_parsed_payload(parsed)
+    run_id = payload["run_id"]
+
+    mutated = pipeline.mutate_approval_group_rules(run_id, "topography_main", {"gdp_rate": "0.20"})
+
+    assert mutated["tender_partial_subtotal"] == payload["tender_partial_subtotal"]
+    assert mutated["approval_partial_subtotal"] != payload["approval_partial_subtotal"]
+
+
+def test_train2_incomplete_export_keeps_partial_and_null_official_totals():
+    pipeline = Train1Pipeline()
+    parsed = {
+        "document_id": "incomplete",
+        "rows": [
+            {
+                "row_id": "ok",
+                "row_type": "line_item",
+                "description_vi": "CF",
+                "unit_raw": "điểm",
+                "quantity_raw": "8",
+                "page": 1,
+                "evidence": [{"type": "pdf_span", "locator": "p1:l1", "text": "CF"}],
+                "ai_suggestions": [{"code": "CF.11620", "confidence": 0.95, "evidence": "code"}],
+            },
+            {
+                "row_id": "bad",
+                "row_type": "line_item",
+                "description_vi": "unknown",
+                "unit_raw": "m",
+                "quantity_raw": "1",
+                "page": 1,
+                "evidence": [{"type": "pdf_span", "locator": "p1:l2", "text": "unknown"}],
+                "ai_suggestions": [],
+            },
+        ],
+    }
+    payload = pipeline.start_from_parsed_payload(parsed)
+    assert payload["status"] == "INCOMPLETE"
+
+    xlsx = pipeline.export_excel(payload["run_id"])
+    wb = load_workbook(filename=io.BytesIO(xlsx))
+    summary = wb["Train1-Summary"]
+
+    assert summary["B1"].value == "INCOMPLETE"
+    assert isinstance(summary["B2"].value, (int, float))
+    assert isinstance(summary["B3"].value, (int, float))
+    assert summary["B4"].value is None
+    assert summary["B5"].value is None
+
+
+def test_parser_contract_malformed_response_rejected():
+    class BadProvider:
+        async def analyze(self, document_bytes=None):
+            return {"document_id": "bad", "rows": [{"row_id": "a"}]}
+
+    adapter = ProviderNeutralParserAdapter(BadProvider())
+    with pytest.raises(ParserProviderContractError):
+        _run(adapter.parse())
+
+
+def test_parser_http_auth_failure(monkeypatch):
+    request = httpx.Request("POST", "https://example.test/parser")
+    response = httpx.Response(401, request=request, text="unauthorized")
+
+    async def fake_post(self, *args, **kwargs):
+        return response
+
+    monkeypatch.setattr(httpx.AsyncClient, "post", fake_post)
+
+    provider = HttpJsonProvider(endpoint="https://example.test/parser", api_key="bad")
+    with pytest.raises(ParserProviderAuthError):
+        _run(provider.analyze(b"%PDF"))
+
+
+def test_parser_http_timeout(monkeypatch):
+    async def fake_post(self, *args, **kwargs):
+        raise httpx.TimeoutException("timeout")
+
+    monkeypatch.setattr(httpx.AsyncClient, "post", fake_post)
+
+    provider = HttpJsonProvider(endpoint="https://example.test/parser")
+    with pytest.raises(ParserProviderTimeoutError):
+        _run(provider.analyze(b"%PDF"))
+
+
+def test_train2_upload_requires_endpoint_no_fixture_fallback(monkeypatch):
+    monkeypatch.setenv("TRAIN2_PARSER_PROVIDER", "http_json")
+    monkeypatch.delenv("TRAIN2_PARSER_API_ENDPOINT", raising=False)
+    monkeypatch.setenv("TRAIN2_UPLOAD_AUTH_TOKEN", "token")
+
+    with TestClient(app) as client:
+        resp = client.post(
+            "/api/train1/runs/upload",
+            headers={"Authorization": "Bearer token"},
+            files={"file": ("sample.pdf", b"%PDF-1.4\nabc", "application/pdf")},
+        )
+
+    assert resp.status_code == 503
+    assert "TRAIN2_PARSER_API_ENDPOINT" in resp.text
+
+
+@pytest.mark.parametrize(
+    "missing_key",
+    ["AZURE_DOC_INTEL_ENDPOINT", "AZURE_DOC_INTEL_KEY"],
+)
+def test_train2_upload_azure_mode_requires_azure_config(monkeypatch, missing_key):
+    monkeypatch.setenv("TRAIN2_UPLOAD_AUTH_TOKEN", "token")
+    monkeypatch.setenv("TRAIN2_PARSER_PROVIDER", "azure")
+    monkeypatch.setenv("MOCK_PARSER", "false")
+    monkeypatch.setenv("AZURE_DOC_INTEL_ENDPOINT", "https://azure.example.test")
+    monkeypatch.setenv("AZURE_DOC_INTEL_KEY", "secret")
+    monkeypatch.delenv(missing_key, raising=False)
+
+    called = {"azure": 0}
+
+    async def fake_azure(*args, **kwargs):
+        called["azure"] += 1
+        raise AssertionError("azure parser must not run when required Azure config is missing")
+
+    monkeypatch.setattr(PIPELINE, "start_from_azure_parser", fake_azure)
+
+    with TestClient(app) as client:
+        resp = client.post(
+            "/api/train1/runs/upload",
+            headers={"Authorization": "Bearer token"},
+            files={"file": ("sample.pdf", b"%PDF-1.4\nabc", "application/pdf")},
+        )
+
+    assert resp.status_code == 503
+    assert missing_key in resp.text
+    assert called["azure"] == 0
+
+
+def test_train2_upload_requires_auth_signature_and_size(monkeypatch):
+    monkeypatch.setenv("TRAIN2_PARSER_API_ENDPOINT", "https://example.test/parser")
+    monkeypatch.setenv("TRAIN2_UPLOAD_AUTH_TOKEN", "token")
+    monkeypatch.setenv("TRAIN2_MAX_UPLOAD_BYTES", "16")
+
+    with TestClient(app) as client:
+        no_auth = client.post(
+            "/api/train1/runs/upload",
+            files={"file": ("sample.pdf", b"%PDF-1.4\nabc", "application/pdf")},
+        )
+        assert no_auth.status_code == 401
+
+        bad_sig = client.post(
+            "/api/train1/runs/upload",
+            headers={"Authorization": "Bearer token"},
+            files={"file": ("sample.pdf", b"NOTPDF", "application/pdf")},
+        )
+        assert bad_sig.status_code == 400
+
+        too_big = client.post(
+            "/api/train1/runs/upload",
+            headers={"Authorization": "Bearer token"},
+            files={"file": ("sample.pdf", b"%PDF-1.4\n0123456789ABCDEFZZ", "application/pdf")},
+        )
+        assert too_big.status_code == 413
+
+
+def test_train2_upload_uses_azure_bridge_when_azure_mode_selected(monkeypatch):
+    monkeypatch.setenv("TRAIN2_UPLOAD_AUTH_TOKEN", "token")
+    monkeypatch.setenv("TRAIN2_PARSER_PROVIDER", "azure")
+    monkeypatch.setenv("MOCK_PARSER", "false")
+    monkeypatch.setenv("AZURE_DOC_INTEL_ENDPOINT", "https://azure.example.test")
+    monkeypatch.setenv("AZURE_DOC_INTEL_KEY", "secret")
+    monkeypatch.delenv("TRAIN2_PARSER_API_ENDPOINT", raising=False)
+    monkeypatch.delenv("TRAIN2_PARSER_API_KEY", raising=False)
+
+    called = {"azure": 0, "http": 0}
+
+    async def fake_azure(pdf_bytes, live_integration_verified=False):
+        called["azure"] += 1
+        return {
+            "run_id": "azure-run-1",
+            "source_document_id": "azure-doc-intel-test",
+            "required_row_count": 0,
+            "resolved_required_row_count": 0,
+            "status": "COMPLETE",
+            "official_tender_total": None,
+            "official_approval_total": None,
+            "tender_partial_subtotal": "0",
+            "approval_partial_subtotal": "0",
+            "approval_group_components": {},
+            "blocked_rows": [],
+            "live_integration_verified": live_integration_verified,
+            "integration_label": "azure_document_intelligence",
+            "integration_note": None,
+            "rows": [],
+        }
+
+    async def fake_http(*args, **kwargs):
+        called["http"] += 1
+        raise AssertionError("normalized HTTP provider must not be used in azure mode")
+
+    monkeypatch.setattr(PIPELINE, "start_from_azure_parser", fake_azure)
+    monkeypatch.setattr(PIPELINE, "start_from_parser_api", fake_http)
+
+    with TestClient(app) as client:
+        resp = client.post(
+            "/api/train1/runs/upload",
+            headers={"Authorization": "Bearer token"},
+            files={"file": ("sample.pdf", b"%PDF-1.4\nabc", "application/pdf")},
+        )
+
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["integration_label"] == "azure_document_intelligence"
+    assert body["live_integration_verified"] is True
+    assert called["azure"] == 1
+    assert called["http"] == 0
+
+
+@pytest.mark.parametrize("mock_value", [None, "true", "1", "yes", ""])
+def test_train2_upload_azure_mode_requires_explicit_mock_off(monkeypatch, mock_value):
+    monkeypatch.setenv("TRAIN2_UPLOAD_AUTH_TOKEN", "token")
+    monkeypatch.setenv("TRAIN2_PARSER_PROVIDER", "azure")
+    monkeypatch.setenv("AZURE_DOC_INTEL_ENDPOINT", "https://azure.example.test")
+    monkeypatch.setenv("AZURE_DOC_INTEL_KEY", "secret")
+    if mock_value is None:
+        monkeypatch.delenv("MOCK_PARSER", raising=False)
+    else:
+        monkeypatch.setenv("MOCK_PARSER", mock_value)
+
+    called = {"azure": 0}
+
+    async def fake_azure(*args, **kwargs):
+        called["azure"] += 1
+        raise AssertionError("azure parser must not run when MOCK_PARSER is not explicitly false")
+
+    monkeypatch.setattr(PIPELINE, "start_from_azure_parser", fake_azure)
+
+    with TestClient(app) as client:
+        resp = client.post(
+            "/api/train1/runs/upload",
+            headers={"Authorization": "Bearer token"},
+            files={"file": ("sample.pdf", b"%PDF-1.4\nabc", "application/pdf")},
+        )
+
+    assert resp.status_code == 503
+    assert "MOCK_PARSER" in resp.text
+    assert called["azure"] == 0
+
+
+def test_train2_azure_parser_error_response_is_sanitized(monkeypatch):
+    monkeypatch.setenv("TRAIN2_UPLOAD_AUTH_TOKEN", "token")
+    monkeypatch.setenv("TRAIN2_PARSER_PROVIDER", "azure")
+    monkeypatch.setenv("MOCK_PARSER", "false")
+    monkeypatch.setenv("AZURE_DOC_INTEL_ENDPOINT", "https://azure.example.test")
+    monkeypatch.setenv("AZURE_DOC_INTEL_KEY", "secret")
+
+    async def fake_azure(*args, **kwargs):
+        from parser_adapter.provider_neutral import ParserProviderAuthError
+
+        raise ParserProviderAuthError("Azure rejected token secret-123")
+
+    monkeypatch.setattr(PIPELINE, "start_from_azure_parser", fake_azure)
+
+    with TestClient(app) as client:
+        resp = client.post(
+            "/api/train1/runs/upload",
+            headers={"Authorization": "Bearer token"},
+            files={"file": ("sample.pdf", b"%PDF-1.4\nabc", "application/pdf")},
+        )
+
+    assert resp.status_code == 502
+    assert "secret-123" not in resp.text
+    assert "Azure parser authentication failed" in resp.text
+
+
+def test_train2_manual_correction_retains_source_evidence():
+    pipeline = Train1Pipeline()
+    parsed = {
+        "document_id": "manual-evidence",
+        "rows": [
+            {
+                "row_id": "m1",
+                "row_type": "line_item",
+                "description_vi": "Ambiguous",
+                "unit_raw": "",
+                "quantity_raw": "1",
+                "page": 1,
+                "evidence": [{"type": "pdf_span", "locator": "p1:l1", "text": "proof"}],
+                "ai_suggestions": [
+                    {"code": "CF.21120", "confidence": 0.8, "evidence": "maybe"},
+                    {"code": "AG.11112", "confidence": 0.8, "evidence": "maybe"},
+                ],
+            }
+        ],
+    }
+    payload = pipeline.start_from_parsed_payload(parsed)
+    updated = pipeline.apply_manual_mapping(
+        payload["run_id"],
+        "m1",
+        "CF.21120",
+        reason="user decision",
+        unit_confirmed=True,
+        unit_correction="mốc",
+    )
+
+    row = updated["rows"][0]
+    assert row["mapping_status"] == "resolved"
+    assert row["corrections"]
+    assert row["corrections"][-1]["retained_evidence"][0]["text"] == "proof"
+
+
+def test_train2_manual_selection_requires_unit_confirmation_or_correction():
+    pipeline = Train1Pipeline()
+    parsed = {
+        "document_id": "manual-unit-check",
+        "rows": [
+            {
+                "row_id": "m2",
+                "row_type": "line_item",
+                "description_vi": "Ambiguous",
+                "unit_raw": "",
+                "quantity_raw": "1",
+                "page": 1,
+                "evidence": [{"type": "pdf_span", "locator": "p1:l1", "text": "proof"}],
+                "ai_suggestions": [{"code": "CF.21120", "confidence": 0.9, "evidence": "hint"}],
+            }
+        ],
+    }
+    payload = pipeline.start_from_parsed_payload(parsed)
+    updated = pipeline.apply_manual_mapping(payload["run_id"], "m2", "CF.21120", reason="manual")
+
+    row = updated["rows"][0]
+    assert row["mapping_status"] == "unit_verification_required"
+
+
+def test_train2_unit_confirmed_without_unit_remains_blocked():
+    pipeline = Train1Pipeline()
+    parsed = {
+        "document_id": "manual-empty-unit",
+        "rows": [
+            {
+                "row_id": "m3",
+                "row_type": "line_item",
+                "description_vi": "Ambiguous",
+                "unit_raw": "",
+                "quantity_raw": "1",
+                "manual_selected_code": "CF.21120",
+                "manual_unit_confirmed": True,
+                "manual_unit_correction": "",
+                "page": 1,
+                "evidence": [{"type": "pdf_span", "locator": "p1:l1", "text": "proof"}],
+                "ai_suggestions": [{"code": "CF.21120", "confidence": 0.9, "evidence": "hint"}],
+            }
+        ],
+    }
+    payload = pipeline.start_from_parsed_payload(parsed)
+    row = payload["rows"][0]
+    assert row["mapping_status"] == "unit_verification_required"
+
+
+def test_train2_manual_mapping_requires_canonical_unit_to_be_explicit():
+    pipeline = Train1Pipeline()
+    decision = pipeline.mapper.decide(
+        row_id="m4",
+        row_type="line_item",
+        description_vi="Ambiguous",
+        unit_raw="điểm",
+        quantity_raw="1",
+        quantity=Decimal("1"),
+        suggestions=[{"code": "CF.21120", "confidence": 0.9, "evidence": "hint"}],
+        work_master={"CF.21120": {"unit": ""}},
+        unit_rules=[],
+        manual_selected_code="CF.21120",
+        manual_unit_confirmed=True,
+        manual_unit_correction="",
+        allow_zero_quantity=False,
+    )
+    assert decision.mapping_status == "unit_verification_required"
+    assert decision.reason is not None
+
+
+def test_train2_conversion_requires_approved_provenance():
+    pipeline = Train1Pipeline()
+    pipeline._unit_rules.append({
+        "from_unit": "2diem",
+        "to_unit": "điểm",
+        "factor": 2,
+        "verified": True,
+        "note": "parser claim only",
+    })
+
+    parsed = {
+        "document_id": "conversion-no-provenance",
+        "rows": [
+            {
+                "row_id": "c1",
+                "row_type": "line_item",
+                "description_vi": "CF row",
+                "unit_raw": "2diem",
+                "quantity_raw": "3",
+                "page": 1,
+                "evidence": [{"type": "pdf_span", "locator": "p1:l1", "text": "CF"}],
+                "ai_suggestions": [{"code": "CF.11620", "confidence": 0.99, "evidence": "code"}],
+            }
+        ],
+    }
+    payload = pipeline.start_from_parsed_payload(parsed)
+    row = payload["rows"][0]
+    assert row["mapping_status"] == "unit_incompatible"
+    assert row["quantity_factor"] == "1"
+
+
+def test_train2_approved_conversion_changes_tender_and_approval_quantities():
+    pipeline = Train1Pipeline()
+    pipeline._unit_rules.append({
+        "from_unit": "2diem",
+        "to_unit": "điểm",
+        "factor": 2,
+        "approved": True,
+        "status": "approved",
+        "provenance": "reference XLS approved by cost control",
+    })
+
+    parsed = {
+        "document_id": "conversion-approved",
+        "rows": [
+            {
+                "row_id": "c2",
+                "row_type": "line_item",
+                "description_vi": "CF row",
+                "unit_raw": "2diem",
+                "quantity_raw": "3",
+                "page": 1,
+                "evidence": [{"type": "pdf_span", "locator": "p1:l1", "text": "CF"}],
+                "ai_suggestions": [{"code": "CF.11620", "confidence": 0.99, "evidence": "code"}],
+            }
+        ],
+    }
+    payload = pipeline.start_from_parsed_payload(parsed)
+    row = payload["rows"][0]
+    runtime = pipeline.engine.load_runtime_data()
+    cf = pipeline.engine.calculate_work_item_from_runtime("CF.11620", runtime)
+    expected_tender = (cf["tender_rounded_unit_price"] * Decimal("6")).quantize(Decimal("1"))
+    expected_approval = pipeline.engine._compute_loaded_components(
+        cf["direct_material_total"] * Decimal("6"),
+        cf["direct_labour_total"] * Decimal("6"),
+        cf["direct_machine_total"] * Decimal("6"),
+        pipeline.engine.approval_rules_for("topography", runtime=runtime, approval_group=runtime["work_item_master"]["CF.11620"]["approval_rule_group"]),
+    )["FINAL"]
+
+    assert row["mapping_status"] == "resolved"
+    assert row["quantity_factor"] == "2"
+    assert row["converted_quantity"] == "6.0000"
+    assert Decimal(row["tender_extension"]) == expected_tender
+    assert Decimal(payload["approval_partial_subtotal"]) == expected_approval
+
+
+def test_train2_manual_selection_requires_unit_confirmation_or_correction():
+    pipeline = Train1Pipeline()
+    parsed = {
+        "document_id": "manual-unit-check",
+        "rows": [
+            {
+                "row_id": "m2",
+                "row_type": "line_item",
+                "description_vi": "Ambiguous",
+                "unit_raw": "",
+                "quantity_raw": "1",
+                "page": 1,
+                "evidence": [{"type": "pdf_span", "locator": "p1:l1", "text": "proof"}],
+                "ai_suggestions": [{"code": "CF.21120", "confidence": 0.9, "evidence": "hint"}],
+            }
+        ],
+    }
+    payload = pipeline.start_from_parsed_payload(parsed)
+    updated = pipeline.apply_manual_mapping(payload["run_id"], "m2", "CF.21120", reason="manual")
+
+    row = updated["rows"][0]
+    assert row["mapping_status"] == "unit_verification_required"
+
+
+def test_train2_conversion_factor_applies_to_tender_and_approval_aggregate():
+    pipeline = Train1Pipeline()
+    pipeline._unit_rules.append({
+        "from_unit": "2diem",
+        "to_unit": "điểm",
+        "factor": 2,
+        "approved": True,
+        "status": "approved",
+        "provenance": "reference XLS approved by cost control",
+    })
+
+    parsed = {
+        "document_id": "conversion-aggregate",
+        "rows": [
+            {
+                "row_id": "c1",
+                "row_type": "line_item",
+                "description_vi": "CF row",
+                "unit_raw": "2diem",
+                "quantity_raw": "3",
+                "page": 1,
+                "evidence": [{"type": "pdf_span", "locator": "p1:l1", "text": "CF"}],
+                "ai_suggestions": [{"code": "CF.11620", "confidence": 0.99, "evidence": "code"}],
+            }
+        ],
+    }
+    payload = pipeline.start_from_parsed_payload(parsed)
+    row = payload["rows"][0]
+
+    assert row["mapping_status"] == "resolved"
+    assert row["quantity_factor"] == "2"
+    assert row["converted_quantity"] == "6.0000"
+
+    runtime = pipeline.engine.load_runtime_data()
+    cf = pipeline.engine.calculate_work_item_from_runtime("CF.11620", runtime)
+    expected_tender_extension = (cf["tender_rounded_unit_price"] * Decimal("6")).quantize(Decimal("1"))
+
+    work_item = runtime["work_item_master"]["CF.11620"]
+    group = work_item["approval_rule_group"]
+    rules = pipeline.engine.approval_rules_for("topography", runtime=runtime, approval_group=group)
+    expected_approval = pipeline.engine._compute_loaded_components(
+        cf["direct_material_total"] * Decimal("6"),
+        cf["direct_labour_total"] * Decimal("6"),
+        cf["direct_machine_total"] * Decimal("6"),
+        rules,
+    )["FINAL"]
+
+    assert Decimal(row["tender_extension"]) == expected_tender_extension
+    assert Decimal(payload["approval_partial_subtotal"]) == expected_approval
+
+
+def test_train2_invalid_conversion_factor_blocked():
+    pipeline = Train1Pipeline()
+    pipeline._unit_rules.append({
+        "from_unit": "badunit",
+        "to_unit": "điểm",
+        "factor": 0,
+        "verified": True,
+        "note": "unapproved parser hint",
+    })
+
+    parsed = {
+        "document_id": "invalid-conversion",
+        "rows": [
+            {
+                "row_id": "ic1",
+                "row_type": "line_item",
+                "description_vi": "CF row",
+                "unit_raw": "badunit",
+                "quantity_raw": "1",
+                "page": 1,
+                "evidence": [{"type": "pdf_span", "locator": "p1:l1", "text": "CF"}],
+                "ai_suggestions": [{"code": "CF.11620", "confidence": 0.99, "evidence": "code"}],
+            }
+        ],
+    }
+
+    payload = pipeline.start_from_parsed_payload(parsed)
+    row = payload["rows"][0]
+    assert row["mapping_status"] == "invalid_conversion_factor"
+    assert payload["status"] == "INCOMPLETE"
+
+
+def test_train2_all_endpoints_require_auth_and_fixture_is_env_gated(monkeypatch):
+    monkeypatch.setenv("TRAIN2_UPLOAD_AUTH_TOKEN", "token")
+
+    with TestClient(app) as client:
+        fixture_no_auth = client.post("/api/train1/runs/fixture")
+        assert fixture_no_auth.status_code == 401
+
+        monkeypatch.setenv("APP_ENV", "prod")
+        fixture_prod = client.post("/api/train1/runs/fixture", headers={"Authorization": "Bearer token"})
+        assert fixture_prod.status_code == 403
+
+        monkeypatch.setenv("APP_ENV", "test")
+        fixture_ok = client.post("/api/train1/runs/fixture", headers={"Authorization": "Bearer token"})
+        assert fixture_ok.status_code == 200
+        run_id = fixture_ok.json()["run_id"]
+
+        review_no_auth = client.get(f"/api/train1/runs/{run_id}/review")
+        assert review_no_auth.status_code == 401
+
+        override_no_auth = client.post(
+            f"/api/train1/runs/{run_id}/override",
+            json={"row_id": "row-1", "canonical_code": "CF.11620"},
+        )
+        assert override_no_auth.status_code == 401
+
+        mutate_no_auth = client.post(
+            f"/api/train1/runs/{run_id}/mutate-prices",
+            json={"price_updates": {"VL.CAT": "123"}},
+        )
+        assert mutate_no_auth.status_code == 401
+
+        export_no_auth = client.get(f"/api/train1/runs/{run_id}/export.xlsx")
+        assert export_no_auth.status_code == 401
+
+
+@pytest.mark.skipif(not REAL_RESPONSE_FIXTURE_PATH.exists(), reason="Recorded real response fixture missing")
+def test_recorded_real_fixture_path_exists():
+    assert REAL_RESPONSE_FIXTURE_PATH.exists()

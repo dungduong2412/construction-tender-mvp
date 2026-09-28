@@ -1,0 +1,42 @@
+{
+  "source_workbook": "DuToan KS CauBinhGoi 2609.21 DuThau.xls",
+  "source_sha256": "9c09bdb98931fe721b74e6b08c0d94f1680d3d30c0550c17a94dac517b093cca",
+  "source_sheet_count": 62,
+  "applicable_sheet": "Dự thầu",
+  "source_print_area": "A1:L47",
+  "output_print_area": "A1:L<dynamic-total-row>",
+  "page_setup": {
+    "orientation": "portrait",
+    "fit_to_width": 1,
+    "repeat_title_rows": "1:5",
+    "footer": "page number"
+  },
+  "column_contract": [
+    {"column": "A", "meaning": "STT", "visible": true, "source_width": 6.49},
+    {"column": "B", "meaning": "Mã số", "visible": true, "source_width": 12.16},
+    {"column": "C", "meaning": "Mô tả công việc", "visible": true, "source_width": 89.49},
+    {"column": "D", "meaning": "Đơn vị tính", "visible": true, "source_width": 9.32},
+    {"column": "E", "meaning": "Khối lượng", "visible": true, "source_width": 11.65},
+    {"column": "F", "meaning": "Vật liệu", "visible": false, "source_width": 12.65, "output_policy": "blank"},
+    {"column": "G", "meaning": "Nhân công", "visible": false, "source_width": 15.65, "output_policy": "blank"},
+    {"column": "H", "meaning": "Máy", "visible": false, "source_width": 12.65, "output_policy": "blank"},
+    {"column": "I", "meaning": "Đơn giá", "visible": true, "source_width": 17.16},
+    {"column": "J", "meaning": "Thành tiền", "visible": true, "source_width": 18.82},
+    {"column": "K", "meaning": "Source helper", "visible": false, "source_width": 14.16, "output_policy": "blank"},
+    {"column": "L", "meaning": "Reserved template column", "visible": true, "source_width": 13.0, "output_policy": "blank"}
+  ],
+  "merged_title_rows": ["A1:L1", "A2:L2", "A3:L3"],
+  "row_formula_contract": {
+    "amount": "ROUND(quantity * tender_unit_price, 0)",
+    "total": "ROUND(SUM(amount_rows), 0)"
+  },
+  "excluded_from_submission": [
+    "detailed resource costs",
+    "approval-only figures",
+    "reviewer identity",
+    "audit history",
+    "unresolved register",
+    "source polygons"
+  ],
+  "final_export_gate": "Every mandatory billable row must have tender pricing and approval resource evidence."
+}

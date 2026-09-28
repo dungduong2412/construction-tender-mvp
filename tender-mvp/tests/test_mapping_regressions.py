@@ -74,6 +74,16 @@ async def test_exact_required_mappings_in_mock_mode():
         assert got_code == expected_code, f"Expected {expected_code} but got {got_code} for '{item.description_vi}'"
 
 
+@pytest.mark.asyncio
+async def test_child_scale_overrides_conflicting_structural_parent_label():
+    mapper = SemanticMapper(mock_ai=True)
+    candidates = _load_candidates()
+    item = _make_item("Đo vẽ bình đồ tỷ lệ 1/200 vùng đồng bằng", "ha", row_id="child-scale")
+    item.section_path = "I > I.1 Đo vẽ bình đồ tỷ lệ 1/500"
+    output = await mapper.map_item(item, candidates, "v1")
+    assert _code_for_id(candidates, output.master_item_id) == "KS-003"
+
+
 def test_billable_unpriced_never_marked_mapped_and_priced():
     mapping_out = MappingOutput(
         master_item_id=6,

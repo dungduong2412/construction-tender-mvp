@@ -18,6 +18,7 @@ from typing import Optional
 
 from boq.reconstructor import BOQLineItem
 from semantic_mapper.mapper import MappingOutput
+from pricing_availability import NOT_APPLICABLE, classify_price
 
 
 @dataclass
@@ -31,6 +32,7 @@ class PriceResult:
     coeff_applied: list[str]
     unit_rule_ref: Optional[str]
     error_reason: Optional[str]
+    availability_status: str = "not_available"
 
 
 class PricingEngine:
@@ -75,6 +77,7 @@ class PricingEngine:
                 coeff_applied=[],
                 unit_rule_ref=None,
                 error_reason=f"Not a billable item: row_type={item.row_type}",
+                availability_status=NOT_APPLICABLE,
             )
 
         if mapping.master_item_id is None:
@@ -131,7 +134,14 @@ class PricingEngine:
                 error_reason="Quantity is missing/unparseable — not defaulting to zero",
             )
 
-        if master.get("unit_price") is None or master.get("unit_price") == 0:
+        availability = classify_price(
+            master.get("unit_price"),
+            source_reference=master.get("price_source_reference") or master.get("source_sheet"),
+            approval_status=master.get("approval_status"),
+            approved_by=master.get("approved_by"),
+            zero_price_authorized=bool(master.get("zero_price_authorized")),
+        )
+        if not availability.available:
             return PriceResult(
                 row_id=item.row_id,
                 status="unresolved",
@@ -141,7 +151,8 @@ class PricingEngine:
                 formula_ref=master.get("formula_ref"),
                 coeff_applied=[],
                 unit_rule_ref=None,
-                error_reason="Mapped master price is missing or zero; manual review required.",
+                error_reason=availability.reason,
+                availability_status=availability.status,
             )
 
         # Unit compatibility check
@@ -172,7 +183,7 @@ class PricingEngine:
 
         # Arithmetic — all Decimal
         try:
-            base_price = Decimal(str(master["unit_price"]))
+            base_price = availability.value
             quantity = Decimal(str(item.quantity))
         except InvalidOperation as exc:
             return PriceResult(
@@ -217,6 +228,7 @@ class PricingEngine:
             coeff_applied=coeff_applied,
             unit_rule_ref=unit_rule_ref,
             error_reason=None,
+            availability_status=availability.status,
         )
 
     def _find_unit_rule(

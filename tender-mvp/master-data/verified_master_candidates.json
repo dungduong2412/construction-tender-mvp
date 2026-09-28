@@ -1,0 +1,5232 @@
+{
+  "status": "AUTHORITATIVE_CANDIDATES_PREPARED_NOT_APPLIED",
+  "reason": "The PDF schedule remains incomplete because 16 numeric rows lack authoritative inputs; applying only the resolved subset to operational runtime would create a partial master-data rollout.",
+  "unique_work_item_candidates": 46,
+  "work_item_candidates": [
+    {
+      "scoped_id": "WORKBOOK.LITERAL.R8@A8",
+      "code": "WORKBOOK.LITERAL.R8",
+      "description": "Điều tra thu thập tài liệu kinh tế - xã hội",
+      "unit": "Công",
+      "category": "topography",
+      "source_cells": {
+        "master_row": "Công trình!A8:AM8",
+        "source_specification": null,
+        "machine_price_basis": null,
+        "material_direct_cell": "Công trình!Q8",
+        "labour_direct_cell": "Công trình!S8",
+        "machine_direct_cell": "Công trình!T8",
+        "loaded_price_cell": null,
+        "loaded_price_formula": null
+      },
+      "direct_components": {
+        "material": "0",
+        "other": "0",
+        "labour": "289200.0",
+        "machine": "0"
+      },
+      "norms": [],
+      "tender_unit_price_evidence": "572335",
+      "used_by_pdf_rows": [
+        2
+      ]
+    },
+    {
+      "scoped_id": "WORKBOOK.LITERAL.R12@A12",
+      "code": "WORKBOOK.LITERAL.R12",
+      "description": "Mua mốc tọa độ hạng III",
+      "unit": "Mốc",
+      "category": "topography",
+      "source_cells": {
+        "master_row": "Công trình!A12:AM12",
+        "source_specification": null,
+        "machine_price_basis": null,
+        "material_direct_cell": "Công trình!Q12",
+        "labour_direct_cell": "Công trình!S12",
+        "machine_direct_cell": "Công trình!T12",
+        "loaded_price_cell": null,
+        "loaded_price_formula": null
+      },
+      "direct_components": {
+        "material": "120000.0",
+        "other": "0",
+        "labour": "0",
+        "machine": "0"
+      },
+      "norms": [],
+      "tender_unit_price_evidence": "148427",
+      "used_by_pdf_rows": [
+        6
+      ]
+    },
+    {
+      "scoped_id": "CG.11220@A15",
+      "code": "CG.11220",
+      "description": "Đo khống chế cao. Thủy chuẩn hạng 4. Cấp địa hình II",
+      "unit": "km",
+      "category": "topography",
+      "source_cells": {
+        "master_row": "Công trình!A15:AM15",
+        "source_specification": "Định mức 38/2026/TT-BXD - Phần KS",
+        "machine_price_basis": "GM38_2026",
+        "material_direct_cell": "Công trình!Q15",
+        "labour_direct_cell": "Công trình!S15",
+        "machine_direct_cell": "Công trình!T15",
+        "loaded_price_cell": "Chiết tính!H67",
+        "loaded_price_formula": "=ROUND(H57+H61+H62+H66,1)"
+      },
+      "direct_components": {
+        "material": "15153.6",
+        "other": "0",
+        "labour": "1854057.2",
+        "machine": "4819.9"
+      },
+      "norms": [
+        {
+          "resource_type": "material",
+          "code": "A28.0192",
+          "description": "Gỗ nhóm V",
+          "unit": "m3",
+          "norm_quantity": "0.0015",
+          "unit_price": "4000000",
+          "line_total": "6000.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE15 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0341",
+          "description": "Xi măng PCB30",
+          "unit": "kg",
+          "norm_quantity": "2",
+          "unit_price": "1713",
+          "line_total": "3426.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE15 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0008",
+          "description": "Đá 1x2",
+          "unit": "m3",
+          "norm_quantity": "0.006",
+          "unit_price": "450000",
+          "line_total": "2700.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE15 (serialized recipe item 3)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0089",
+          "description": "Cát vàng",
+          "unit": "m3",
+          "norm_quantity": "0.0035",
+          "unit_price": "300000",
+          "line_total": "1050.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE15 (serialized recipe item 4)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0025",
+          "description": "Đinh",
+          "unit": "kg",
+          "norm_quantity": "0.03",
+          "unit_price": "20000",
+          "line_total": "600.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE15 (serialized recipe item 5)"
+        },
+        {
+          "resource_type": "material",
+          "code": "Z999",
+          "description": "Vật liệu khác",
+          "unit": "%",
+          "norm_quantity": "10",
+          "unit_price": "137.76",
+          "line_total": "1377.6",
+          "pricing_rule": "PCT_MATERIAL_SUBTOTAL",
+          "provenance": "Công trình!AE15 (serialized recipe item 6)"
+        },
+        {
+          "resource_type": "labour",
+          "code": "NKS",
+          "description": "Kỹ sư",
+          "unit": "công",
+          "norm_quantity": "1.39",
+          "unit_price": "348919",
+          "line_total": "484997.4",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AF15 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "labour",
+          "code": "N3",
+          "description": "Nhân công nhóm 3",
+          "unit": "công",
+          "norm_quantity": "3.84",
+          "unit_price": "356526",
+          "line_total": "1369059.8",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AF15 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M201.0020",
+          "description": "Máy thủy bình điện tử",
+          "unit": "ca",
+          "norm_quantity": "0.32",
+          "unit_price": "14767",
+          "line_total": "4725.4",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG15 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M999",
+          "description": "Máy khác",
+          "unit": "%",
+          "norm_quantity": "2",
+          "unit_price": "47.2544",
+          "line_total": "94.5",
+          "pricing_rule": "PCT_MACHINE_SUBTOTAL",
+          "provenance": "Công trình!AG15 (serialized recipe item 2)"
+        }
+      ],
+      "tender_unit_price_evidence": "3292279.0",
+      "used_by_pdf_rows": [
+        9
+      ]
+    },
+    {
+      "scoped_id": "CF.11620@A16",
+      "code": "CF.11620",
+      "description": "Đo lưới khống chế mặt bằng. Đường chuyền cấp 2. Bộ thiết bị GPS (3 máy). ). ĐH cấp II",
+      "unit": "điểm",
+      "category": "topography",
+      "source_cells": {
+        "master_row": "Công trình!A16:AM16",
+        "source_specification": "Định mức 38/2026/TT-BXD - Phần KS",
+        "machine_price_basis": "GM38_2026",
+        "material_direct_cell": "Công trình!Q16",
+        "labour_direct_cell": "Công trình!S16",
+        "machine_direct_cell": "Công trình!T16",
+        "loaded_price_cell": null,
+        "loaded_price_formula": null
+      },
+      "direct_components": {
+        "material": "34642.1",
+        "other": "0",
+        "labour": "2179246.5",
+        "machine": "95091.3"
+      },
+      "norms": [
+        {
+          "resource_type": "material",
+          "code": "A28.0341",
+          "description": "Xi măng PCB30",
+          "unit": "kg",
+          "norm_quantity": "3",
+          "unit_price": "1713",
+          "line_total": "5139.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE16 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0008",
+          "description": "Đá 1x2",
+          "unit": "m3",
+          "norm_quantity": "0.01",
+          "unit_price": "450000",
+          "line_total": "4500.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE16 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0089",
+          "description": "Cát vàng",
+          "unit": "m3",
+          "norm_quantity": "0.006",
+          "unit_price": "300000",
+          "line_total": "1800.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE16 (serialized recipe item 3)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0026",
+          "description": "Đinh + dây thép",
+          "unit": "kg",
+          "norm_quantity": "0.1",
+          "unit_price": "20000",
+          "line_total": "2000.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE16 (serialized recipe item 4)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0296",
+          "description": "Sơn trắng + đỏ",
+          "unit": "kg",
+          "norm_quantity": "0.2",
+          "unit_price": "44814",
+          "line_total": "8962.8",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE16 (serialized recipe item 5)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0298",
+          "description": "Sổ đo",
+          "unit": "quyển",
+          "norm_quantity": "1",
+          "unit_price": "9091",
+          "line_total": "9091.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE16 (serialized recipe item 6)"
+        },
+        {
+          "resource_type": "material",
+          "code": "Z999",
+          "description": "Vật liệu khác",
+          "unit": "%",
+          "norm_quantity": "10",
+          "unit_price": "314.928",
+          "line_total": "3149.3",
+          "pricing_rule": "PCT_MATERIAL_SUBTOTAL",
+          "provenance": "Công trình!AE16 (serialized recipe item 7)"
+        },
+        {
+          "resource_type": "labour",
+          "code": "NKS",
+          "description": "Kỹ sư",
+          "unit": "công",
+          "norm_quantity": "1.76",
+          "unit_price": "348919",
+          "line_total": "614097.4",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AF16 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "labour",
+          "code": "N3",
+          "description": "Nhân công nhóm 3",
+          "unit": "công",
+          "norm_quantity": "4.39",
+          "unit_price": "356526",
+          "line_total": "1565149.1",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AF16 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M201.0022",
+          "description": "Bộ thiết bị GPS G3100-R2",
+          "unit": "ca",
+          "norm_quantity": "0.16",
+          "unit_price": "540291",
+          "line_total": "86446.6",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG16 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M999",
+          "description": "Máy khác",
+          "unit": "%",
+          "norm_quantity": "10",
+          "unit_price": "864.4656",
+          "line_total": "8644.7",
+          "pricing_rule": "PCT_MACHINE_SUBTOTAL",
+          "provenance": "Công trình!AG16 (serialized recipe item 2)"
+        }
+      ],
+      "tender_unit_price_evidence": "4473257",
+      "used_by_pdf_rows": [
+        10
+      ]
+    },
+    {
+      "scoped_id": "CG.11320@A17",
+      "code": "CG.11320",
+      "description": "Đo khống chế cao. Thủy chuẩn kỹ thuật. Cấp địa hình II",
+      "unit": "km",
+      "category": "topography",
+      "source_cells": {
+        "master_row": "Công trình!A17:AM17",
+        "source_specification": "Định mức 38/2026/TT-BXD - Phần KS",
+        "machine_price_basis": "GM38_2026",
+        "material_direct_cell": "Công trình!Q17",
+        "labour_direct_cell": "Công trình!S17",
+        "machine_direct_cell": "Công trình!T17",
+        "loaded_price_cell": "Chiết tính!H130",
+        "loaded_price_formula": "=ROUND(H120+H124+H125+H129,1)"
+      },
+      "direct_components": {
+        "material": "2954.6",
+        "other": "0",
+        "labour": "985589.2",
+        "machine": "3464.3"
+      },
+      "norms": [
+        {
+          "resource_type": "material",
+          "code": "A28.0298",
+          "description": "Sổ đo",
+          "unit": "quyển",
+          "norm_quantity": "0.25",
+          "unit_price": "9091",
+          "line_total": "2272.8",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE17 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "material",
+          "code": "Z999",
+          "description": "Vật liệu khác",
+          "unit": "%",
+          "norm_quantity": "30",
+          "unit_price": "22.7275",
+          "line_total": "681.8",
+          "pricing_rule": "PCT_MATERIAL_SUBTOTAL",
+          "provenance": "Công trình!AE17 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "labour",
+          "code": "NKS",
+          "description": "Kỹ sư",
+          "unit": "công",
+          "norm_quantity": "0.73",
+          "unit_price": "348919",
+          "line_total": "254710.9",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AF17 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "labour",
+          "code": "N3",
+          "description": "Nhân công nhóm 3",
+          "unit": "công",
+          "norm_quantity": "2.05",
+          "unit_price": "356526",
+          "line_total": "730878.3",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AF17 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M201.0020",
+          "description": "Máy thủy bình điện tử",
+          "unit": "ca",
+          "norm_quantity": "0.23",
+          "unit_price": "14767",
+          "line_total": "3396.4",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG17 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M999",
+          "description": "Máy khác",
+          "unit": "%",
+          "norm_quantity": "2",
+          "unit_price": "33.9641",
+          "line_total": "67.9",
+          "pricing_rule": "PCT_MACHINE_SUBTOTAL",
+          "provenance": "Công trình!AG17 (serialized recipe item 2)"
+        }
+      ],
+      "tender_unit_price_evidence": "1745497.8",
+      "used_by_pdf_rows": [
+        11
+      ]
+    },
+    {
+      "scoped_id": "CK.11720@A42",
+      "code": "CK.11720",
+      "description": "Đo vẽ chi tiết bản đồ địa hình trên cạn bằng máy toàn đạc điện tử và máy thủy bình điện tử. Bản đồ tỷ lệ 1/2.000, đường đồng mức 1m, cấp địa hình II",
+      "unit": "100 ha",
+      "category": "topography",
+      "source_cells": {
+        "master_row": "Công trình!A42:AM42",
+        "source_specification": "Đơn giá 2966/QĐ-UBND năm 2023 - Phần KS",
+        "machine_price_basis": "Giá máy 2188/QĐ-SXD-KTXD ngày 21/11/2022 KV1",
+        "material_direct_cell": "Công trình!Q42",
+        "labour_direct_cell": "Công trình!S42",
+        "machine_direct_cell": "Công trình!T42",
+        "loaded_price_cell": null,
+        "loaded_price_formula": null
+      },
+      "direct_components": {
+        "material": "85936.0",
+        "other": "0",
+        "labour": "24283723.0",
+        "machine": "1201662.0"
+      },
+      "norms": [
+        {
+          "resource_type": "material",
+          "code": "A28.1000",
+          "description": "Cọc gỗ (4x4x40) cm",
+          "unit": "cọc",
+          "norm_quantity": "10",
+          "unit_price": "6109",
+          "line_total": "61090.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE42 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0298",
+          "description": "Sổ đo",
+          "unit": "quyển",
+          "norm_quantity": "1.5",
+          "unit_price": "9091",
+          "line_total": "13636.5",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE42 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "material",
+          "code": "Z999",
+          "description": "Vật liệu khác",
+          "unit": "%",
+          "norm_quantity": "15",
+          "unit_price": "747.265",
+          "line_total": "11209.0",
+          "pricing_rule": "PCT_MATERIAL_SUBTOTAL",
+          "provenance": "Công trình!AE42 (serialized recipe item 3)"
+        },
+        {
+          "resource_type": "labour",
+          "code": "NKS.40",
+          "description": "Kỹ sư 4,0/8",
+          "unit": "công",
+          "norm_quantity": "21.68",
+          "unit_price": "315149",
+          "line_total": "6832430.3",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AF42 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "labour",
+          "code": "N2.40",
+          "description": "Nhân công 4,0/7 - Nhóm 2",
+          "unit": "công",
+          "norm_quantity": "59.85",
+          "unit_price": "315655",
+          "line_total": "18891951.8",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AF42 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M201.0021",
+          "description": "Máy toàn đạc điện tử",
+          "unit": "ca",
+          "norm_quantity": "7.32",
+          "unit_price": "147059",
+          "line_total": "1076471.9",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG42 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M201.0020",
+          "description": "Máy thủy bình điện tử",
+          "unit": "ca",
+          "norm_quantity": "1.08",
+          "unit_price": "14767",
+          "line_total": "15948.4",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG42 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M999",
+          "description": "Máy khác",
+          "unit": "%",
+          "norm_quantity": "10",
+          "unit_price": "10924.2024",
+          "line_total": "109242.0",
+          "pricing_rule": "PCT_MACHINE_SUBTOTAL",
+          "provenance": "Công trình!AG42 (serialized recipe item 3)"
+        }
+      ],
+      "tender_unit_price_evidence": "49650800",
+      "used_by_pdf_rows": [
+        13,
+        32
+      ]
+    },
+    {
+      "scoped_id": "CK.11730@A45",
+      "code": "CK.11730",
+      "description": "Đo vẽ chi tiết bản đồ địa hình trên cạn bằng máy toàn đạc điện tử và máy thủy bình điện tử. Bản đồ tỷ lệ 1/2.000, đường đồng mức 1m, cấp địa hình III",
+      "unit": "100 ha",
+      "category": "topography",
+      "source_cells": {
+        "master_row": "Công trình!A45:AM45",
+        "source_specification": "Đơn giá 2966/QĐ-UBND năm 2023 - Phần KS",
+        "machine_price_basis": "Giá máy 2188/QĐ-SXD-KTXD ngày 21/11/2022 KV1",
+        "material_direct_cell": "Công trình!Q45",
+        "labour_direct_cell": "Công trình!S45",
+        "machine_direct_cell": "Công trình!T45",
+        "loaded_price_cell": null,
+        "loaded_price_formula": null
+      },
+      "direct_components": {
+        "material": "122694.0",
+        "other": "0",
+        "labour": "37966896.0",
+        "machine": "1867511.0"
+      },
+      "norms": [
+        {
+          "resource_type": "material",
+          "code": "A28.1000",
+          "description": "Cọc gỗ (4x4x40) cm",
+          "unit": "cọc",
+          "norm_quantity": "13",
+          "unit_price": "6109",
+          "line_total": "79417.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE45 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0298",
+          "description": "Sổ đo",
+          "unit": "quyển",
+          "norm_quantity": "3",
+          "unit_price": "9091",
+          "line_total": "27273.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE45 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "material",
+          "code": "Z999",
+          "description": "Vật liệu khác",
+          "unit": "%",
+          "norm_quantity": "15",
+          "unit_price": "1066.9",
+          "line_total": "16003.5",
+          "pricing_rule": "PCT_MATERIAL_SUBTOTAL",
+          "provenance": "Công trình!AE45 (serialized recipe item 3)"
+        },
+        {
+          "resource_type": "labour",
+          "code": "NKS.40",
+          "description": "Kỹ sư 4,0/8",
+          "unit": "công",
+          "norm_quantity": "34.03",
+          "unit_price": "315149",
+          "line_total": "10724520.5",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AF45 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "labour",
+          "code": "N2.40",
+          "description": "Nhân công 4,0/7 - Nhóm 2",
+          "unit": "công",
+          "norm_quantity": "93.44",
+          "unit_price": "315655",
+          "line_total": "29494803.2",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AF45 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M201.0021",
+          "description": "Máy toàn đạc điện tử",
+          "unit": "ca",
+          "norm_quantity": "11.4",
+          "unit_price": "147059",
+          "line_total": "1676472.6",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG45 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M201.0020",
+          "description": "Máy thủy bình điện tử",
+          "unit": "ca",
+          "norm_quantity": "1.44",
+          "unit_price": "14767",
+          "line_total": "21264.5",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG45 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M999",
+          "description": "Máy khác",
+          "unit": "%",
+          "norm_quantity": "10",
+          "unit_price": "16977.3708",
+          "line_total": "169773.7",
+          "pricing_rule": "PCT_MACHINE_SUBTOTAL",
+          "provenance": "Công trình!AG45 (serialized recipe item 3)"
+        }
+      ],
+      "tender_unit_price_evidence": "77599239",
+      "used_by_pdf_rows": [
+        14,
+        33
+      ]
+    },
+    {
+      "scoped_id": "CH.11120@A43",
+      "code": "CH.11120",
+      "description": "Đo vẽ mặt cắt dọc ở trên cạn. Cấp địa hình II",
+      "unit": "100m",
+      "category": "topography",
+      "source_cells": {
+        "master_row": "Công trình!A43:AM43",
+        "source_specification": "Đơn giá 2966/QĐ-UBND năm 2023 - Phần KS",
+        "machine_price_basis": "Giá máy 2188/QĐ-SXD-KTXD ngày 21/11/2022 KV1",
+        "material_direct_cell": "Công trình!Q43",
+        "labour_direct_cell": "Công trình!S43",
+        "machine_direct_cell": "Công trình!T43",
+        "loaded_price_cell": null,
+        "loaded_price_formula": null
+      },
+      "direct_components": {
+        "material": "25275.0",
+        "other": "0",
+        "labour": "464553.0",
+        "machine": "20396.0"
+      },
+      "norms": [
+        {
+          "resource_type": "material",
+          "code": "A28.0249",
+          "description": "Mốc bê tông đúc sẵn",
+          "unit": "cái",
+          "norm_quantity": "0.25",
+          "unit_price": "15000",
+          "line_total": "3750.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE43 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A24.0797A",
+          "description": "Xi măng PCB30",
+          "unit": "kg",
+          "norm_quantity": "1",
+          "unit_price": "1713",
+          "line_total": "1713.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE43 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0091",
+          "description": "Cọc gỗ (4x4x40) cm",
+          "unit": "cái",
+          "norm_quantity": "2.5",
+          "unit_price": "6109",
+          "line_total": "15272.5",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE43 (serialized recipe item 3)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0295",
+          "description": "Sơn đỏ + trắng",
+          "unit": "kg",
+          "norm_quantity": "0.05",
+          "unit_price": "44814",
+          "line_total": "2240.7",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE43 (serialized recipe item 4)"
+        },
+        {
+          "resource_type": "material",
+          "code": "Z999",
+          "description": "Vật liệu khác",
+          "unit": "%",
+          "norm_quantity": "10",
+          "unit_price": "229.762",
+          "line_total": "2297.6",
+          "pricing_rule": "PCT_MATERIAL_SUBTOTAL",
+          "provenance": "Công trình!AE43 (serialized recipe item 5)"
+        },
+        {
+          "resource_type": "labour",
+          "code": "NKS.40",
+          "description": "Kỹ sư 4,0/8",
+          "unit": "công",
+          "norm_quantity": "0.61",
+          "unit_price": "315149",
+          "line_total": "192240.9",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AF43 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "labour",
+          "code": "N2.40",
+          "description": "Nhân công 4,0/7 - Nhóm 2",
+          "unit": "công",
+          "norm_quantity": "0.95",
+          "unit_price": "315655",
+          "line_total": "299872.3",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AF43 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M201.0021",
+          "description": "Máy toàn đạc điện tử",
+          "unit": "ca",
+          "norm_quantity": "0.11",
+          "unit_price": "147059",
+          "line_total": "16176.5",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG43 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M201.0020",
+          "description": "Máy thủy bình điện tử",
+          "unit": "ca",
+          "norm_quantity": "0.22",
+          "unit_price": "14767",
+          "line_total": "3248.7",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG43 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M999",
+          "description": "Máy khác",
+          "unit": "%",
+          "norm_quantity": "5",
+          "unit_price": "194.2523",
+          "line_total": "971.3",
+          "pricing_rule": "PCT_MACHINE_SUBTOTAL",
+          "provenance": "Công trình!AG43 (serialized recipe item 3)"
+        }
+      ],
+      "tender_unit_price_evidence": "975854",
+      "used_by_pdf_rows": [
+        15,
+        34
+      ]
+    },
+    {
+      "scoped_id": "CH.11130@A46",
+      "code": "CH.11130",
+      "description": "Đo vẽ mặt cắt dọc ở trên cạn. Cấp địa hình III",
+      "unit": "100m",
+      "category": "topography",
+      "source_cells": {
+        "master_row": "Công trình!A46:AM46",
+        "source_specification": "Đơn giá 2966/QĐ-UBND năm 2023 - Phần KS",
+        "machine_price_basis": "Giá máy 2188/QĐ-SXD-KTXD ngày 21/11/2022 KV1",
+        "material_direct_cell": "Công trình!Q46",
+        "labour_direct_cell": "Công trình!S46",
+        "machine_direct_cell": "Công trình!T46",
+        "loaded_price_cell": null,
+        "loaded_price_formula": null
+      },
+      "direct_components": {
+        "material": "32866.0",
+        "other": "0",
+        "labour": "604516.0",
+        "machine": "26114.0"
+      },
+      "norms": [
+        {
+          "resource_type": "material",
+          "code": "A28.0249",
+          "description": "Mốc bê tông đúc sẵn",
+          "unit": "cái",
+          "norm_quantity": "0.3",
+          "unit_price": "15000",
+          "line_total": "4500.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE46 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A24.0797A",
+          "description": "Xi măng PCB30",
+          "unit": "kg",
+          "norm_quantity": "1.5",
+          "unit_price": "1713",
+          "line_total": "2569.5",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE46 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0091",
+          "description": "Cọc gỗ (4x4x40) cm",
+          "unit": "cái",
+          "norm_quantity": "3",
+          "unit_price": "6109",
+          "line_total": "18327.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE46 (serialized recipe item 3)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0295",
+          "description": "Sơn đỏ + trắng",
+          "unit": "kg",
+          "norm_quantity": "0.1",
+          "unit_price": "44814",
+          "line_total": "4481.4",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE46 (serialized recipe item 4)"
+        },
+        {
+          "resource_type": "material",
+          "code": "Z999",
+          "description": "Vật liệu khác",
+          "unit": "%",
+          "norm_quantity": "10",
+          "unit_price": "298.779",
+          "line_total": "2987.8",
+          "pricing_rule": "PCT_MATERIAL_SUBTOTAL",
+          "provenance": "Công trình!AE46 (serialized recipe item 5)"
+        },
+        {
+          "resource_type": "labour",
+          "code": "NKS.40",
+          "description": "Kỹ sư 4,0/8",
+          "unit": "công",
+          "norm_quantity": "0.79",
+          "unit_price": "315149",
+          "line_total": "248967.7",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AF46 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "labour",
+          "code": "N2.40",
+          "description": "Nhân công 4,0/7 - Nhóm 2",
+          "unit": "công",
+          "norm_quantity": "1.24",
+          "unit_price": "315655",
+          "line_total": "391412.2",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AF46 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M201.0021",
+          "description": "Máy toàn đạc điện tử",
+          "unit": "ca",
+          "norm_quantity": "0.14",
+          "unit_price": "147059",
+          "line_total": "20588.3",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG46 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M201.0020",
+          "description": "Máy thủy bình điện tử",
+          "unit": "ca",
+          "norm_quantity": "0.29",
+          "unit_price": "14767",
+          "line_total": "4282.4",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG46 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M999",
+          "description": "Máy khác",
+          "unit": "%",
+          "norm_quantity": "5",
+          "unit_price": "248.7069",
+          "line_total": "1243.5",
+          "pricing_rule": "PCT_MACHINE_SUBTOTAL",
+          "provenance": "Công trình!AG46 (serialized recipe item 3)"
+        }
+      ],
+      "tender_unit_price_evidence": "1269306",
+      "used_by_pdf_rows": [
+        16,
+        35
+      ]
+    },
+    {
+      "scoped_id": "CH.11220@A44",
+      "code": "CH.11220",
+      "description": "Đo vẽ mặt cắt ngang ở trên cạn. Cấp địa hình II",
+      "unit": "100m",
+      "category": "topography",
+      "source_cells": {
+        "master_row": "Công trình!A44:AM44",
+        "source_specification": "Đơn giá 2966/QĐ-UBND năm 2023 - Phần KS",
+        "machine_price_basis": "Giá máy 2188/QĐ-SXD-KTXD ngày 21/11/2022 KV1",
+        "material_direct_cell": "Công trình!Q44",
+        "labour_direct_cell": "Công trình!S44",
+        "machine_direct_cell": "Công trình!T44",
+        "loaded_price_cell": "Chiết tính!H289",
+        "loaded_price_formula": "=ROUND(H279+H283+H284+H288,1)"
+      },
+      "direct_components": {
+        "material": "43277.0",
+        "other": "0",
+        "labour": "562800.0",
+        "machine": "25946.0"
+      },
+      "norms": [
+        {
+          "resource_type": "material",
+          "code": "A28.0091",
+          "description": "Cọc gỗ (4x4x40) cm",
+          "unit": "cái",
+          "norm_quantity": "6",
+          "unit_price": "6109",
+          "line_total": "36654.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE44 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0295",
+          "description": "Sơn đỏ + trắng",
+          "unit": "kg",
+          "norm_quantity": "0.06",
+          "unit_price": "44814",
+          "line_total": "2688.8",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE44 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "material",
+          "code": "Z999",
+          "description": "Vật liệu khác",
+          "unit": "%",
+          "norm_quantity": "10",
+          "unit_price": "393.4284",
+          "line_total": "3934.3",
+          "pricing_rule": "PCT_MATERIAL_SUBTOTAL",
+          "provenance": "Công trình!AE44 (serialized recipe item 3)"
+        },
+        {
+          "resource_type": "labour",
+          "code": "NKS.40",
+          "description": "Kỹ sư 4,0/8",
+          "unit": "công",
+          "norm_quantity": "0.79",
+          "unit_price": "315149",
+          "line_total": "248967.7",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AF44 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "labour",
+          "code": "N2.40",
+          "description": "Nhân công 4,0/7 - Nhóm 2",
+          "unit": "công",
+          "norm_quantity": "1.1",
+          "unit_price": "315655",
+          "line_total": "347220.5",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AF44 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M201.0021",
+          "description": "Máy toàn đạc điện tử",
+          "unit": "ca",
+          "norm_quantity": "0.16",
+          "unit_price": "147059",
+          "line_total": "23529.4",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG44 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M201.0020",
+          "description": "Máy thủy bình điện tử",
+          "unit": "ca",
+          "norm_quantity": "0.08",
+          "unit_price": "14767",
+          "line_total": "1181.4",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG44 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M999",
+          "description": "Máy khác",
+          "unit": "%",
+          "norm_quantity": "5",
+          "unit_price": "247.108",
+          "line_total": "1235.5",
+          "pricing_rule": "PCT_MACHINE_SUBTOTAL",
+          "provenance": "Công trình!AG44 (serialized recipe item 3)"
+        }
+      ],
+      "tender_unit_price_evidence": "1254247.7",
+      "used_by_pdf_rows": [
+        17,
+        36
+      ]
+    },
+    {
+      "scoped_id": "CH.11230@A47",
+      "code": "CH.11230",
+      "description": "Đo vẽ mặt cắt ngang ở trên cạn. Cấp địa hình III",
+      "unit": "100m",
+      "category": "topography",
+      "source_cells": {
+        "master_row": "Công trình!A47:AM47",
+        "source_specification": "Đơn giá 2966/QĐ-UBND năm 2023 - Phần KS",
+        "machine_price_basis": "Giá máy 2188/QĐ-SXD-KTXD ngày 21/11/2022 KV1",
+        "material_direct_cell": "Công trình!Q47",
+        "labour_direct_cell": "Công trình!S47",
+        "machine_direct_cell": "Công trình!T47",
+        "loaded_price_cell": null,
+        "loaded_price_formula": null
+      },
+      "direct_components": {
+        "material": "50490.0",
+        "other": "0",
+        "labour": "732537.0",
+        "machine": "32743.0"
+      },
+      "norms": [
+        {
+          "resource_type": "material",
+          "code": "A28.0091",
+          "description": "Cọc gỗ (4x4x40) cm",
+          "unit": "cái",
+          "norm_quantity": "7",
+          "unit_price": "6109",
+          "line_total": "42763.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE47 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0295",
+          "description": "Sơn đỏ + trắng",
+          "unit": "kg",
+          "norm_quantity": "0.07",
+          "unit_price": "44814",
+          "line_total": "3137.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE47 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "material",
+          "code": "Z999",
+          "description": "Vật liệu khác",
+          "unit": "%",
+          "norm_quantity": "10",
+          "unit_price": "458.9998",
+          "line_total": "4590.0",
+          "pricing_rule": "PCT_MATERIAL_SUBTOTAL",
+          "provenance": "Công trình!AE47 (serialized recipe item 3)"
+        },
+        {
+          "resource_type": "labour",
+          "code": "NKS.40",
+          "description": "Kỹ sư 4,0/8",
+          "unit": "công",
+          "norm_quantity": "1.02",
+          "unit_price": "315149",
+          "line_total": "321452.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AF47 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "labour",
+          "code": "N2.40",
+          "description": "Nhân công 4,0/7 - Nhóm 2",
+          "unit": "công",
+          "norm_quantity": "1.44",
+          "unit_price": "315655",
+          "line_total": "454543.2",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AF47 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M201.0021",
+          "description": "Máy toàn đạc điện tử",
+          "unit": "ca",
+          "norm_quantity": "0.2",
+          "unit_price": "147059",
+          "line_total": "29411.8",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG47 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M201.0020",
+          "description": "Máy thủy bình điện tử",
+          "unit": "ca",
+          "norm_quantity": "0.12",
+          "unit_price": "14767",
+          "line_total": "1772.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG47 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M999",
+          "description": "Máy khác",
+          "unit": "%",
+          "norm_quantity": "5",
+          "unit_price": "311.8384",
+          "line_total": "1559.2",
+          "pricing_rule": "PCT_MACHINE_SUBTOTAL",
+          "provenance": "Công trình!AG47 (serialized recipe item 3)"
+        }
+      ],
+      "tender_unit_price_evidence": "1552662",
+      "used_by_pdf_rows": [
+        18,
+        37
+      ]
+    },
+    {
+      "scoped_id": "CK.11520@A28",
+      "code": "CK.11520",
+      "description": "Đo vẽ chi tiết bản đồ địa hình trên cạn bằng máy toàn đạc điện tử và máy thủy bình điện tử. Bản đồ tỷ lệ 1/1.000, đường đồng mức 1m, cấp địa hình II",
+      "unit": "100 ha",
+      "category": "topography",
+      "source_cells": {
+        "master_row": "Công trình!A28:AM28",
+        "source_specification": "Đơn giá 2966/QĐ-UBND năm 2023 - Phần KS",
+        "machine_price_basis": "Giá máy 2188/QĐ-SXD-KTXD ngày 21/11/2022 KV1",
+        "material_direct_cell": "Công trình!Q28",
+        "labour_direct_cell": "Công trình!S28",
+        "machine_direct_cell": "Công trình!T28",
+        "loaded_price_cell": "Chiết tính!H161",
+        "loaded_price_formula": "=ROUND(H151+H155+H156+H160,1)"
+      },
+      "direct_components": {
+        "material": "342908.0",
+        "other": "0",
+        "labour": "53494441.0",
+        "machine": "3135125.0"
+      },
+      "norms": [
+        {
+          "resource_type": "material",
+          "code": "A28.1000",
+          "description": "Cọc gỗ (4x4x40) cm",
+          "unit": "cọc",
+          "norm_quantity": "25",
+          "unit_price": "6109",
+          "line_total": "152725.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE28 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0298",
+          "description": "Sổ đo",
+          "unit": "quyển",
+          "norm_quantity": "16",
+          "unit_price": "9091",
+          "line_total": "145456.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE28 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "material",
+          "code": "Z999",
+          "description": "Vật liệu khác",
+          "unit": "%",
+          "norm_quantity": "15",
+          "unit_price": "2981.81",
+          "line_total": "44727.2",
+          "pricing_rule": "PCT_MATERIAL_SUBTOTAL",
+          "provenance": "Công trình!AE28 (serialized recipe item 3)"
+        },
+        {
+          "resource_type": "labour",
+          "code": "NKS.40",
+          "description": "Kỹ sư 4,0/8",
+          "unit": "công",
+          "norm_quantity": "46.6",
+          "unit_price": "315149",
+          "line_total": "14685943.4",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AF28 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "labour",
+          "code": "N2.40",
+          "description": "Nhân công 4,0/7 - Nhóm 2",
+          "unit": "công",
+          "norm_quantity": "133",
+          "unit_price": "315655",
+          "line_total": "41982115.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AF28 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M201.0021",
+          "description": "Máy toàn đạc điện tử",
+          "unit": "ca",
+          "norm_quantity": "19.2",
+          "unit_price": "147059",
+          "line_total": "2823532.8",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG28 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M201.0020",
+          "description": "Máy thủy bình điện tử",
+          "unit": "ca",
+          "norm_quantity": "1.8",
+          "unit_price": "14767",
+          "line_total": "26580.6",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG28 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M999",
+          "description": "Máy khác",
+          "unit": "%",
+          "norm_quantity": "10",
+          "unit_price": "28501.134",
+          "line_total": "285011.3",
+          "pricing_rule": "PCT_MACHINE_SUBTOTAL",
+          "provenance": "Công trình!AG28 (serialized recipe item 3)"
+        }
+      ],
+      "tender_unit_price_evidence": "116151252.1",
+      "used_by_pdf_rows": [
+        21
+      ]
+    },
+    {
+      "scoped_id": "CK.31510@A21",
+      "code": "CK.31510",
+      "description": "Đo vẽ chi tiết bản đồ địa hình dưới nước bằng máy toàn đạc điện tử và máy thủy bình điện tử. Bản đồ tỷ lệ 1/1.000, đường đồng mức 1m, cấp địa hình I",
+      "unit": "100 ha",
+      "category": "topography",
+      "source_cells": {
+        "master_row": "Công trình!A21:AM21",
+        "source_specification": "Định mức 38/2026/TT-BXD - Phần KS",
+        "machine_price_basis": "GM38_2026",
+        "material_direct_cell": "Công trình!Q21",
+        "labour_direct_cell": "Công trình!S21",
+        "machine_direct_cell": "Công trình!T21",
+        "loaded_price_cell": "Chiết tính!H192",
+        "loaded_price_formula": "=ROUND(H182+H186+H187+H191,1)"
+      },
+      "direct_components": {
+        "material": "19439.9",
+        "other": "0",
+        "labour": "1651217.8",
+        "machine": "40766.1"
+      },
+      "norms": [
+        {
+          "resource_type": "material",
+          "code": "A28.1000",
+          "description": "Cọc gỗ (4x4x40) cm",
+          "unit": "cọc",
+          "norm_quantity": "2",
+          "unit_price": "6109",
+          "line_total": "12218.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE21 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0298",
+          "description": "Sổ đo",
+          "unit": "quyển",
+          "norm_quantity": "0.6",
+          "unit_price": "9091",
+          "line_total": "5454.6",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE21 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "material",
+          "code": "Z999",
+          "description": "Vật liệu khác",
+          "unit": "%",
+          "norm_quantity": "10",
+          "unit_price": "176.726",
+          "line_total": "1767.3",
+          "pricing_rule": "PCT_MATERIAL_SUBTOTAL",
+          "provenance": "Công trình!AE21 (serialized recipe item 3)"
+        },
+        {
+          "resource_type": "labour",
+          "code": "NKS",
+          "description": "Kỹ sư",
+          "unit": "công",
+          "norm_quantity": "1.34",
+          "unit_price": "348919",
+          "line_total": "467551.5",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AF21 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "labour",
+          "code": "N3",
+          "description": "Nhân công nhóm 3",
+          "unit": "công",
+          "norm_quantity": "3.32",
+          "unit_price": "356526",
+          "line_total": "1183666.3",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AF21 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M201.0021",
+          "description": "Máy toàn đạc điện tử",
+          "unit": "ca",
+          "norm_quantity": "0.25",
+          "unit_price": "147059",
+          "line_total": "36764.8",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG21 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M201.0020",
+          "description": "Máy thủy bình điện tử",
+          "unit": "ca",
+          "norm_quantity": "0.02",
+          "unit_price": "14767",
+          "line_total": "295.3",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG21 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M999",
+          "description": "Máy khác",
+          "unit": "%",
+          "norm_quantity": "10",
+          "unit_price": "370.6009",
+          "line_total": "3706.0",
+          "pricing_rule": "PCT_MACHINE_SUBTOTAL",
+          "provenance": "Công trình!AG21 (serialized recipe item 3)"
+        }
+      ],
+      "tender_unit_price_evidence": "101592768.3",
+      "used_by_pdf_rows": [
+        22
+      ]
+    },
+    {
+      "scoped_id": "CH.11120@A30",
+      "code": "CH.11120",
+      "description": "Đo vẽ mặt cắt dọc ở trên cạn. Cấp địa hình II",
+      "unit": "100m",
+      "category": "topography",
+      "source_cells": {
+        "master_row": "Công trình!A30:AM30",
+        "source_specification": "Đơn giá 2966/QĐ-UBND năm 2023 - Phần KS",
+        "machine_price_basis": "Giá máy 2188/QĐ-SXD-KTXD ngày 21/11/2022 KV1",
+        "material_direct_cell": "Công trình!Q30",
+        "labour_direct_cell": "Công trình!S30",
+        "machine_direct_cell": "Công trình!T30",
+        "loaded_price_cell": null,
+        "loaded_price_formula": null
+      },
+      "direct_components": {
+        "material": "25275.0",
+        "other": "0",
+        "labour": "464553.0",
+        "machine": "20396.0"
+      },
+      "norms": [
+        {
+          "resource_type": "material",
+          "code": "A28.0249",
+          "description": "Mốc bê tông đúc sẵn",
+          "unit": "cái",
+          "norm_quantity": "0.25",
+          "unit_price": "15000",
+          "line_total": "3750.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE30 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A24.0797A",
+          "description": "Xi măng PCB30",
+          "unit": "kg",
+          "norm_quantity": "1",
+          "unit_price": "1713",
+          "line_total": "1713.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE30 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0091",
+          "description": "Cọc gỗ (4x4x40) cm",
+          "unit": "cái",
+          "norm_quantity": "2.5",
+          "unit_price": "6109",
+          "line_total": "15272.5",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE30 (serialized recipe item 3)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0295",
+          "description": "Sơn đỏ + trắng",
+          "unit": "kg",
+          "norm_quantity": "0.05",
+          "unit_price": "44814",
+          "line_total": "2240.7",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE30 (serialized recipe item 4)"
+        },
+        {
+          "resource_type": "material",
+          "code": "Z999",
+          "description": "Vật liệu khác",
+          "unit": "%",
+          "norm_quantity": "10",
+          "unit_price": "229.762",
+          "line_total": "2297.6",
+          "pricing_rule": "PCT_MATERIAL_SUBTOTAL",
+          "provenance": "Công trình!AE30 (serialized recipe item 5)"
+        },
+        {
+          "resource_type": "labour",
+          "code": "NKS.40",
+          "description": "Kỹ sư 4,0/8",
+          "unit": "công",
+          "norm_quantity": "0.61",
+          "unit_price": "315149",
+          "line_total": "192240.9",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AF30 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "labour",
+          "code": "N2.40",
+          "description": "Nhân công 4,0/7 - Nhóm 2",
+          "unit": "công",
+          "norm_quantity": "0.95",
+          "unit_price": "315655",
+          "line_total": "299872.3",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AF30 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M201.0021",
+          "description": "Máy toàn đạc điện tử",
+          "unit": "ca",
+          "norm_quantity": "0.11",
+          "unit_price": "147059",
+          "line_total": "16176.5",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG30 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M201.0020",
+          "description": "Máy thủy bình điện tử",
+          "unit": "ca",
+          "norm_quantity": "0.22",
+          "unit_price": "14767",
+          "line_total": "3248.7",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG30 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M999",
+          "description": "Máy khác",
+          "unit": "%",
+          "norm_quantity": "5",
+          "unit_price": "194.2523",
+          "line_total": "971.3",
+          "pricing_rule": "PCT_MACHINE_SUBTOTAL",
+          "provenance": "Công trình!AG30 (serialized recipe item 3)"
+        }
+      ],
+      "tender_unit_price_evidence": "975854",
+      "used_by_pdf_rows": [
+        23
+      ]
+    },
+    {
+      "scoped_id": "CH.11310@A31",
+      "code": "CH.11310",
+      "description": "Đo vẽ mặt cắt dọc ở dưới nước. Cấp địa hình I",
+      "unit": "100m",
+      "category": "topography",
+      "source_cells": {
+        "master_row": "Công trình!A31:AM31",
+        "source_specification": "Đơn giá 2966/QĐ-UBND năm 2023 - Phần KS",
+        "machine_price_basis": "Giá máy 2188/QĐ-SXD-KTXD ngày 21/11/2022 KV1",
+        "material_direct_cell": "Công trình!Q31",
+        "labour_direct_cell": "Công trình!S31",
+        "machine_direct_cell": "Công trình!T31",
+        "loaded_price_cell": "Chiết tính!H258",
+        "loaded_price_formula": "=ROUND(H248+H252+H253+H257,1)"
+      },
+      "direct_components": {
+        "material": "21089.0",
+        "other": "0",
+        "labour": "464515.0",
+        "machine": "16688.0"
+      },
+      "norms": [
+        {
+          "resource_type": "material",
+          "code": "A28.0249",
+          "description": "Mốc bê tông đúc sẵn",
+          "unit": "cái",
+          "norm_quantity": "0.2",
+          "unit_price": "15000",
+          "line_total": "3000.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE31 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A24.0797A",
+          "description": "Xi măng PCB30",
+          "unit": "kg",
+          "norm_quantity": "1",
+          "unit_price": "1713",
+          "line_total": "1713.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE31 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0091",
+          "description": "Cọc gỗ (4x4x40) cm",
+          "unit": "cái",
+          "norm_quantity": "2",
+          "unit_price": "6109",
+          "line_total": "12218.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE31 (serialized recipe item 3)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0295",
+          "description": "Sơn đỏ + trắng",
+          "unit": "kg",
+          "norm_quantity": "0.05",
+          "unit_price": "44814",
+          "line_total": "2240.7",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE31 (serialized recipe item 4)"
+        },
+        {
+          "resource_type": "material",
+          "code": "Z999",
+          "description": "Vật liệu khác",
+          "unit": "%",
+          "norm_quantity": "10",
+          "unit_price": "191.717",
+          "line_total": "1917.2",
+          "pricing_rule": "PCT_MATERIAL_SUBTOTAL",
+          "provenance": "Công trình!AE31 (serialized recipe item 5)"
+        },
+        {
+          "resource_type": "labour",
+          "code": "NKS.40",
+          "description": "Kỹ sư 4,0/8",
+          "unit": "công",
+          "norm_quantity": "0.69",
+          "unit_price": "315149",
+          "line_total": "217452.8",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AF31 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "labour",
+          "code": "N2.40",
+          "description": "Nhân công 4,0/7 - Nhóm 2",
+          "unit": "công",
+          "norm_quantity": "0.87",
+          "unit_price": "315655",
+          "line_total": "274619.9",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AF31 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M201.0021",
+          "description": "Máy toàn đạc điện tử",
+          "unit": "ca",
+          "norm_quantity": "0.09",
+          "unit_price": "147059",
+          "line_total": "13235.3",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG31 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M201.0020",
+          "description": "Máy thủy bình điện tử",
+          "unit": "ca",
+          "norm_quantity": "0.18",
+          "unit_price": "14767",
+          "line_total": "2658.1",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG31 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M999",
+          "description": "Máy khác",
+          "unit": "%",
+          "norm_quantity": "5",
+          "unit_price": "158.9337",
+          "line_total": "794.7",
+          "pricing_rule": "PCT_MACHINE_SUBTOTAL",
+          "provenance": "Công trình!AG31 (serialized recipe item 3)"
+        }
+      ],
+      "tender_unit_price_evidence": "1632943.7",
+      "used_by_pdf_rows": [
+        24,
+        29
+      ]
+    },
+    {
+      "scoped_id": "CH.11220@A32",
+      "code": "CH.11220",
+      "description": "Đo vẽ mặt cắt ngang ở trên cạn. Cấp địa hình II",
+      "unit": "100m",
+      "category": "topography",
+      "source_cells": {
+        "master_row": "Công trình!A32:AM32",
+        "source_specification": "Đơn giá 2966/QĐ-UBND năm 2023 - Phần KS",
+        "machine_price_basis": "Giá máy 2188/QĐ-SXD-KTXD ngày 21/11/2022 KV1",
+        "material_direct_cell": "Công trình!Q32",
+        "labour_direct_cell": "Công trình!S32",
+        "machine_direct_cell": "Công trình!T32",
+        "loaded_price_cell": "Chiết tính!H289",
+        "loaded_price_formula": "=ROUND(H279+H283+H284+H288,1)"
+      },
+      "direct_components": {
+        "material": "43277.0",
+        "other": "0",
+        "labour": "562800.0",
+        "machine": "25946.0"
+      },
+      "norms": [
+        {
+          "resource_type": "material",
+          "code": "A28.0091",
+          "description": "Cọc gỗ (4x4x40) cm",
+          "unit": "cái",
+          "norm_quantity": "6",
+          "unit_price": "6109",
+          "line_total": "36654.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE32 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0295",
+          "description": "Sơn đỏ + trắng",
+          "unit": "kg",
+          "norm_quantity": "0.06",
+          "unit_price": "44814",
+          "line_total": "2688.8",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE32 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "material",
+          "code": "Z999",
+          "description": "Vật liệu khác",
+          "unit": "%",
+          "norm_quantity": "10",
+          "unit_price": "393.4284",
+          "line_total": "3934.3",
+          "pricing_rule": "PCT_MATERIAL_SUBTOTAL",
+          "provenance": "Công trình!AE32 (serialized recipe item 3)"
+        },
+        {
+          "resource_type": "labour",
+          "code": "NKS.40",
+          "description": "Kỹ sư 4,0/8",
+          "unit": "công",
+          "norm_quantity": "0.79",
+          "unit_price": "315149",
+          "line_total": "248967.7",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AF32 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "labour",
+          "code": "N2.40",
+          "description": "Nhân công 4,0/7 - Nhóm 2",
+          "unit": "công",
+          "norm_quantity": "1.1",
+          "unit_price": "315655",
+          "line_total": "347220.5",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AF32 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M201.0021",
+          "description": "Máy toàn đạc điện tử",
+          "unit": "ca",
+          "norm_quantity": "0.16",
+          "unit_price": "147059",
+          "line_total": "23529.4",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG32 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M201.0020",
+          "description": "Máy thủy bình điện tử",
+          "unit": "ca",
+          "norm_quantity": "0.08",
+          "unit_price": "14767",
+          "line_total": "1181.4",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG32 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M999",
+          "description": "Máy khác",
+          "unit": "%",
+          "norm_quantity": "5",
+          "unit_price": "247.108",
+          "line_total": "1235.5",
+          "pricing_rule": "PCT_MACHINE_SUBTOTAL",
+          "provenance": "Công trình!AG32 (serialized recipe item 3)"
+        }
+      ],
+      "tender_unit_price_evidence": "1254247.7",
+      "used_by_pdf_rows": [
+        25
+      ]
+    },
+    {
+      "scoped_id": "CK.11320@A35",
+      "code": "CK.11320",
+      "description": "Đo vẽ chi tiết bản đồ địa hình trên cạn bằng máy toàn đạc điện tử và máy thủy bình điện tử. Bản đồ tỷ lệ 1/500, đường đồng mức 0,5m, cấp địa hình II",
+      "unit": "ha",
+      "category": "topography",
+      "source_cells": {
+        "master_row": "Công trình!A35:AM35",
+        "source_specification": "DM12_2021_KS",
+        "machine_price_basis": "GM10_2019KS",
+        "material_direct_cell": "Công trình!Q35",
+        "labour_direct_cell": "Công trình!S35",
+        "machine_direct_cell": "Công trình!T35",
+        "loaded_price_cell": null,
+        "loaded_price_formula": null
+      },
+      "direct_components": {
+        "material": "16576.8",
+        "other": "0",
+        "labour": "1710146.8",
+        "machine": "102561.7"
+      },
+      "norms": [
+        {
+          "resource_type": "material",
+          "code": "A28.1000",
+          "description": "Cọc gỗ (4x4x40) cm",
+          "unit": "cọc",
+          "norm_quantity": "2",
+          "unit_price": "4480",
+          "line_total": "8960.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE35 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0298",
+          "description": "Sổ đo",
+          "unit": "quyển",
+          "norm_quantity": "0.6",
+          "unit_price": "9091",
+          "line_total": "5454.6",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE35 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "material",
+          "code": "Z999",
+          "description": "Vật liệu khác",
+          "unit": "%",
+          "norm_quantity": "15",
+          "unit_price": "144.146",
+          "line_total": "2162.2",
+          "pricing_rule": "PCT_MATERIAL_SUBTOTAL",
+          "provenance": "Công trình!AE35 (serialized recipe item 3)"
+        },
+        {
+          "resource_type": "labour",
+          "code": "NKS.40",
+          "description": "Kỹ sư 4,0/8",
+          "unit": "công",
+          "norm_quantity": "1.39",
+          "unit_price": "315149",
+          "line_total": "438057.1",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AF35 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "labour",
+          "code": "N2.40",
+          "description": "Nhân công 4,0/7 - Nhóm 2",
+          "unit": "công",
+          "norm_quantity": "4.03",
+          "unit_price": "315655",
+          "line_total": "1272089.7",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AF35 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M201.0021",
+          "description": "Máy toàn đặc điện tử TS06 hoặc loại tương tự",
+          "unit": "ca",
+          "norm_quantity": "0.63",
+          "unit_price": "147059",
+          "line_total": "92647.2",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG35 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M201.0020",
+          "description": "Máy thủy bình điện tử PLP-110 hoặc loại tương tự",
+          "unit": "ca",
+          "norm_quantity": "0.04",
+          "unit_price": "14767",
+          "line_total": "590.7",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG35 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M999",
+          "description": "Máy khác",
+          "unit": "%",
+          "norm_quantity": "10",
+          "unit_price": "932.3785",
+          "line_total": "9323.8",
+          "pricing_rule": "PCT_MACHINE_SUBTOTAL",
+          "provenance": "Công trình!AG35 (serialized recipe item 3)"
+        }
+      ],
+      "tender_unit_price_evidence": "3531791",
+      "used_by_pdf_rows": [
+        26
+      ]
+    },
+    {
+      "scoped_id": "CH.11120@A37",
+      "code": "CH.11120",
+      "description": "Đo vẽ mặt cắt dọc ở trên cạn. Cấp địa hình II",
+      "unit": "100m",
+      "category": "topography",
+      "source_cells": {
+        "master_row": "Công trình!A37:AM37",
+        "source_specification": "Đơn giá 2966/QĐ-UBND năm 2023 - Phần KS",
+        "machine_price_basis": "Giá máy 2188/QĐ-SXD-KTXD ngày 21/11/2022 KV1",
+        "material_direct_cell": "Công trình!Q37",
+        "labour_direct_cell": "Công trình!S37",
+        "machine_direct_cell": "Công trình!T37",
+        "loaded_price_cell": null,
+        "loaded_price_formula": null
+      },
+      "direct_components": {
+        "material": "25275.0",
+        "other": "0",
+        "labour": "464553.0",
+        "machine": "20396.0"
+      },
+      "norms": [
+        {
+          "resource_type": "material",
+          "code": "A28.0249",
+          "description": "Mốc bê tông đúc sẵn",
+          "unit": "cái",
+          "norm_quantity": "0.25",
+          "unit_price": "15000",
+          "line_total": "3750.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE37 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A24.0797A",
+          "description": "Xi măng PCB30",
+          "unit": "kg",
+          "norm_quantity": "1",
+          "unit_price": "1713",
+          "line_total": "1713.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE37 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0091",
+          "description": "Cọc gỗ (4x4x40) cm",
+          "unit": "cái",
+          "norm_quantity": "2.5",
+          "unit_price": "6109",
+          "line_total": "15272.5",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE37 (serialized recipe item 3)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0295",
+          "description": "Sơn đỏ + trắng",
+          "unit": "kg",
+          "norm_quantity": "0.05",
+          "unit_price": "44814",
+          "line_total": "2240.7",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE37 (serialized recipe item 4)"
+        },
+        {
+          "resource_type": "material",
+          "code": "Z999",
+          "description": "Vật liệu khác",
+          "unit": "%",
+          "norm_quantity": "10",
+          "unit_price": "229.762",
+          "line_total": "2297.6",
+          "pricing_rule": "PCT_MATERIAL_SUBTOTAL",
+          "provenance": "Công trình!AE37 (serialized recipe item 5)"
+        },
+        {
+          "resource_type": "labour",
+          "code": "NKS.40",
+          "description": "Kỹ sư 4,0/8",
+          "unit": "công",
+          "norm_quantity": "0.61",
+          "unit_price": "315149",
+          "line_total": "192240.9",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AF37 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "labour",
+          "code": "N2.40",
+          "description": "Nhân công 4,0/7 - Nhóm 2",
+          "unit": "công",
+          "norm_quantity": "0.95",
+          "unit_price": "315655",
+          "line_total": "299872.3",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AF37 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M201.0021",
+          "description": "Máy toàn đạc điện tử",
+          "unit": "ca",
+          "norm_quantity": "0.11",
+          "unit_price": "147059",
+          "line_total": "16176.5",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG37 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M201.0020",
+          "description": "Máy thủy bình điện tử",
+          "unit": "ca",
+          "norm_quantity": "0.22",
+          "unit_price": "14767",
+          "line_total": "3248.7",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG37 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M999",
+          "description": "Máy khác",
+          "unit": "%",
+          "norm_quantity": "5",
+          "unit_price": "194.2523",
+          "line_total": "971.3",
+          "pricing_rule": "PCT_MACHINE_SUBTOTAL",
+          "provenance": "Công trình!AG37 (serialized recipe item 3)"
+        }
+      ],
+      "tender_unit_price_evidence": "975854",
+      "used_by_pdf_rows": [
+        28
+      ]
+    },
+    {
+      "scoped_id": "CH.11220@A39",
+      "code": "CH.11220",
+      "description": "Đo vẽ mặt cắt ngang ở trên cạn. Cấp địa hình II",
+      "unit": "100m",
+      "category": "topography",
+      "source_cells": {
+        "master_row": "Công trình!A39:AM39",
+        "source_specification": "Đơn giá 2966/QĐ-UBND năm 2023 - Phần KS",
+        "machine_price_basis": "Giá máy 2188/QĐ-SXD-KTXD ngày 21/11/2022 KV1",
+        "material_direct_cell": "Công trình!Q39",
+        "labour_direct_cell": "Công trình!S39",
+        "machine_direct_cell": "Công trình!T39",
+        "loaded_price_cell": "Chiết tính!H289",
+        "loaded_price_formula": "=ROUND(H279+H283+H284+H288,1)"
+      },
+      "direct_components": {
+        "material": "43277.0",
+        "other": "0",
+        "labour": "562800.0",
+        "machine": "25946.0"
+      },
+      "norms": [
+        {
+          "resource_type": "material",
+          "code": "A28.0091",
+          "description": "Cọc gỗ (4x4x40) cm",
+          "unit": "cái",
+          "norm_quantity": "6",
+          "unit_price": "6109",
+          "line_total": "36654.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE39 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0295",
+          "description": "Sơn đỏ + trắng",
+          "unit": "kg",
+          "norm_quantity": "0.06",
+          "unit_price": "44814",
+          "line_total": "2688.8",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE39 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "material",
+          "code": "Z999",
+          "description": "Vật liệu khác",
+          "unit": "%",
+          "norm_quantity": "10",
+          "unit_price": "393.4284",
+          "line_total": "3934.3",
+          "pricing_rule": "PCT_MATERIAL_SUBTOTAL",
+          "provenance": "Công trình!AE39 (serialized recipe item 3)"
+        },
+        {
+          "resource_type": "labour",
+          "code": "NKS.40",
+          "description": "Kỹ sư 4,0/8",
+          "unit": "công",
+          "norm_quantity": "0.79",
+          "unit_price": "315149",
+          "line_total": "248967.7",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AF39 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "labour",
+          "code": "N2.40",
+          "description": "Nhân công 4,0/7 - Nhóm 2",
+          "unit": "công",
+          "norm_quantity": "1.1",
+          "unit_price": "315655",
+          "line_total": "347220.5",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AF39 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M201.0021",
+          "description": "Máy toàn đạc điện tử",
+          "unit": "ca",
+          "norm_quantity": "0.16",
+          "unit_price": "147059",
+          "line_total": "23529.4",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG39 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M201.0020",
+          "description": "Máy thủy bình điện tử",
+          "unit": "ca",
+          "norm_quantity": "0.08",
+          "unit_price": "14767",
+          "line_total": "1181.4",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG39 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M999",
+          "description": "Máy khác",
+          "unit": "%",
+          "norm_quantity": "5",
+          "unit_price": "247.108",
+          "line_total": "1235.5",
+          "pricing_rule": "PCT_MACHINE_SUBTOTAL",
+          "provenance": "Công trình!AG39 (serialized recipe item 3)"
+        }
+      ],
+      "tender_unit_price_evidence": "1254247.7",
+      "used_by_pdf_rows": [
+        30
+      ]
+    },
+    {
+      "scoped_id": "WORKBOOK.LITERAL.R52@A52",
+      "code": "WORKBOOK.LITERAL.R52",
+      "description": "Mua số liệu mực nước năm lớn nhất tại trạm thủy văn",
+      "unit": "trạm",
+      "category": "topography",
+      "source_cells": {
+        "master_row": "Công trình!A52:AM52",
+        "source_specification": null,
+        "machine_price_basis": null,
+        "material_direct_cell": "Công trình!Q52",
+        "labour_direct_cell": "Công trình!S52",
+        "machine_direct_cell": "Công trình!T52",
+        "loaded_price_cell": null,
+        "loaded_price_formula": null
+      },
+      "direct_components": {
+        "material": "15500000.0",
+        "other": "0",
+        "labour": "0",
+        "machine": "0"
+      },
+      "norms": [],
+      "tender_unit_price_evidence": "19171838",
+      "used_by_pdf_rows": [
+        39
+      ]
+    },
+    {
+      "scoped_id": "WORKBOOK.LITERAL.R53@A53",
+      "code": "WORKBOOK.LITERAL.R53",
+      "description": "Đo điều tra mực nước dọc tuyến",
+      "unit": "công",
+      "category": "topography",
+      "source_cells": {
+        "master_row": "Công trình!A53:AM53",
+        "source_specification": null,
+        "machine_price_basis": null,
+        "material_direct_cell": "Công trình!Q53",
+        "labour_direct_cell": "Công trình!S53",
+        "machine_direct_cell": "Công trình!T53",
+        "loaded_price_cell": null,
+        "loaded_price_formula": null
+      },
+      "direct_components": {
+        "material": "0",
+        "other": "0",
+        "labour": "309701.0",
+        "machine": "0"
+      },
+      "norms": [],
+      "tender_unit_price_evidence": "612907",
+      "used_by_pdf_rows": [
+        40
+      ]
+    },
+    {
+      "scoped_id": "WORKBOOK.LITERAL.R54@A54",
+      "code": "WORKBOOK.LITERAL.R54",
+      "description": "Đo điều tra mực nước cầu",
+      "unit": "công",
+      "category": "topography",
+      "source_cells": {
+        "master_row": "Công trình!A54:AM54",
+        "source_specification": null,
+        "machine_price_basis": null,
+        "material_direct_cell": "Công trình!Q54",
+        "labour_direct_cell": "Công trình!S54",
+        "machine_direct_cell": "Công trình!T54",
+        "loaded_price_cell": null,
+        "loaded_price_formula": null
+      },
+      "direct_components": {
+        "material": "0",
+        "other": "0",
+        "labour": "309701.0",
+        "machine": "0"
+      },
+      "norms": [],
+      "tender_unit_price_evidence": "612907",
+      "used_by_pdf_rows": [
+        41
+      ]
+    },
+    {
+      "scoped_id": "CH.11310@A55",
+      "code": "CH.11310",
+      "description": "Đo vẽ mặt cắt dọc ở dưới nước. Cấp địa hình I",
+      "unit": "100m",
+      "category": "topography",
+      "source_cells": {
+        "master_row": "Công trình!A55:AM55",
+        "source_specification": "Đơn giá 2966/QĐ-UBND năm 2023 - Phần KS",
+        "machine_price_basis": "Giá máy 2188/QĐ-SXD-KTXD ngày 21/11/2022 KV1",
+        "material_direct_cell": "Công trình!Q55",
+        "labour_direct_cell": "Công trình!S55",
+        "machine_direct_cell": "Công trình!T55",
+        "loaded_price_cell": "Chiết tính!H258",
+        "loaded_price_formula": "=ROUND(H248+H252+H253+H257,1)"
+      },
+      "direct_components": {
+        "material": "21089.0",
+        "other": "0",
+        "labour": "464515.0",
+        "machine": "16688.0"
+      },
+      "norms": [
+        {
+          "resource_type": "material",
+          "code": "A28.0249",
+          "description": "Mốc bê tông đúc sẵn",
+          "unit": "cái",
+          "norm_quantity": "0.2",
+          "unit_price": "15000",
+          "line_total": "3000.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE55 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A24.0797A",
+          "description": "Xi măng PCB30",
+          "unit": "kg",
+          "norm_quantity": "1",
+          "unit_price": "1713",
+          "line_total": "1713.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE55 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0091",
+          "description": "Cọc gỗ (4x4x40) cm",
+          "unit": "cái",
+          "norm_quantity": "2",
+          "unit_price": "6109",
+          "line_total": "12218.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE55 (serialized recipe item 3)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0295",
+          "description": "Sơn đỏ + trắng",
+          "unit": "kg",
+          "norm_quantity": "0.05",
+          "unit_price": "44814",
+          "line_total": "2240.7",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE55 (serialized recipe item 4)"
+        },
+        {
+          "resource_type": "material",
+          "code": "Z999",
+          "description": "Vật liệu khác",
+          "unit": "%",
+          "norm_quantity": "10",
+          "unit_price": "191.717",
+          "line_total": "1917.2",
+          "pricing_rule": "PCT_MATERIAL_SUBTOTAL",
+          "provenance": "Công trình!AE55 (serialized recipe item 5)"
+        },
+        {
+          "resource_type": "labour",
+          "code": "NKS.40",
+          "description": "Kỹ sư 4,0/8",
+          "unit": "công",
+          "norm_quantity": "0.69",
+          "unit_price": "315149",
+          "line_total": "217452.8",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AF55 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "labour",
+          "code": "N2.40",
+          "description": "Nhân công 4,0/7 - Nhóm 2",
+          "unit": "công",
+          "norm_quantity": "0.87",
+          "unit_price": "315655",
+          "line_total": "274619.9",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AF55 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M201.0021",
+          "description": "Máy toàn đạc điện tử",
+          "unit": "ca",
+          "norm_quantity": "0.09",
+          "unit_price": "147059",
+          "line_total": "13235.3",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG55 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M201.0020",
+          "description": "Máy thủy bình điện tử",
+          "unit": "ca",
+          "norm_quantity": "0.18",
+          "unit_price": "14767",
+          "line_total": "2658.1",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG55 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M999",
+          "description": "Máy khác",
+          "unit": "%",
+          "norm_quantity": "5",
+          "unit_price": "158.9337",
+          "line_total": "794.7",
+          "pricing_rule": "PCT_MACHINE_SUBTOTAL",
+          "provenance": "Công trình!AG55 (serialized recipe item 3)"
+        }
+      ],
+      "tender_unit_price_evidence": "1632943.7",
+      "used_by_pdf_rows": [
+        42
+      ]
+    },
+    {
+      "scoped_id": "CH.11220@A56",
+      "code": "CH.11220",
+      "description": "Đo vẽ mặt cắt ngang ở trên cạn. Cấp địa hình II",
+      "unit": "100m",
+      "category": "topography",
+      "source_cells": {
+        "master_row": "Công trình!A56:AM56",
+        "source_specification": "Đơn giá 2966/QĐ-UBND năm 2023 - Phần KS",
+        "machine_price_basis": "Giá máy 2188/QĐ-SXD-KTXD ngày 21/11/2022 KV1",
+        "material_direct_cell": "Công trình!Q56",
+        "labour_direct_cell": "Công trình!S56",
+        "machine_direct_cell": "Công trình!T56",
+        "loaded_price_cell": "Chiết tính!H289",
+        "loaded_price_formula": "=ROUND(H279+H283+H284+H288,1)"
+      },
+      "direct_components": {
+        "material": "43277.0",
+        "other": "0",
+        "labour": "562800.0",
+        "machine": "25946.0"
+      },
+      "norms": [
+        {
+          "resource_type": "material",
+          "code": "A28.0091",
+          "description": "Cọc gỗ (4x4x40) cm",
+          "unit": "cái",
+          "norm_quantity": "6",
+          "unit_price": "6109",
+          "line_total": "36654.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE56 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0295",
+          "description": "Sơn đỏ + trắng",
+          "unit": "kg",
+          "norm_quantity": "0.06",
+          "unit_price": "44814",
+          "line_total": "2688.8",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE56 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "material",
+          "code": "Z999",
+          "description": "Vật liệu khác",
+          "unit": "%",
+          "norm_quantity": "10",
+          "unit_price": "393.4284",
+          "line_total": "3934.3",
+          "pricing_rule": "PCT_MATERIAL_SUBTOTAL",
+          "provenance": "Công trình!AE56 (serialized recipe item 3)"
+        },
+        {
+          "resource_type": "labour",
+          "code": "NKS.40",
+          "description": "Kỹ sư 4,0/8",
+          "unit": "công",
+          "norm_quantity": "0.79",
+          "unit_price": "315149",
+          "line_total": "248967.7",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AF56 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "labour",
+          "code": "N2.40",
+          "description": "Nhân công 4,0/7 - Nhóm 2",
+          "unit": "công",
+          "norm_quantity": "1.1",
+          "unit_price": "315655",
+          "line_total": "347220.5",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AF56 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M201.0021",
+          "description": "Máy toàn đạc điện tử",
+          "unit": "ca",
+          "norm_quantity": "0.16",
+          "unit_price": "147059",
+          "line_total": "23529.4",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG56 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M201.0020",
+          "description": "Máy thủy bình điện tử",
+          "unit": "ca",
+          "norm_quantity": "0.08",
+          "unit_price": "14767",
+          "line_total": "1181.4",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG56 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M999",
+          "description": "Máy khác",
+          "unit": "%",
+          "norm_quantity": "5",
+          "unit_price": "247.108",
+          "line_total": "1235.5",
+          "pricing_rule": "PCT_MACHINE_SUBTOTAL",
+          "provenance": "Công trình!AG56 (serialized recipe item 3)"
+        }
+      ],
+      "tender_unit_price_evidence": "1254247.7",
+      "used_by_pdf_rows": [
+        43
+      ]
+    },
+    {
+      "scoped_id": "CH.11410@A57",
+      "code": "CH.11410",
+      "description": "Đo vẽ mặt cắt ngang ở dưới nước. Cấp địa hình I",
+      "unit": "100m",
+      "category": "topography",
+      "source_cells": {
+        "master_row": "Công trình!A57:AM57",
+        "source_specification": "Đơn giá 2966/QĐ-UBND năm 2023 - Phần KS",
+        "machine_price_basis": "Giá máy 2188/QĐ-SXD-KTXD ngày 21/11/2022 KV1",
+        "material_direct_cell": "Công trình!Q57",
+        "labour_direct_cell": "Công trình!S57",
+        "machine_direct_cell": "Công trình!T57",
+        "loaded_price_cell": null,
+        "loaded_price_formula": null
+      },
+      "direct_components": {
+        "material": "28852.0",
+        "other": "0",
+        "labour": "744327.0",
+        "machine": "42007.0"
+      },
+      "norms": [
+        {
+          "resource_type": "material",
+          "code": "A28.0091",
+          "description": "Cọc gỗ (4x4x40) cm",
+          "unit": "cái",
+          "norm_quantity": "4",
+          "unit_price": "6109",
+          "line_total": "24436.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE57 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0295",
+          "description": "Sơn đỏ + trắng",
+          "unit": "kg",
+          "norm_quantity": "0.04",
+          "unit_price": "44814",
+          "line_total": "1792.6",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE57 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "material",
+          "code": "Z999",
+          "description": "Vật liệu khác",
+          "unit": "%",
+          "norm_quantity": "10",
+          "unit_price": "262.2856",
+          "line_total": "2622.9",
+          "pricing_rule": "PCT_MATERIAL_SUBTOTAL",
+          "provenance": "Công trình!AE57 (serialized recipe item 3)"
+        },
+        {
+          "resource_type": "labour",
+          "code": "NKS.40",
+          "description": "Kỹ sư 4,0/8",
+          "unit": "công",
+          "norm_quantity": "1.29",
+          "unit_price": "315149",
+          "line_total": "406542.2",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AF57 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "labour",
+          "code": "N2.40",
+          "description": "Nhân công 4,0/7 - Nhóm 2",
+          "unit": "công",
+          "norm_quantity": "1.21",
+          "unit_price": "315655",
+          "line_total": "381942.6",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AF57 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M201.0021",
+          "description": "Máy toàn đạc điện tử",
+          "unit": "ca",
+          "norm_quantity": "0.26",
+          "unit_price": "147059",
+          "line_total": "38235.3",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG57 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M201.0020",
+          "description": "Máy thủy bình điện tử",
+          "unit": "ca",
+          "norm_quantity": "0.12",
+          "unit_price": "14767",
+          "line_total": "1772.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG57 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M999",
+          "description": "Máy khác",
+          "unit": "%",
+          "norm_quantity": "5",
+          "unit_price": "400.0738",
+          "line_total": "2000.4",
+          "pricing_rule": "PCT_MACHINE_SUBTOTAL",
+          "provenance": "Công trình!AG57 (serialized recipe item 3)"
+        }
+      ],
+      "tender_unit_price_evidence": "1560689",
+      "used_by_pdf_rows": [
+        44
+      ]
+    },
+    {
+      "scoped_id": "WORKBOOK.LITERAL.R58@A58",
+      "code": "WORKBOOK.LITERAL.R58",
+      "description": "Khảo sát, thu thập hồ đập, kênh mương thủy lợi",
+      "unit": "công",
+      "category": "topography",
+      "source_cells": {
+        "master_row": "Công trình!A58:AM58",
+        "source_specification": null,
+        "machine_price_basis": null,
+        "material_direct_cell": "Công trình!Q58",
+        "labour_direct_cell": "Công trình!S58",
+        "machine_direct_cell": "Công trình!T58",
+        "loaded_price_cell": null,
+        "loaded_price_formula": null
+      },
+      "direct_components": {
+        "material": "0",
+        "other": "0",
+        "labour": "309701.0",
+        "machine": "0"
+      },
+      "norms": [],
+      "tender_unit_price_evidence": "612907",
+      "used_by_pdf_rows": [
+        45
+      ]
+    },
+    {
+      "scoped_id": "CC.21110@A63",
+      "code": "CC.21110",
+      "description": "Khoan xoay bơm rửa để lấy mẫu ở trên cạn. Độ sâu hố khoan từ 0m đến 30m. Cấp đất đá I -III",
+      "unit": "m khoan",
+      "category": "geotechnical_drilling",
+      "source_cells": {
+        "master_row": "Công trình!A63:AM63",
+        "source_specification": "Định mức 38/2026/TT-BXD - Phần KS",
+        "machine_price_basis": "GM38_2026",
+        "material_direct_cell": "Công trình!Q63",
+        "labour_direct_cell": "Công trình!S63",
+        "machine_direct_cell": "Công trình!T63",
+        "loaded_price_cell": "Chiết tính!H355",
+        "loaded_price_formula": "=ROUND(H345+H349+H350+H354,1)"
+      },
+      "direct_components": {
+        "material": "40799.0",
+        "other": "0",
+        "labour": "627485.8",
+        "machine": "7364.4"
+      },
+      "norms": [
+        {
+          "resource_type": "material",
+          "code": "A28.0254",
+          "description": "Mũi khoan hợp kim",
+          "unit": "cái",
+          "norm_quantity": "0.07",
+          "unit_price": "150000",
+          "line_total": "10500.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE63 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0097",
+          "description": "Cần khoan",
+          "unit": "m",
+          "norm_quantity": "0.015",
+          "unit_price": "60000",
+          "line_total": "900.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE63 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0022",
+          "description": "Đầu nối cần",
+          "unit": "bộ",
+          "norm_quantity": "0.005",
+          "unit_price": "150000",
+          "line_total": "750.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE63 (serialized recipe item 3)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0172",
+          "description": "Ống chống",
+          "unit": "m",
+          "norm_quantity": "0.03",
+          "unit_price": "20000",
+          "line_total": "600.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE63 (serialized recipe item 4)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0023",
+          "description": "Đầu nối ống chống",
+          "unit": "cái",
+          "norm_quantity": "0.01",
+          "unit_price": "40000",
+          "line_total": "400.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE63 (serialized recipe item 5)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0177",
+          "description": "Ống mẫu đơn",
+          "unit": "m",
+          "norm_quantity": "0.04",
+          "unit_price": "45000",
+          "line_total": "1800.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE63 (serialized recipe item 6)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0178",
+          "description": "Ống mẫu kép",
+          "unit": "cái",
+          "norm_quantity": "0.002",
+          "unit_price": "70000",
+          "line_total": "140.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE63 (serialized recipe item 7)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0216",
+          "description": "Hộp nhựa đựng mẫu",
+          "unit": "cái",
+          "norm_quantity": "0.4",
+          "unit_price": "20000",
+          "line_total": "8000.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE63 (serialized recipe item 8)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0192",
+          "description": "Gỗ nhóm V",
+          "unit": "m3",
+          "norm_quantity": "0.0035",
+          "unit_price": "4000000",
+          "line_total": "14000.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE63 (serialized recipe item 9)"
+        },
+        {
+          "resource_type": "material",
+          "code": "Z999",
+          "description": "Vật liệu khác",
+          "unit": "%",
+          "norm_quantity": "10",
+          "unit_price": "370.9",
+          "line_total": "3709.0",
+          "pricing_rule": "PCT_MATERIAL_SUBTOTAL",
+          "provenance": "Công trình!AE63 (serialized recipe item 10)"
+        },
+        {
+          "resource_type": "labour",
+          "code": "N3",
+          "description": "Nhân công nhóm 3",
+          "unit": "công",
+          "norm_quantity": "1.76",
+          "unit_price": "356526",
+          "line_total": "627485.8",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AF63 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M201.0002",
+          "description": "Máy khoan XY - 1A",
+          "unit": "ca",
+          "norm_quantity": "0.09",
+          "unit_price": "80222",
+          "line_total": "7220.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG63 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M999",
+          "description": "Máy khác",
+          "unit": "%",
+          "norm_quantity": "2",
+          "unit_price": "72.1998",
+          "line_total": "144.4",
+          "pricing_rule": "PCT_MACHINE_SUBTOTAL",
+          "provenance": "Công trình!AG63 (serialized recipe item 2)"
+        }
+      ],
+      "tender_unit_price_evidence": "1101235.1",
+      "used_by_pdf_rows": [
+        49
+      ]
+    },
+    {
+      "scoped_id": "CE.11410@A71",
+      "code": "CE.11410",
+      "description": "Thí nghiệm xuyên tiêu chuẩn SPT. Cấp đất đá cấp I-III",
+      "unit": "1 lần TN",
+      "category": "geotechnical_drilling",
+      "source_cells": {
+        "master_row": "Công trình!A71:AM71",
+        "source_specification": "Định mức 38/2026/TT-BXD - Phần KS",
+        "machine_price_basis": "GM38_2026",
+        "material_direct_cell": "Công trình!Q71",
+        "labour_direct_cell": "Công trình!S71",
+        "machine_direct_cell": "Công trình!T71",
+        "loaded_price_cell": "Chiết tính!H528",
+        "loaded_price_formula": "=ROUND(H518+H522+H523+H527,1)"
+      },
+      "direct_components": {
+        "material": "6992.0",
+        "other": "0",
+        "labour": "267394.5",
+        "machine": "1107.6"
+      },
+      "norms": [
+        {
+          "resource_type": "material",
+          "code": "A28.0257",
+          "description": "Mũi xuyên cắt",
+          "unit": "cái",
+          "norm_quantity": "0.1",
+          "unit_price": "50000",
+          "line_total": "5000.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE71 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0176",
+          "description": "Ống mẫu",
+          "unit": "ống",
+          "norm_quantity": "0.04",
+          "unit_price": "7000",
+          "line_total": "280.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE71 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0217",
+          "description": "Hộp gỗ đựng mẫu",
+          "unit": "hộp",
+          "norm_quantity": "0.04",
+          "unit_price": "20000",
+          "line_total": "800.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE71 (serialized recipe item 3)"
+        },
+        {
+          "resource_type": "material",
+          "code": "Z999",
+          "description": "Vật liệu khác",
+          "unit": "%",
+          "norm_quantity": "15",
+          "unit_price": "60.8",
+          "line_total": "912.0",
+          "pricing_rule": "PCT_MATERIAL_SUBTOTAL",
+          "provenance": "Công trình!AE71 (serialized recipe item 4)"
+        },
+        {
+          "resource_type": "labour",
+          "code": "N3",
+          "description": "Nhân công nhóm 3",
+          "unit": "công",
+          "norm_quantity": "0.75",
+          "unit_price": "356526",
+          "line_total": "267394.5",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AF71 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M201.0013",
+          "description": "Bộ dụng cụ thí nghiệm SPT",
+          "unit": "ca",
+          "norm_quantity": "0.1",
+          "unit_price": "11076",
+          "line_total": "1107.6",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG71 (serialized recipe item 1)"
+        }
+      ],
+      "tender_unit_price_evidence": "409823.9",
+      "used_by_pdf_rows": [
+        51,
+        69
+      ]
+    },
+    {
+      "scoped_id": "DC.02001@A77",
+      "code": "DC.02001",
+      "description": "Thí nghiệm cơ lý hóa của đất trong phòng thí nghiệm, chỉ tiêu khối lượng riêng",
+      "unit": "1 chỉ tiêu",
+      "category": "laboratory",
+      "source_cells": {
+        "master_row": "Công trình!A77:AM77",
+        "source_specification": "Định mức 38/2026/TT-BXD - Phần TNVL",
+        "machine_price_basis": "GM38_2026",
+        "material_direct_cell": "Công trình!Q77",
+        "labour_direct_cell": "Công trình!S77",
+        "machine_direct_cell": "Công trình!T77",
+        "loaded_price_cell": "Chiết tính!H610",
+        "loaded_price_formula": "=ROUND(H600+H604+H605+H609,1)"
+      },
+      "direct_components": {
+        "material": "42775.0",
+        "other": "0",
+        "labour": "289379.9",
+        "machine": "25370.1"
+      },
+      "norms": [
+        {
+          "resource_type": "material",
+          "code": "A0001",
+          "description": "Điện năng",
+          "unit": "kWh",
+          "norm_quantity": "17.44",
+          "unit_price": "1685",
+          "line_total": "29386.4",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE77 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A0008",
+          "description": "Nước cất",
+          "unit": "lít",
+          "norm_quantity": "0.5",
+          "unit_price": "17000",
+          "line_total": "8500.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE77 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A0044",
+          "description": "Khay men",
+          "unit": "cái",
+          "norm_quantity": "0.05",
+          "unit_price": "20000",
+          "line_total": "1000.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE77 (serialized recipe item 3)"
+        },
+        {
+          "resource_type": "material",
+          "code": "Z999",
+          "description": "Vật liệu khác",
+          "unit": "%",
+          "norm_quantity": "10",
+          "unit_price": "388.864",
+          "line_total": "3888.6",
+          "pricing_rule": "PCT_MATERIAL_SUBTOTAL",
+          "provenance": "Công trình!AE77 (serialized recipe item 4)"
+        },
+        {
+          "resource_type": "labour",
+          "code": "N4",
+          "description": "Nhân công nhóm 4",
+          "unit": "công",
+          "norm_quantity": "0.76",
+          "unit_price": "380763",
+          "line_total": "289379.9",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AF77 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M202.0014",
+          "description": "Tủ sấy",
+          "unit": "ca",
+          "norm_quantity": "2.125",
+          "unit_price": "11348",
+          "line_total": "24114.5",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG77 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M202.0018",
+          "description": "Máy hút ẩm",
+          "unit": "ca",
+          "norm_quantity": "0.003",
+          "unit_price": "9287",
+          "line_total": "27.9",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG77 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M006",
+          "description": "Cân kỹ thuật",
+          "unit": "ca",
+          "norm_quantity": "0.003",
+          "unit_price": "6521",
+          "line_total": "19.6",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG77 (serialized recipe item 3)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M999",
+          "description": "Máy khác",
+          "unit": "%",
+          "norm_quantity": "5",
+          "unit_price": "241.61924",
+          "line_total": "1208.1",
+          "pricing_rule": "PCT_MACHINE_SUBTOTAL",
+          "provenance": "Công trình!AG77 (serialized recipe item 4)"
+        }
+      ],
+      "tender_unit_price_evidence": "577097.7",
+      "used_by_pdf_rows": [
+        55,
+        74
+      ]
+    },
+    {
+      "scoped_id": "DC.02002@A78",
+      "code": "DC.02002",
+      "description": "Thí nghiệm cơ lý hóa của đất trong phòng thí nghiệm, chỉ tiêu độ ẩm, độ hút ẩm",
+      "unit": "1 chỉ tiêu",
+      "category": "laboratory",
+      "source_cells": {
+        "master_row": "Công trình!A78:AM78",
+        "source_specification": "Định mức 38/2026/TT-BXD - Phần TNVL",
+        "machine_price_basis": "GM38_2026",
+        "material_direct_cell": "Công trình!Q78",
+        "labour_direct_cell": "Công trình!S78",
+        "machine_direct_cell": "Công trình!T78",
+        "loaded_price_cell": null,
+        "loaded_price_formula": null
+      },
+      "direct_components": {
+        "material": "15438.5",
+        "other": "0",
+        "labour": "49880.0",
+        "machine": "12214.8"
+      },
+      "norms": [
+        {
+          "resource_type": "material",
+          "code": "A0001",
+          "description": "Điện năng",
+          "unit": "kWh",
+          "norm_quantity": "8.27",
+          "unit_price": "1685",
+          "line_total": "13935.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE78 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A0044",
+          "description": "Khay men",
+          "unit": "cái",
+          "norm_quantity": "0.005",
+          "unit_price": "20000",
+          "line_total": "100.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE78 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "material",
+          "code": "Z999",
+          "description": "Vật liệu khác",
+          "unit": "%",
+          "norm_quantity": "10",
+          "unit_price": "140.3495",
+          "line_total": "1403.5",
+          "pricing_rule": "PCT_MATERIAL_SUBTOTAL",
+          "provenance": "Công trình!AE78 (serialized recipe item 3)"
+        },
+        {
+          "resource_type": "labour",
+          "code": "N4",
+          "description": "Nhân công nhóm 4",
+          "unit": "công",
+          "norm_quantity": "0.131",
+          "unit_price": "380763",
+          "line_total": "49880.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AF78 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M202.0014",
+          "description": "Tủ sấy",
+          "unit": "ca",
+          "norm_quantity": "1",
+          "unit_price": "11348",
+          "line_total": "11348.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG78 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M202.0018",
+          "description": "Máy hút ẩm",
+          "unit": "ca",
+          "norm_quantity": "0.03",
+          "unit_price": "9287",
+          "line_total": "278.6",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG78 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M006",
+          "description": "Cân kỹ thuật",
+          "unit": "ca",
+          "norm_quantity": "0.001",
+          "unit_price": "6521",
+          "line_total": "6.5",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG78 (serialized recipe item 3)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M999",
+          "description": "Máy khác",
+          "unit": "%",
+          "norm_quantity": "5",
+          "unit_price": "116.33131",
+          "line_total": "581.7",
+          "pricing_rule": "PCT_MACHINE_SUBTOTAL",
+          "provenance": "Công trình!AG78 (serialized recipe item 4)"
+        }
+      ],
+      "tender_unit_price_evidence": "128432",
+      "used_by_pdf_rows": [
+        56,
+        75
+      ]
+    },
+    {
+      "scoped_id": "DC.02004@A80",
+      "code": "DC.02004",
+      "description": "Thí nghiệm cơ lý hóa của đất trong phòng thí nghiệm, chỉ tiêu thành phần hạt",
+      "unit": "1 chỉ tiêu",
+      "category": "laboratory",
+      "source_cells": {
+        "master_row": "Công trình!A80:AM80",
+        "source_specification": "Định mức 38/2026/TT-BXD - Phần TNVL",
+        "machine_price_basis": "GM38_2026",
+        "material_direct_cell": "Công trình!Q80",
+        "labour_direct_cell": "Công trình!S80",
+        "machine_direct_cell": "Công trình!T80",
+        "loaded_price_cell": null,
+        "loaded_price_formula": null
+      },
+      "direct_components": {
+        "material": "53791.0",
+        "other": "0",
+        "labour": "159920.5",
+        "machine": "14156.1"
+      },
+      "norms": [
+        {
+          "resource_type": "material",
+          "code": "A0001",
+          "description": "Điện năng",
+          "unit": "kWh",
+          "norm_quantity": "8.41",
+          "unit_price": "1685",
+          "line_total": "14170.9",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE80 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A0073",
+          "description": "Nhiệt kế",
+          "unit": "cái",
+          "norm_quantity": "0.005",
+          "unit_price": "70000",
+          "line_total": "350.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE80 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A0008",
+          "description": "Nước cất",
+          "unit": "lít",
+          "norm_quantity": "2",
+          "unit_price": "17000",
+          "line_total": "34000.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE80 (serialized recipe item 3)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A0044",
+          "description": "Khay men",
+          "unit": "cái",
+          "norm_quantity": "0.005",
+          "unit_price": "20000",
+          "line_total": "100.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE80 (serialized recipe item 4)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A0020",
+          "description": "Amoni hydroxit (NH4OH)",
+          "unit": "kg",
+          "norm_quantity": "0.1",
+          "unit_price": "2800",
+          "line_total": "280.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE80 (serialized recipe item 5)"
+        },
+        {
+          "resource_type": "material",
+          "code": "Z999",
+          "description": "Vật liệu khác",
+          "unit": "%",
+          "norm_quantity": "10",
+          "unit_price": "489.0085",
+          "line_total": "4890.1",
+          "pricing_rule": "PCT_MATERIAL_SUBTOTAL",
+          "provenance": "Công trình!AE80 (serialized recipe item 6)"
+        },
+        {
+          "resource_type": "labour",
+          "code": "N4",
+          "description": "Nhân công nhóm 4",
+          "unit": "công",
+          "norm_quantity": "0.42",
+          "unit_price": "380763",
+          "line_total": "159920.5",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AF80 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M202.0014",
+          "description": "Tủ sấy",
+          "unit": "ca",
+          "norm_quantity": "1",
+          "unit_price": "11348",
+          "line_total": "11348.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG80 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M202.0018",
+          "description": "Máy hút ẩm",
+          "unit": "ca",
+          "norm_quantity": "0.01",
+          "unit_price": "9287",
+          "line_total": "92.9",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG80 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M006",
+          "description": "Cân kỹ thuật",
+          "unit": "ca",
+          "norm_quantity": "0.313",
+          "unit_price": "6521",
+          "line_total": "2041.1",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG80 (serialized recipe item 3)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M999",
+          "description": "Máy khác",
+          "unit": "%",
+          "norm_quantity": "5",
+          "unit_price": "134.81943",
+          "line_total": "674.1",
+          "pricing_rule": "PCT_MACHINE_SUBTOTAL",
+          "provenance": "Công trình!AG80 (serialized recipe item 4)"
+        }
+      ],
+      "tender_unit_price_evidence": "387013",
+      "used_by_pdf_rows": [
+        57,
+        76
+      ]
+    },
+    {
+      "scoped_id": "DC.02003@A79",
+      "code": "DC.02003",
+      "description": "Thí nghiệm cơ lý hóa của đất trong phòng thí nghiệm, chỉ tiêu giới hạn dẻo, giới hạn chảy",
+      "unit": "1 chỉ tiêu",
+      "category": "laboratory",
+      "source_cells": {
+        "master_row": "Công trình!A79:AM79",
+        "source_specification": "Định mức 38/2026/TT-BXD - Phần TNVL",
+        "machine_price_basis": "GM38_2026",
+        "material_direct_cell": "Công trình!Q79",
+        "labour_direct_cell": "Công trình!S79",
+        "machine_direct_cell": "Công trình!T79",
+        "loaded_price_cell": null,
+        "loaded_price_formula": null
+      },
+      "direct_components": {
+        "material": "15494.1",
+        "other": "0",
+        "labour": "104709.8",
+        "machine": "13004.3"
+      },
+      "norms": [
+        {
+          "resource_type": "material",
+          "code": "A0001",
+          "description": "Điện năng",
+          "unit": "kWh",
+          "norm_quantity": "8.3",
+          "unit_price": "1685",
+          "line_total": "13985.5",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE79 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A0044",
+          "description": "Khay men",
+          "unit": "cái",
+          "norm_quantity": "0.005",
+          "unit_price": "20000",
+          "line_total": "100.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE79 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "material",
+          "code": "Z999",
+          "description": "Vật liệu khác",
+          "unit": "%",
+          "norm_quantity": "10",
+          "unit_price": "140.855",
+          "line_total": "1408.6",
+          "pricing_rule": "PCT_MATERIAL_SUBTOTAL",
+          "provenance": "Công trình!AE79 (serialized recipe item 3)"
+        },
+        {
+          "resource_type": "labour",
+          "code": "N4",
+          "description": "Nhân công nhóm 4",
+          "unit": "công",
+          "norm_quantity": "0.275",
+          "unit_price": "380763",
+          "line_total": "104709.8",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AF79 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M202.0014",
+          "description": "Tủ sấy",
+          "unit": "ca",
+          "norm_quantity": "1",
+          "unit_price": "11348",
+          "line_total": "11348.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG79 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M202.0018",
+          "description": "Máy hút ẩm",
+          "unit": "ca",
+          "norm_quantity": "0.03",
+          "unit_price": "9287",
+          "line_total": "278.6",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG79 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M006",
+          "description": "Cân kỹ thuật",
+          "unit": "ca",
+          "norm_quantity": "0.063",
+          "unit_price": "6521",
+          "line_total": "410.8",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG79 (serialized recipe item 3)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M202.0049",
+          "description": "Máy caragrang (làm thí nghiệm chảy)",
+          "unit": "ca",
+          "norm_quantity": "0.063",
+          "unit_price": "5518",
+          "line_total": "347.6",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG79 (serialized recipe item 4)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M999",
+          "description": "Máy khác",
+          "unit": "%",
+          "norm_quantity": "5",
+          "unit_price": "123.85067",
+          "line_total": "619.3",
+          "pricing_rule": "PCT_MACHINE_SUBTOTAL",
+          "provenance": "Công trình!AG79 (serialized recipe item 5)"
+        }
+      ],
+      "tender_unit_price_evidence": "234290",
+      "used_by_pdf_rows": [
+        58,
+        77
+      ]
+    },
+    {
+      "scoped_id": "DC.02006@A81",
+      "code": "DC.02006",
+      "description": "Thí nghiệm cơ lý hóa của đất trong phòng thí nghiệm, chỉ tiêu sức chống cắt trên máy cắt phẳng",
+      "unit": "1 chỉ tiêu",
+      "category": "laboratory",
+      "source_cells": {
+        "master_row": "Công trình!A81:AM81",
+        "source_specification": "Định mức 38/2026/TT-BXD - Phần TNVL",
+        "machine_price_basis": "GM38_2026",
+        "material_direct_cell": "Công trình!Q81",
+        "labour_direct_cell": "Công trình!S81",
+        "machine_direct_cell": "Công trình!T81",
+        "loaded_price_cell": "Chiết tính!H734",
+        "loaded_price_formula": "=ROUND(H724+H728+H729+H733,1)"
+      },
+      "direct_components": {
+        "material": "945.2",
+        "other": "0",
+        "labour": "38076.3",
+        "machine": "1795.7"
+      },
+      "norms": [
+        {
+          "resource_type": "material",
+          "code": "A0001",
+          "description": "Điện năng",
+          "unit": "kWh",
+          "norm_quantity": "0.05",
+          "unit_price": "1685",
+          "line_total": "84.3",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE81 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A0074",
+          "description": "Dao vòng",
+          "unit": "cái",
+          "norm_quantity": "0.015",
+          "unit_price": "45000",
+          "line_total": "675.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE81 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A0044",
+          "description": "Khay men",
+          "unit": "cái",
+          "norm_quantity": "0.005",
+          "unit_price": "20000",
+          "line_total": "100.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE81 (serialized recipe item 3)"
+        },
+        {
+          "resource_type": "material",
+          "code": "Z999",
+          "description": "Vật liệu khác",
+          "unit": "%",
+          "norm_quantity": "10",
+          "unit_price": "8.5925",
+          "line_total": "85.9",
+          "pricing_rule": "PCT_MATERIAL_SUBTOTAL",
+          "provenance": "Công trình!AE81 (serialized recipe item 4)"
+        },
+        {
+          "resource_type": "labour",
+          "code": "N4",
+          "description": "Nhân công nhóm 4",
+          "unit": "công",
+          "norm_quantity": "0.1",
+          "unit_price": "380763",
+          "line_total": "38076.3",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AF81 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M006",
+          "description": "Cân kỹ thuật",
+          "unit": "ca",
+          "norm_quantity": "0.063",
+          "unit_price": "6521",
+          "line_total": "410.8",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG81 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M202.0182",
+          "description": "Máy cắt phẳng",
+          "unit": "ca",
+          "norm_quantity": "0.063",
+          "unit_price": "20625",
+          "line_total": "1299.4",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG81 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M999",
+          "description": "Máy khác",
+          "unit": "%",
+          "norm_quantity": "5",
+          "unit_price": "17.10198",
+          "line_total": "85.5",
+          "pricing_rule": "PCT_MACHINE_SUBTOTAL",
+          "provenance": "Công trình!AG81 (serialized recipe item 3)"
+        }
+      ],
+      "tender_unit_price_evidence": "69169.9",
+      "used_by_pdf_rows": [
+        59,
+        78
+      ]
+    },
+    {
+      "scoped_id": "DC.02009@A82",
+      "code": "DC.02009",
+      "description": "Thí nghiệm cơ lý hóa của đất trong phòng thí nghiệm, chỉ tiêu khối thể tích (dung trọng)",
+      "unit": "1 chỉ tiêu",
+      "category": "laboratory",
+      "source_cells": {
+        "master_row": "Công trình!A82:AM82",
+        "source_specification": "Định mức 38/2026/TT-BXD - Phần TNVL",
+        "machine_price_basis": "GM38_2026",
+        "material_direct_cell": "Công trình!Q82",
+        "labour_direct_cell": "Công trình!S82",
+        "machine_direct_cell": "Công trình!T82",
+        "loaded_price_cell": "Chiết tính!H763",
+        "loaded_price_formula": "=ROUND(H753+H757+H758+H762,1)"
+      },
+      "direct_components": {
+        "material": "4542.2",
+        "other": "0",
+        "labour": "32364.9",
+        "machine": "4143.8"
+      },
+      "norms": [
+        {
+          "resource_type": "material",
+          "code": "A0001",
+          "description": "Điện năng",
+          "unit": "kWh",
+          "norm_quantity": "2.05",
+          "unit_price": "1685",
+          "line_total": "3454.3",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE82 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A0074",
+          "description": "Dao vòng",
+          "unit": "cái",
+          "norm_quantity": "0.015",
+          "unit_price": "45000",
+          "line_total": "675.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE82 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "material",
+          "code": "Z999",
+          "description": "Vật liệu khác",
+          "unit": "%",
+          "norm_quantity": "10",
+          "unit_price": "41.2925",
+          "line_total": "412.9",
+          "pricing_rule": "PCT_MATERIAL_SUBTOTAL",
+          "provenance": "Công trình!AE82 (serialized recipe item 3)"
+        },
+        {
+          "resource_type": "labour",
+          "code": "N4",
+          "description": "Nhân công nhóm 4",
+          "unit": "công",
+          "norm_quantity": "0.085",
+          "unit_price": "380763",
+          "line_total": "32364.9",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AF82 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M202.0014",
+          "description": "Tủ sấy",
+          "unit": "ca",
+          "norm_quantity": "0.25",
+          "unit_price": "11348",
+          "line_total": "2837.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG82 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M202.0012",
+          "description": "Cân thuỷ tĩnh",
+          "unit": "ca",
+          "norm_quantity": "0.25",
+          "unit_price": "4438",
+          "line_total": "1109.5",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG82 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M999",
+          "description": "Máy khác",
+          "unit": "%",
+          "norm_quantity": "5",
+          "unit_price": "39.465",
+          "line_total": "197.3",
+          "pricing_rule": "PCT_MACHINE_SUBTOTAL",
+          "provenance": "Công trình!AG82 (serialized recipe item 3)"
+        }
+      ],
+      "tender_unit_price_evidence": "65700.5",
+      "used_by_pdf_rows": [
+        60,
+        79
+      ]
+    },
+    {
+      "scoped_id": "DC.02007@A83",
+      "code": "DC.02007",
+      "description": "Thí nghiệm cơ lý hóa của đất trong phòng thí nghiệm, chỉ tiêu tính nén lún trong điều kiện không nở hông (nén nhanh)",
+      "unit": "1 chỉ tiêu",
+      "category": "laboratory",
+      "source_cells": {
+        "master_row": "Công trình!A83:AM83",
+        "source_specification": "Định mức 38/2026/TT-BXD - Phần TNVL",
+        "machine_price_basis": "GM38_2026",
+        "material_direct_cell": "Công trình!Q83",
+        "labour_direct_cell": "Công trình!S83",
+        "machine_direct_cell": "Công trình!T83",
+        "loaded_price_cell": "Chiết tính!H792",
+        "loaded_price_formula": "=ROUND(H782+H786+H787+H791,1)"
+      },
+      "direct_components": {
+        "material": "4558.4",
+        "other": "0",
+        "labour": "361724.9",
+        "machine": "48320.8"
+      },
+      "norms": [
+        {
+          "resource_type": "material",
+          "code": "A0001",
+          "description": "Điện năng",
+          "unit": "kWh",
+          "norm_quantity": "2.4",
+          "unit_price": "1685",
+          "line_total": "4044.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE83 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A0044",
+          "description": "Khay men",
+          "unit": "cái",
+          "norm_quantity": "0.005",
+          "unit_price": "20000",
+          "line_total": "100.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE83 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "material",
+          "code": "Z999",
+          "description": "Vật liệu khác",
+          "unit": "%",
+          "norm_quantity": "10",
+          "unit_price": "41.44",
+          "line_total": "414.4",
+          "pricing_rule": "PCT_MATERIAL_SUBTOTAL",
+          "provenance": "Công trình!AE83 (serialized recipe item 3)"
+        },
+        {
+          "resource_type": "labour",
+          "code": "N4",
+          "description": "Nhân công nhóm 4",
+          "unit": "công",
+          "norm_quantity": "0.95",
+          "unit_price": "380763",
+          "line_total": "361724.9",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AF83 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M006",
+          "description": "Cân kỹ thuật",
+          "unit": "ca",
+          "norm_quantity": "0.063",
+          "unit_price": "6521",
+          "line_total": "410.8",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG83 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M202.0036",
+          "description": "Máy nén một trục",
+          "unit": "ca",
+          "norm_quantity": "3",
+          "unit_price": "15203",
+          "line_total": "45609.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG83 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M999",
+          "description": "Máy khác",
+          "unit": "%",
+          "norm_quantity": "5",
+          "unit_price": "460.19823",
+          "line_total": "2301.0",
+          "pricing_rule": "PCT_MACHINE_SUBTOTAL",
+          "provenance": "Công trình!AG83 (serialized recipe item 3)"
+        }
+      ],
+      "tender_unit_price_evidence": "171569.0",
+      "used_by_pdf_rows": [
+        61,
+        80
+      ]
+    },
+    {
+      "scoped_id": "DC.02008@A92",
+      "code": "DC.02008",
+      "description": "Thí nghiệm cơ lý hóa của đất trong phòng thí nghiệm, chỉ tiêu độ chặt tiêu chuẩn",
+      "unit": "1 chỉ tiêu",
+      "category": "laboratory",
+      "source_cells": {
+        "master_row": "Công trình!A92:AM92",
+        "source_specification": "Định mức 38/2026/TT-BXD - Phần TNVL",
+        "machine_price_basis": "GM38_2026",
+        "material_direct_cell": "Công trình!Q92",
+        "labour_direct_cell": "Công trình!S92",
+        "machine_direct_cell": "Công trình!T92",
+        "loaded_price_cell": "Chiết tính!H1024",
+        "loaded_price_formula": "=ROUND(H1014+H1018+H1019+H1023,1)"
+      },
+      "direct_components": {
+        "material": "29862.8",
+        "other": "0",
+        "labour": "571144.5",
+        "machine": "16298.1"
+      },
+      "norms": [
+        {
+          "resource_type": "material",
+          "code": "A0001",
+          "description": "Điện năng",
+          "unit": "kWh",
+          "norm_quantity": "11.07",
+          "unit_price": "1685",
+          "line_total": "18653.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE92 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A0073",
+          "description": "Nhiệt kế",
+          "unit": "cái",
+          "norm_quantity": "0.03",
+          "unit_price": "70000",
+          "line_total": "2100.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE92 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A0074",
+          "description": "Dao vòng",
+          "unit": "cái",
+          "norm_quantity": "0.031",
+          "unit_price": "45000",
+          "line_total": "1395.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE92 (serialized recipe item 3)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A0044",
+          "description": "Khay men",
+          "unit": "cái",
+          "norm_quantity": "0.25",
+          "unit_price": "20000",
+          "line_total": "5000.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE92 (serialized recipe item 4)"
+        },
+        {
+          "resource_type": "material",
+          "code": "Z999",
+          "description": "Vật liệu khác",
+          "unit": "%",
+          "norm_quantity": "10",
+          "unit_price": "271.4795",
+          "line_total": "2714.8",
+          "pricing_rule": "PCT_MATERIAL_SUBTOTAL",
+          "provenance": "Công trình!AE92 (serialized recipe item 5)"
+        },
+        {
+          "resource_type": "labour",
+          "code": "N4",
+          "description": "Nhân công nhóm 4",
+          "unit": "công",
+          "norm_quantity": "1.5",
+          "unit_price": "380763",
+          "line_total": "571144.5",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AF92 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M202.0014",
+          "description": "Tủ sấy",
+          "unit": "ca",
+          "norm_quantity": "1.35",
+          "unit_price": "11348",
+          "line_total": "15319.8",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG92 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M006",
+          "description": "Cân kỹ thuật",
+          "unit": "ca",
+          "norm_quantity": "0.031",
+          "unit_price": "6521",
+          "line_total": "202.2",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG92 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M999",
+          "description": "Máy khác",
+          "unit": "%",
+          "norm_quantity": "5",
+          "unit_price": "155.21951",
+          "line_total": "776.1",
+          "pricing_rule": "PCT_MACHINE_SUBTOTAL",
+          "provenance": "Công trình!AG92 (serialized recipe item 3)"
+        }
+      ],
+      "tender_unit_price_evidence": "1058295.3",
+      "used_by_pdf_rows": [
+        62,
+        81
+      ]
+    },
+    {
+      "scoped_id": "DC.02010@A90",
+      "code": "DC.02010",
+      "description": "Thí nghiệm cơ lý hóa của đất trong phòng thí nghiệm, chỉ tiêu xác định góc nghỉ tự nhiên của đất rời (khô, ướt)",
+      "unit": "1 chỉ tiêu",
+      "category": "laboratory",
+      "source_cells": {
+        "master_row": "Công trình!A90:AM90",
+        "source_specification": "Định mức 38/2026/TT-BXD - Phần TNVL",
+        "machine_price_basis": "GM38_2026",
+        "material_direct_cell": "Công trình!Q90",
+        "labour_direct_cell": "Công trình!S90",
+        "machine_direct_cell": "Công trình!T90",
+        "loaded_price_cell": "Chiết tính!H970",
+        "loaded_price_formula": "=ROUND(H960+H964+H965+H969,1)"
+      },
+      "direct_components": {
+        "material": "0",
+        "other": "0",
+        "labour": "95190.8",
+        "machine": "162.5"
+      },
+      "norms": [
+        {
+          "resource_type": "labour",
+          "code": "N4",
+          "description": "Nhân công nhóm 4",
+          "unit": "công",
+          "norm_quantity": "0.25",
+          "unit_price": "380763",
+          "line_total": "95190.8",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AF90 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M202.0201",
+          "description": "Thiết bị đo góc nghỉ tự nhiên của đất rời",
+          "unit": "ca",
+          "norm_quantity": "0.125",
+          "unit_price": "1238",
+          "line_total": "154.8",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG90 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M999",
+          "description": "Máy khác",
+          "unit": "%",
+          "norm_quantity": "5",
+          "unit_price": "1.5475",
+          "line_total": "7.7",
+          "pricing_rule": "PCT_MACHINE_SUBTOTAL",
+          "provenance": "Công trình!AG90 (serialized recipe item 2)"
+        }
+      ],
+      "tender_unit_price_evidence": "165656.3",
+      "used_by_pdf_rows": [
+        63,
+        82
+      ]
+    },
+    {
+      "scoped_id": "DC.02007@A84",
+      "code": "DC.02007",
+      "description": "Thí nghiệm cơ lý hóa của đất trong phòng thí nghiệm, chỉ tiêu tính nén lún trong điều kiện không nở hông (Nén cố kết)",
+      "unit": "1 chỉ tiêu",
+      "category": "laboratory",
+      "source_cells": {
+        "master_row": "Công trình!A84:AM84",
+        "source_specification": "Định mức 38/2026/TT-BXD - Phần TNVL",
+        "machine_price_basis": "GM38_2026",
+        "material_direct_cell": "Công trình!Q84",
+        "labour_direct_cell": "Công trình!S84",
+        "machine_direct_cell": "Công trình!T84",
+        "loaded_price_cell": "Chiết tính!H821",
+        "loaded_price_formula": "=ROUND(H811+H815+H816+H820,1)"
+      },
+      "direct_components": {
+        "material": "4558.4",
+        "other": "0",
+        "labour": "361724.9",
+        "machine": "48320.8"
+      },
+      "norms": [
+        {
+          "resource_type": "material",
+          "code": "A0001",
+          "description": "Điện năng",
+          "unit": "kWh",
+          "norm_quantity": "2.4",
+          "unit_price": "1685",
+          "line_total": "4044.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE84 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A0044",
+          "description": "Khay men",
+          "unit": "cái",
+          "norm_quantity": "0.005",
+          "unit_price": "20000",
+          "line_total": "100.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE84 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "material",
+          "code": "Z999",
+          "description": "Vật liệu khác",
+          "unit": "%",
+          "norm_quantity": "10",
+          "unit_price": "41.44",
+          "line_total": "414.4",
+          "pricing_rule": "PCT_MATERIAL_SUBTOTAL",
+          "provenance": "Công trình!AE84 (serialized recipe item 3)"
+        },
+        {
+          "resource_type": "labour",
+          "code": "N4",
+          "description": "Nhân công nhóm 4",
+          "unit": "công",
+          "norm_quantity": "0.95",
+          "unit_price": "380763",
+          "line_total": "361724.9",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AF84 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M006",
+          "description": "Cân kỹ thuật",
+          "unit": "ca",
+          "norm_quantity": "0.063",
+          "unit_price": "6521",
+          "line_total": "410.8",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG84 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M202.0036",
+          "description": "Máy nén một trục",
+          "unit": "ca",
+          "norm_quantity": "3",
+          "unit_price": "15203",
+          "line_total": "45609.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG84 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M999",
+          "description": "Máy khác",
+          "unit": "%",
+          "norm_quantity": "5",
+          "unit_price": "460.19823",
+          "line_total": "2301.0",
+          "pricing_rule": "PCT_MACHINE_SUBTOTAL",
+          "provenance": "Công trình!AG84 (serialized recipe item 3)"
+        }
+      ],
+      "tender_unit_price_evidence": "686275.7",
+      "used_by_pdf_rows": [
+        64,
+        83
+      ]
+    },
+    {
+      "scoped_id": "DC.02013@A96",
+      "code": "DC.02013",
+      "description": "Thí nghiệm cơ lý hóa của đất trong phòng thí nghiệm, xác định sức chống cắt của đất bằng máy nén 3 trục theo sơ đồ CU",
+      "unit": "1 chỉ tiêu",
+      "category": "laboratory",
+      "source_cells": {
+        "master_row": "Công trình!A96:AM96",
+        "source_specification": "Định mức 38/2026/TT-BXD - Phần TNVL",
+        "machine_price_basis": "GM38_2026",
+        "material_direct_cell": "Công trình!Q96",
+        "labour_direct_cell": "Công trình!S96",
+        "machine_direct_cell": "Công trình!T96",
+        "loaded_price_cell": "Chiết tính!H1117",
+        "loaded_price_formula": "=ROUND(H1107+H1111+H1112+H1116,1)"
+      },
+      "direct_components": {
+        "material": "44689.2",
+        "other": "0",
+        "labour": "6663352.5",
+        "machine": "1395425.8"
+      },
+      "norms": [
+        {
+          "resource_type": "material",
+          "code": "A0001",
+          "description": "Điện năng",
+          "unit": "kWh",
+          "norm_quantity": "22.9",
+          "unit_price": "1685",
+          "line_total": "38586.5",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE96 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A0076",
+          "description": "Ống lấy mẫu",
+          "unit": "cái",
+          "norm_quantity": "0.08",
+          "unit_price": "15000",
+          "line_total": "1200.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE96 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A0044",
+          "description": "Khay men",
+          "unit": "cái",
+          "norm_quantity": "0.02",
+          "unit_price": "20000",
+          "line_total": "400.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE96 (serialized recipe item 3)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A0081",
+          "description": "Cốc thủy tinh cao 25mm, đường kính 50mm",
+          "unit": "cái",
+          "norm_quantity": "0.04",
+          "unit_price": "3000",
+          "line_total": "120.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE96 (serialized recipe item 4)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A0078",
+          "description": "Phễu thủy tinh",
+          "unit": "cái",
+          "norm_quantity": "0.04",
+          "unit_price": "8000",
+          "line_total": "320.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE96 (serialized recipe item 5)"
+        },
+        {
+          "resource_type": "material",
+          "code": "Z999",
+          "description": "Vật liệu khác",
+          "unit": "%",
+          "norm_quantity": "10",
+          "unit_price": "406.265",
+          "line_total": "4062.7",
+          "pricing_rule": "PCT_MATERIAL_SUBTOTAL",
+          "provenance": "Công trình!AE96 (serialized recipe item 6)"
+        },
+        {
+          "resource_type": "labour",
+          "code": "N4",
+          "description": "Nhân công nhóm 4",
+          "unit": "công",
+          "norm_quantity": "17.5",
+          "unit_price": "380763",
+          "line_total": "6663352.5",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AF96 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M202.0010",
+          "description": "Cân phân tích",
+          "unit": "ca",
+          "norm_quantity": "8",
+          "unit_price": "10054",
+          "line_total": "80432.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG96 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M202.0021",
+          "description": "Máy chưng cất nước",
+          "unit": "ca",
+          "norm_quantity": "4.57",
+          "unit_price": "6621",
+          "line_total": "30258.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG96 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M202.0029",
+          "description": "Máy nén 3 trục",
+          "unit": "ca",
+          "norm_quantity": "2.14",
+          "unit_price": "569293",
+          "line_total": "1218287.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG96 (serialized recipe item 3)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M999",
+          "description": "Máy khác",
+          "unit": "%",
+          "norm_quantity": "5",
+          "unit_price": "13289.7699",
+          "line_total": "66448.8",
+          "pricing_rule": "PCT_MACHINE_SUBTOTAL",
+          "provenance": "Công trình!AG96 (serialized recipe item 4)"
+        }
+      ],
+      "tender_unit_price_evidence": "13340670.5",
+      "used_by_pdf_rows": [
+        65,
+        85
+      ]
+    },
+    {
+      "scoped_id": "NC.4/7@A73",
+      "code": "NC.4/7",
+      "description": "Quan trắc mực nước ngầm",
+      "unit": "công",
+      "category": "geotechnical_drilling",
+      "source_cells": {
+        "master_row": "Công trình!A73:AM73",
+        "source_specification": null,
+        "machine_price_basis": null,
+        "material_direct_cell": "Công trình!Q73",
+        "labour_direct_cell": "Công trình!S73",
+        "machine_direct_cell": "Công trình!T73",
+        "loaded_price_cell": "Chiết tính!H575",
+        "loaded_price_formula": "=ROUND(H565+H569+H570+H574,1)"
+      },
+      "direct_components": {
+        "material": "0",
+        "other": "0",
+        "labour": "356526.0",
+        "machine": "0"
+      },
+      "norms": [],
+      "tender_unit_price_evidence": "628854.8",
+      "used_by_pdf_rows": [
+        66,
+        91
+      ]
+    },
+    {
+      "scoped_id": "CC.21310@A66",
+      "code": "CC.21310",
+      "description": "Khoan xoay bơm rửa để lấy mẫu ở trên cạn. Độ sâu hố khoan từ 0m đến 100m. Cấp đất đá I -III",
+      "unit": "m khoan",
+      "category": "geotechnical_drilling",
+      "source_cells": {
+        "master_row": "Công trình!A66:AM66",
+        "source_specification": "Định mức 38/2026/TT-BXD - Phần KS",
+        "machine_price_basis": "GM38_2026",
+        "material_direct_cell": "Công trình!Q66",
+        "labour_direct_cell": "Công trình!S66",
+        "machine_direct_cell": "Công trình!T66",
+        "loaded_price_cell": "Chiết tính!H415",
+        "loaded_price_formula": "=ROUND(H405+H409+H410+H414,1)"
+      },
+      "direct_components": {
+        "material": "38703.5",
+        "other": "0",
+        "labour": "723747.8",
+        "machine": "8182.6"
+      },
+      "norms": [
+        {
+          "resource_type": "material",
+          "code": "A28.0254",
+          "description": "Mũi khoan hợp kim",
+          "unit": "cái",
+          "norm_quantity": "0.056",
+          "unit_price": "150000",
+          "line_total": "8400.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE66 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0097",
+          "description": "Cần khoan",
+          "unit": "m",
+          "norm_quantity": "0.017",
+          "unit_price": "60000",
+          "line_total": "1020.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE66 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0022",
+          "description": "Đầu nối cần",
+          "unit": "bộ",
+          "norm_quantity": "0.0055",
+          "unit_price": "150000",
+          "line_total": "825.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE66 (serialized recipe item 3)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0172",
+          "description": "Ống chống",
+          "unit": "m",
+          "norm_quantity": "0.03",
+          "unit_price": "20000",
+          "line_total": "600.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE66 (serialized recipe item 4)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0023",
+          "description": "Đầu nối ống chống",
+          "unit": "cái",
+          "norm_quantity": "0.01",
+          "unit_price": "40000",
+          "line_total": "400.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE66 (serialized recipe item 5)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0177",
+          "description": "Ống mẫu đơn",
+          "unit": "m",
+          "norm_quantity": "0.04",
+          "unit_price": "45000",
+          "line_total": "1800.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE66 (serialized recipe item 6)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0178",
+          "description": "Ống mẫu kép",
+          "unit": "cái",
+          "norm_quantity": "0.002",
+          "unit_price": "70000",
+          "line_total": "140.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE66 (serialized recipe item 7)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0216",
+          "description": "Hộp nhựa đựng mẫu",
+          "unit": "cái",
+          "norm_quantity": "0.4",
+          "unit_price": "20000",
+          "line_total": "8000.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE66 (serialized recipe item 8)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A28.0192",
+          "description": "Gỗ nhóm V",
+          "unit": "m3",
+          "norm_quantity": "0.0035",
+          "unit_price": "4000000",
+          "line_total": "14000.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE66 (serialized recipe item 9)"
+        },
+        {
+          "resource_type": "material",
+          "code": "Z999",
+          "description": "Vật liệu khác",
+          "unit": "%",
+          "norm_quantity": "10",
+          "unit_price": "351.85",
+          "line_total": "3518.5",
+          "pricing_rule": "PCT_MATERIAL_SUBTOTAL",
+          "provenance": "Công trình!AE66 (serialized recipe item 10)"
+        },
+        {
+          "resource_type": "labour",
+          "code": "N3",
+          "description": "Nhân công nhóm 3",
+          "unit": "công",
+          "norm_quantity": "2.03",
+          "unit_price": "356526",
+          "line_total": "723747.8",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AF66 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M201.0002",
+          "description": "Máy khoan XY - 1A",
+          "unit": "ca",
+          "norm_quantity": "0.1",
+          "unit_price": "80222",
+          "line_total": "8022.2",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG66 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M999",
+          "description": "Máy khác",
+          "unit": "%",
+          "norm_quantity": "2",
+          "unit_price": "80.222",
+          "line_total": "160.4",
+          "pricing_rule": "PCT_MACHINE_SUBTOTAL",
+          "provenance": "Công trình!AG66 (serialized recipe item 2)"
+        }
+      ],
+      "tender_unit_price_evidence": "1260527.1",
+      "used_by_pdf_rows": [
+        68
+      ]
+    },
+    {
+      "scoped_id": "DC.02011@A85",
+      "code": "DC.02011",
+      "description": "Thí nghiệm cơ lý hóa của đất trong phòng thí nghiệm, chỉ tiêu thí nghiệm nén 1 trục trong điều kiện có nở hông (Qu)",
+      "unit": "1 chỉ tiêu",
+      "category": "laboratory",
+      "source_cells": {
+        "master_row": "Công trình!A85:AM85",
+        "source_specification": "Định mức 38/2026/TT-BXD - Phần TNVL",
+        "machine_price_basis": "GM38_2026",
+        "material_direct_cell": "Công trình!Q85",
+        "labour_direct_cell": "Công trình!S85",
+        "machine_direct_cell": "Công trình!T85",
+        "loaded_price_cell": "Chiết tính!H850",
+        "loaded_price_formula": "=ROUND(H840+H844+H845+H849,1)"
+      },
+      "direct_components": {
+        "material": "5778.1",
+        "other": "0",
+        "labour": "434069.8",
+        "machine": "57994.5"
+      },
+      "norms": [
+        {
+          "resource_type": "material",
+          "code": "A0001",
+          "description": "Điện năng",
+          "unit": "kWh",
+          "norm_quantity": "2.88",
+          "unit_price": "1685",
+          "line_total": "4852.8",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE85 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A0044",
+          "description": "Khay men",
+          "unit": "cái",
+          "norm_quantity": "0.02",
+          "unit_price": "20000",
+          "line_total": "400.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE85 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "material",
+          "code": "Z999",
+          "description": "Vật liệu khác",
+          "unit": "%",
+          "norm_quantity": "10",
+          "unit_price": "52.528",
+          "line_total": "525.3",
+          "pricing_rule": "PCT_MATERIAL_SUBTOTAL",
+          "provenance": "Công trình!AE85 (serialized recipe item 3)"
+        },
+        {
+          "resource_type": "labour",
+          "code": "N4",
+          "description": "Nhân công nhóm 4",
+          "unit": "công",
+          "norm_quantity": "1.14",
+          "unit_price": "380763",
+          "line_total": "434069.8",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AF85 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M202.0036",
+          "description": "Máy nén một trục",
+          "unit": "ca",
+          "norm_quantity": "3.6",
+          "unit_price": "15203",
+          "line_total": "54730.8",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG85 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M006",
+          "description": "Cân kỹ thuật",
+          "unit": "ca",
+          "norm_quantity": "0.077",
+          "unit_price": "6521",
+          "line_total": "502.1",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG85 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M999",
+          "description": "Máy khác",
+          "unit": "%",
+          "norm_quantity": "5",
+          "unit_price": "552.32917",
+          "line_total": "2761.6",
+          "pricing_rule": "PCT_MACHINE_SUBTOTAL",
+          "provenance": "Công trình!AG85 (serialized recipe item 3)"
+        }
+      ],
+      "tender_unit_price_evidence": "823875.9",
+      "used_by_pdf_rows": [
+        84
+      ]
+    },
+    {
+      "scoped_id": "DC.01001@A100",
+      "code": "DC.01001",
+      "description": "Thí nghiệm phân tích nước, chỉ tiêu độ pH",
+      "unit": "1 chỉ tiêu",
+      "category": "laboratory",
+      "source_cells": {
+        "master_row": "Công trình!A100:AM100",
+        "source_specification": "Định mức 38/2026/TT-BXD - Phần TNVL",
+        "machine_price_basis": "GM38_2026",
+        "material_direct_cell": "Công trình!Q100",
+        "labour_direct_cell": "Công trình!S100",
+        "machine_direct_cell": "Công trình!T100",
+        "loaded_price_cell": null,
+        "loaded_price_formula": null
+      },
+      "direct_components": {
+        "material": "5543.7",
+        "other": "0",
+        "labour": "89098.5",
+        "machine": "1066.6"
+      },
+      "norms": [
+        {
+          "resource_type": "material",
+          "code": "A0001",
+          "description": "Điện năng",
+          "unit": "kWh",
+          "norm_quantity": "1",
+          "unit_price": "1685",
+          "line_total": "1685.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE100 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A0008",
+          "description": "Nước cất",
+          "unit": "lít",
+          "norm_quantity": "0.1",
+          "unit_price": "17000",
+          "line_total": "1700.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE100 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A0009",
+          "description": "Giấy lọc",
+          "unit": "hộp",
+          "norm_quantity": "0.1",
+          "unit_price": "15000",
+          "line_total": "1500.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE100 (serialized recipe item 3)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A0151",
+          "description": "Dung dịch chuẩn pH 4.0",
+          "unit": "lít",
+          "norm_quantity": "0.05",
+          "unit_price": "3000",
+          "line_total": "150.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE100 (serialized recipe item 4)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A0152",
+          "description": "Dung dịch chuẩn pH 7.0",
+          "unit": "lít",
+          "norm_quantity": "0.05",
+          "unit_price": "3500",
+          "line_total": "175.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE100 (serialized recipe item 5)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A0153",
+          "description": "Dung dịch chuẩn pH 10.0",
+          "unit": "lít",
+          "norm_quantity": "0.05",
+          "unit_price": "4500",
+          "line_total": "225.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE100 (serialized recipe item 6)"
+        },
+        {
+          "resource_type": "material",
+          "code": "Z999",
+          "description": "Vật liệu khác",
+          "unit": "%",
+          "norm_quantity": "2",
+          "unit_price": "54.35",
+          "line_total": "108.7",
+          "pricing_rule": "PCT_MATERIAL_SUBTOTAL",
+          "provenance": "Công trình!AE100 (serialized recipe item 7)"
+        },
+        {
+          "resource_type": "labour",
+          "code": "N4",
+          "description": "Nhân công nhóm 4",
+          "unit": "công",
+          "norm_quantity": "0.234",
+          "unit_price": "380763",
+          "line_total": "89098.5",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AF100 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M202.0051",
+          "description": "Máy đo PH",
+          "unit": "ca",
+          "norm_quantity": "0.125",
+          "unit_price": "8126",
+          "line_total": "1015.8",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG100 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M999",
+          "description": "Máy khác",
+          "unit": "%",
+          "norm_quantity": "5",
+          "unit_price": "10.1575",
+          "line_total": "50.8",
+          "pricing_rule": "PCT_MACHINE_SUBTOTAL",
+          "provenance": "Công trình!AG100 (serialized recipe item 2)"
+        }
+      ],
+      "tender_unit_price_evidence": "178278",
+      "used_by_pdf_rows": [
+        86
+      ]
+    },
+    {
+      "scoped_id": "DC.01003@A102",
+      "code": "DC.01003",
+      "description": "Thí nghiệm phân tích nước, chỉ tiêu hàm lượng SO4-2",
+      "unit": "1 chỉ tiêu",
+      "category": "laboratory",
+      "source_cells": {
+        "master_row": "Công trình!A102:AM102",
+        "source_specification": "Định mức 38/2026/TT-BXD - Phần TNVL",
+        "machine_price_basis": "GM38_2026",
+        "material_direct_cell": "Công trình!Q102",
+        "labour_direct_cell": "Công trình!S102",
+        "machine_direct_cell": "Công trình!T102",
+        "loaded_price_cell": null,
+        "loaded_price_formula": null
+      },
+      "direct_components": {
+        "material": "33141.4",
+        "other": "0",
+        "labour": "271484.0",
+        "machine": "21913.2"
+      },
+      "norms": [
+        {
+          "resource_type": "material",
+          "code": "A0001",
+          "description": "Điện năng",
+          "unit": "kWh",
+          "norm_quantity": "7.64",
+          "unit_price": "1685",
+          "line_total": "12873.4",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE102 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A0008",
+          "description": "Nước cất",
+          "unit": "lít",
+          "norm_quantity": "1",
+          "unit_price": "17000",
+          "line_total": "17000.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE102 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A0009",
+          "description": "Giấy lọc",
+          "unit": "hộp",
+          "norm_quantity": "0.1",
+          "unit_price": "15000",
+          "line_total": "1500.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE102 (serialized recipe item 3)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A0010",
+          "description": "Axít Clohydric (HCL)",
+          "unit": "lít",
+          "norm_quantity": "0.1",
+          "unit_price": "2500",
+          "line_total": "250.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE102 (serialized recipe item 4)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A0136",
+          "description": "Bari clorua (BaCl2)",
+          "unit": "kg",
+          "norm_quantity": "0.03",
+          "unit_price": "25000",
+          "line_total": "750.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE102 (serialized recipe item 5)"
+        },
+        {
+          "resource_type": "material",
+          "code": "A0029",
+          "description": "Bạc Nitrat (AgNO3)",
+          "unit": "gam",
+          "norm_quantity": "0.01",
+          "unit_price": "11818",
+          "line_total": "118.2",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AE102 (serialized recipe item 6)"
+        },
+        {
+          "resource_type": "material",
+          "code": "Z999",
+          "description": "Vật liệu khác",
+          "unit": "%",
+          "norm_quantity": "2",
+          "unit_price": "324.9158",
+          "line_total": "649.8",
+          "pricing_rule": "PCT_MATERIAL_SUBTOTAL",
+          "provenance": "Công trình!AE102 (serialized recipe item 7)"
+        },
+        {
+          "resource_type": "labour",
+          "code": "N4",
+          "description": "Nhân công nhóm 4",
+          "unit": "công",
+          "norm_quantity": "0.713",
+          "unit_price": "380763",
+          "line_total": "271484.0",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AF102 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M202.0019",
+          "description": "Bếp điện",
+          "unit": "ca",
+          "norm_quantity": "0.031",
+          "unit_price": "2168",
+          "line_total": "67.2",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG102 (serialized recipe item 1)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M202.0010",
+          "description": "Cân phân tích",
+          "unit": "ca",
+          "norm_quantity": "0.031",
+          "unit_price": "10054",
+          "line_total": "311.7",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG102 (serialized recipe item 2)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M202.0014",
+          "description": "Tủ sấy",
+          "unit": "ca",
+          "norm_quantity": "0.031",
+          "unit_price": "11348",
+          "line_total": "351.8",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG102 (serialized recipe item 3)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M202.0018",
+          "description": "Máy hút ẩm",
+          "unit": "ca",
+          "norm_quantity": "0.5",
+          "unit_price": "9287",
+          "line_total": "4643.5",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG102 (serialized recipe item 4)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M202.0013",
+          "description": "Lò nung",
+          "unit": "ca",
+          "norm_quantity": "0.5",
+          "unit_price": "12795",
+          "line_total": "6397.5",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG102 (serialized recipe item 5)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M202.0086",
+          "description": "Kẹp niken",
+          "unit": "ca",
+          "norm_quantity": "0.5",
+          "unit_price": "7155",
+          "line_total": "3577.5",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG102 (serialized recipe item 6)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M202.0015",
+          "description": "Tủ hút khí độc",
+          "unit": "ca",
+          "norm_quantity": "0.5",
+          "unit_price": "11041",
+          "line_total": "5520.5",
+          "pricing_rule": "PRICE_BOOK",
+          "provenance": "Công trình!AG102 (serialized recipe item 7)"
+        },
+        {
+          "resource_type": "machine",
+          "code": "M999",
+          "description": "Máy khác",
+          "unit": "%",
+          "norm_quantity": "5",
+          "unit_price": "208.6967",
+          "line_total": "1043.5",
+          "pricing_rule": "PCT_MACHINE_SUBTOTAL",
+          "provenance": "Công trình!AG102 (serialized recipe item 8)"
+        }
+      ],
+      "tender_unit_price_evidence": "584941",
+      "used_by_pdf_rows": [
+        87
+      ]
+    },
+    {
+      "scoped_id": "KS 3/8@A109",
+      "code": "KS 3/8",
+      "description": "Khảo sát bãi thải, trạm trộn BTN, BTXM (KS 3/8)",
+      "unit": "công",
+      "category": "topography",
+      "source_cells": {
+        "master_row": "Công trình!A109:AM109",
+        "source_specification": null,
+        "machine_price_basis": null,
+        "material_direct_cell": "Công trình!Q109",
+        "labour_direct_cell": "Công trình!S109",
+        "machine_direct_cell": "Công trình!T109",
+        "loaded_price_cell": "Chiết tính!H1420",
+        "loaded_price_formula": "=ROUND(H1410+H1414+H1415+H1419,1)"
+      },
+      "direct_components": {
+        "material": "0",
+        "other": "0",
+        "labour": "260280.0",
+        "machine": "0"
+      },
+      "norms": [],
+      "tender_unit_price_evidence": "461961.5",
+      "used_by_pdf_rows": [
+        93
+      ]
+    },
+    {
+      "scoped_id": "Oto12T@A110",
+      "code": "Oto12T",
+      "description": "Ca xe phục vụ điều tra",
+      "unit": "ca",
+      "category": "topography",
+      "source_cells": {
+        "master_row": "Công trình!A110:AM110",
+        "source_specification": null,
+        "machine_price_basis": null,
+        "material_direct_cell": "Công trình!Q110",
+        "labour_direct_cell": "Công trình!S110",
+        "machine_direct_cell": "Công trình!T110",
+        "loaded_price_cell": "Chiết tính!H1439",
+        "loaded_price_formula": "=ROUND(H1429+H1433+H1434+H1438,1)"
+      },
+      "direct_components": {
+        "material": "0",
+        "other": "0",
+        "labour": "0",
+        "machine": "1668960.0"
+      },
+      "norms": [],
+      "tender_unit_price_evidence": "1858260.1",
+      "used_by_pdf_rows": [
+        94
+      ]
+    }
+  ],
+  "resource_price_conflicts": [
+    {
+      "resource_code": "Z999",
+      "distinct_unit_prices": [
+        {
+          "unit": "%",
+          "unit_price": "1066.9"
+        },
+        {
+          "unit": "%",
+          "unit_price": "137.76"
+        },
+        {
+          "unit": "%",
+          "unit_price": "140.3495"
+        },
+        {
+          "unit": "%",
+          "unit_price": "140.855"
+        },
+        {
+          "unit": "%",
+          "unit_price": "144.146"
+        },
+        {
+          "unit": "%",
+          "unit_price": "176.726"
+        },
+        {
+          "unit": "%",
+          "unit_price": "191.717"
+        },
+        {
+          "unit": "%",
+          "unit_price": "22.7275"
+        },
+        {
+          "unit": "%",
+          "unit_price": "229.762"
+        },
+        {
+          "unit": "%",
+          "unit_price": "262.2856"
+        },
+        {
+          "unit": "%",
+          "unit_price": "271.4795"
+        },
+        {
+          "unit": "%",
+          "unit_price": "298.779"
+        },
+        {
+          "unit": "%",
+          "unit_price": "2981.81"
+        },
+        {
+          "unit": "%",
+          "unit_price": "314.928"
+        },
+        {
+          "unit": "%",
+          "unit_price": "324.9158"
+        },
+        {
+          "unit": "%",
+          "unit_price": "351.85"
+        },
+        {
+          "unit": "%",
+          "unit_price": "370.9"
+        },
+        {
+          "unit": "%",
+          "unit_price": "388.864"
+        },
+        {
+          "unit": "%",
+          "unit_price": "393.4284"
+        },
+        {
+          "unit": "%",
+          "unit_price": "406.265"
+        },
+        {
+          "unit": "%",
+          "unit_price": "41.2925"
+        },
+        {
+          "unit": "%",
+          "unit_price": "41.44"
+        },
+        {
+          "unit": "%",
+          "unit_price": "458.9998"
+        },
+        {
+          "unit": "%",
+          "unit_price": "489.0085"
+        },
+        {
+          "unit": "%",
+          "unit_price": "52.528"
+        },
+        {
+          "unit": "%",
+          "unit_price": "54.35"
+        },
+        {
+          "unit": "%",
+          "unit_price": "60.8"
+        },
+        {
+          "unit": "%",
+          "unit_price": "747.265"
+        },
+        {
+          "unit": "%",
+          "unit_price": "8.5925"
+        }
+      ],
+      "rule": "Keep source/work-item scoped; do not collapse into one global price."
+    },
+    {
+      "resource_code": "M999",
+      "distinct_unit_prices": [
+        {
+          "unit": "%",
+          "unit_price": "1.5475"
+        },
+        {
+          "unit": "%",
+          "unit_price": "10.1575"
+        },
+        {
+          "unit": "%",
+          "unit_price": "10924.2024"
+        },
+        {
+          "unit": "%",
+          "unit_price": "116.33131"
+        },
+        {
+          "unit": "%",
+          "unit_price": "123.85067"
+        },
+        {
+          "unit": "%",
+          "unit_price": "13289.7699"
+        },
+        {
+          "unit": "%",
+          "unit_price": "134.81943"
+        },
+        {
+          "unit": "%",
+          "unit_price": "155.21951"
+        },
+        {
+          "unit": "%",
+          "unit_price": "158.9337"
+        },
+        {
+          "unit": "%",
+          "unit_price": "16977.3708"
+        },
+        {
+          "unit": "%",
+          "unit_price": "17.10198"
+        },
+        {
+          "unit": "%",
+          "unit_price": "194.2523"
+        },
+        {
+          "unit": "%",
+          "unit_price": "208.6967"
+        },
+        {
+          "unit": "%",
+          "unit_price": "241.61924"
+        },
+        {
+          "unit": "%",
+          "unit_price": "247.108"
+        },
+        {
+          "unit": "%",
+          "unit_price": "248.7069"
+        },
+        {
+          "unit": "%",
+          "unit_price": "28501.134"
+        },
+        {
+          "unit": "%",
+          "unit_price": "311.8384"
+        },
+        {
+          "unit": "%",
+          "unit_price": "33.9641"
+        },
+        {
+          "unit": "%",
+          "unit_price": "370.6009"
+        },
+        {
+          "unit": "%",
+          "unit_price": "39.465"
+        },
+        {
+          "unit": "%",
+          "unit_price": "400.0738"
+        },
+        {
+          "unit": "%",
+          "unit_price": "460.19823"
+        },
+        {
+          "unit": "%",
+          "unit_price": "47.2544"
+        },
+        {
+          "unit": "%",
+          "unit_price": "552.32917"
+        },
+        {
+          "unit": "%",
+          "unit_price": "72.1998"
+        },
+        {
+          "unit": "%",
+          "unit_price": "80.222"
+        },
+        {
+          "unit": "%",
+          "unit_price": "864.4656"
+        },
+        {
+          "unit": "%",
+          "unit_price": "932.3785"
+        }
+      ],
+      "rule": "Keep source/work-item scoped; do not collapse into one global price."
+    },
+    {
+      "resource_code": "A28.1000",
+      "distinct_unit_prices": [
+        {
+          "unit": "cọc",
+          "unit_price": "4480"
+        },
+        {
+          "unit": "cọc",
+          "unit_price": "6109"
+        }
+      ],
+      "rule": "Keep source/work-item scoped; do not collapse into one global price."
+    }
+  ],
+  "global_price_book_mutation_allowed": false
+}

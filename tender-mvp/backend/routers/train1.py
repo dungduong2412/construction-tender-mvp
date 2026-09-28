@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import os
+import secrets
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi import File, UploadFile
 from fastapi import Header
 from fastapi.responses import Response
@@ -16,9 +17,6 @@ from integration_train1.pipeline import (
     ParserProviderTimeoutError,
     Train2PipelineError,
 )
-
-router = APIRouter()
-
 
 def _parser_provider_mode() -> str:
     mode = os.getenv("TRAIN2_PARSER_PROVIDER", "").strip().lower()
@@ -40,8 +38,15 @@ def _require_train_auth(authorization: str | None) -> None:
     if not authorization or not authorization.startswith("Bearer "):
         raise HTTPException(status_code=401, detail="Missing Bearer authorization token")
     supplied_token = authorization.split(" ", 1)[1].strip()
-    if supplied_token != expected_token:
+    if not secrets.compare_digest(supplied_token, expected_token):
         raise HTTPException(status_code=401, detail="Invalid upload authorization token")
+
+
+def _require_train_auth_header(authorization: str | None = Header(default=None)) -> None:
+    _require_train_auth(authorization)
+
+
+router = APIRouter(dependencies=[Depends(_require_train_auth_header)])
 
 
 def _fixture_mode_enabled() -> bool:
@@ -62,24 +67,21 @@ class PriceMutationRequest(BaseModel):
 
 
 @router.post("/runs/fixture")
-async def start_run_from_fixture(authorization: str | None = Header(default=None)):
-    _require_train_auth(authorization)
+async def start_run_from_fixture():
     if not _fixture_mode_enabled():
         raise HTTPException(status_code=403, detail="Fixture mode is disabled outside local/test environments")
     return await PIPELINE.start_from_fixture()
 
 
 @router.post("/runs/real-fixture")
-async def start_run_from_recorded_real_fixture(authorization: str | None = Header(default=None)):
-    _require_train_auth(authorization)
+async def start_run_from_recorded_real_fixture():
     if not _fixture_mode_enabled():
         raise HTTPException(status_code=403, detail="Fixture mode is disabled outside local/test environments")
     return await PIPELINE.start_from_real_fixture()
 
 
 @router.post("/runs/upload")
-async def start_run_from_upload(file: UploadFile = File(...), authorization: str | None = Header(default=None)):
-    _require_train_auth(authorization)
+async def start_run_from_upload(file: UploadFile = File(...)):
     if not file.filename or not file.filename.lower().endswith(".pdf"):
         raise HTTPException(status_code=400, detail="Only PDF files are accepted")
 
@@ -163,8 +165,7 @@ async def start_run_from_upload(file: UploadFile = File(...), authorization: str
 
 
 @router.get("/runs/{run_id}/review")
-async def get_review(run_id: str, authorization: str | None = Header(default=None)):
-    _require_train_auth(authorization)
+async def get_review(run_id: str):
     try:
         return PIPELINE.get_review(run_id)
     except KeyError as exc:
@@ -172,8 +173,7 @@ async def get_review(run_id: str, authorization: str | None = Header(default=Non
 
 
 @router.post("/runs/{run_id}/override")
-async def override_mapping(run_id: str, req: ManualOverrideRequest, authorization: str | None = Header(default=None)):
-    _require_train_auth(authorization)
+async def override_mapping(run_id: str, req: ManualOverrideRequest):
     try:
         return PIPELINE.apply_manual_mapping(
             run_id,
@@ -188,8 +188,7 @@ async def override_mapping(run_id: str, req: ManualOverrideRequest, authorizatio
 
 
 @router.post("/runs/{run_id}/mutate-prices")
-async def mutate_prices(run_id: str, req: PriceMutationRequest, authorization: str | None = Header(default=None)):
-    _require_train_auth(authorization)
+async def mutate_prices(run_id: str, req: PriceMutationRequest):
     try:
         return PIPELINE.mutate_runtime_prices(run_id, req.price_updates)
     except KeyError as exc:
@@ -197,8 +196,7 @@ async def mutate_prices(run_id: str, req: PriceMutationRequest, authorization: s
 
 
 @router.get("/runs/{run_id}/export.xlsx")
-async def export_xlsx(run_id: str, authorization: str | None = Header(default=None)):
-    _require_train_auth(authorization)
+async def export_xlsx(run_id: str):
     try:
         content = PIPELINE.export_excel(run_id)
     except KeyError as exc:

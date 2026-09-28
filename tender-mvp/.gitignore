@@ -1,0 +1,14 @@
+.DS_Store
+.env
+.env.*
+!.env.template
+.pytest_cache/
+__pycache__/
+*.py[cod]
+*.db
+*.sqlite
+*.sqlite3
+artifacts/
+runtime/
+*.pdf.part
+.~lock.*

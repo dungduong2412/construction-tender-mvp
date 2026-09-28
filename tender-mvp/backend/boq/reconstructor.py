@@ -31,6 +31,9 @@ class BOQLineItem:
     row_type: str               # "heading" | "metadata" | "line_item"
     doc_order: int
     continuation_of: Optional[str] = None  # row_id of original row if merged
+    source_origin: str = "azure_document_intelligence"
+    source_provenance: str = "Extracted by Azure Document Intelligence."
+    azure_polygon_available: bool = True
 
 
 class BOQReconstructor:
@@ -41,7 +44,7 @@ class BOQReconstructor:
 
         for nrow in normalized_rows:
             # Update section stack
-            if nrow.row_type == "heading":
+            if nrow.row_type == "heading" or self._is_structural_subsection(nrow.stt):
                 section_stack = self._update_section_stack(section_stack, nrow)
             elif nrow.row_type == "metadata":
                 # Metadata rows are recorded but not priced
@@ -63,6 +66,9 @@ class BOQReconstructor:
                 region=str(nrow.polygon),
                 row_type=nrow.row_type,
                 doc_order=nrow.doc_order,
+                source_origin=nrow.source_origin,
+                source_provenance=nrow.source_provenance,
+                azure_polygon_available=nrow.azure_polygon_available,
             ))
 
         return self._merge_continuations(items)
@@ -83,9 +89,13 @@ class BOQReconstructor:
         """Roman numeral = depth 1; Roman.digit = depth 2; etc."""
         if re.match(r"^(I{1,3}|IV|V?I{0,3}|IX|X{0,3})$", stt, re.IGNORECASE):
             return 1
-        if re.match(r"^(I{1,3}|IV|V?I{0,3})\.\d+$", stt, re.IGNORECASE):
-            return 2
+        match = re.match(r"^(I{1,3}|IV|V?I{0,3})((?:\.\d+)+)$", stt, re.IGNORECASE)
+        if match:
+            return 1 + match.group(2).count(".")
         return 1  # default
+
+    def _is_structural_subsection(self, stt: str) -> bool:
+        return bool(re.match(r"^(I{1,3}|IV|V?I{0,3})(?:\.\d+)+$", stt.strip(), re.IGNORECASE))
 
     def _section_key(self, stack: list[str]) -> str:
         if not stack:
@@ -139,6 +149,9 @@ class BOQReconstructor:
                         row_type="line_item",
                         doc_order=item.doc_order,
                         continuation_of=None,
+                        source_origin=item.source_origin,
+                        source_provenance=item.source_provenance,
+                        azure_polygon_available=item.azure_polygon_available,
                     )
                     result.append(merged)
                     i += 2

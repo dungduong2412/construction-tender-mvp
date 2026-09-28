@@ -59,6 +59,9 @@ class ParserRow(BaseModel):
     page: int = Field(ge=1)
     evidence: list[ParserEvidence] = Field(default_factory=list)
     ai_suggestions: list[ParserSuggestion] = Field(default_factory=list)
+    source_origin: str = "provider_extraction"
+    source_provenance: str | None = None
+    azure_polygon_available: bool = True
     manual_selected_code: str | None = None
     manual_unit_confirmed: bool = False
     manual_unit_correction: str | None = None

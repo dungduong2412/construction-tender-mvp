@@ -13,6 +13,7 @@ import pytest
 sys.path.insert(0, str(Path(__file__).parent.parent / "backend"))
 
 FIXTURE_PATH = Path(__file__).parent.parent / "fixtures" / "bang_tien_luong_mock.json"
+RECORDED_AZURE_PATH = Path(__file__).parent.parent / "fixtures" / "bang_tien_luong_azure_historical_94.json"
 
 
 @pytest.fixture
@@ -110,6 +111,12 @@ class TestNormalizer:
                 f"IV.1 18.57 Km must not be a line_item, got {r.row_type}"
             )
 
+    def test_source_polygon_spans_the_extracted_row(self, parsed_doc):
+        line = next(row for row in parsed_doc.boq_rows if row.quantity_raw == "29,5")
+        xs = line.polygon[0::2]
+        assert min(xs) == 10
+        assert max(xs) == 550
+
 
 # ---------------------------------------------------------------------------
 # Vietnamese decimal tests
@@ -201,6 +208,61 @@ class TestBOQReconstructor:
 
 
 class TestAzureBridge:
+    def test_nested_subsection_with_dash_quantity_is_not_billable(self):
+        from parser_adapter.normalizer import _classify_row
+
+        assert _classify_row(
+            "II.3.1",
+            "Cầu lớn, tỷ lệ 1/1000: bình đồ, cắt dọc",
+            "",
+            "-",
+        ) == "metadata"
+
+    def test_historical_azure_remains_94_but_canonical_source_is_95(self):
+        from parser_adapter.normalizer import DocumentNormalizer
+        from boq.reconstructor import BOQReconstructor
+
+        raw = json.loads(RECORDED_AZURE_PATH.read_text(encoding="utf-8"))
+        analyze = raw.get("analyzeResult", raw)
+        historical_rows = 0
+        for table in analyze["tables"]:
+            row_kinds = {}
+            for cell in table["cells"]:
+                row_kinds.setdefault(cell["rowIndex"], set()).add(cell.get("kind", "content"))
+            historical_rows += sum("columnHeader" not in kinds for kinds in row_kinds.values())
+        assert historical_rows == 94
+
+        parsed = DocumentNormalizer().normalize(raw)
+        items = BOQReconstructor().reconstruct(parsed.boq_rows)
+        assert len(items) == 95
+        assert sum(item.row_type == "line_item" for item in items) == 82
+        assert sum(item.row_type != "line_item" for item in items) == 13
+        assert {page: sum(item.page == page for item in items) for page in range(1, 5)} == {
+            1: 25, 2: 28, 3: 22, 4: 20,
+        }
+
+    def test_ii_3_2_recovery_has_source_provenance_without_azure_polygon(self):
+        from parser_adapter.normalizer import DocumentNormalizer
+        from parser_adapter.azure_bridge import azure_analyze_result_to_parser_payload
+        from boq.reconstructor import BOQReconstructor
+
+        raw = json.loads(RECORDED_AZURE_PATH.read_text(encoding="utf-8"))
+        items = BOQReconstructor().reconstruct(DocumentNormalizer().normalize(raw).boq_rows)
+        recovered = next(item for item in items if item.row_number == "II.3.2")
+        assert recovered.row_type != "line_item"
+        assert recovered.quantity is None
+        assert recovered.region == "[]"
+        assert recovered.azure_polygon_available is False
+        assert recovered.source_origin == "source_document_inspection"
+        assert "historical Azure fixture omitted" in recovered.source_provenance
+        children = [item for item in items if item.row_type == "line_item" and "II.3.2" in item.section_path]
+        assert len(children) == 5
+        provider_payload = azure_analyze_result_to_parser_payload(raw, "recorded-source")
+        assert len(provider_payload["rows"]) == 95
+        provider_row = next(row for row in provider_payload["rows"] if row["row_id"] == "source-inspection-II.3.2")
+        assert provider_row["evidence"] == []
+        assert provider_row["azure_polygon_available"] is False
+
     def test_recorded_azure_response_normalizes_to_strict_payload(self, azure_bridge_payload):
         assert azure_bridge_payload["document_id"] == "azure-doc-intel-test-001"
         assert azure_bridge_payload["provider"] == "azure-document-intelligence"

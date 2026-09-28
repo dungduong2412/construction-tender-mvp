@@ -1,99 +1,77 @@
-"""Export router — generate and download the Excel bid worksheet."""
-import json
-import os
+"""Export router — internal draft and governed final submission workbooks."""
 import re
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import Response
-from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from database import BOQRow, Job, MappingResult, MasterItem, Override, get_db
-from excel_exporter.exporter import ExportRow, generate_excel
-
-DEMO_TENANT_ID = os.getenv("DEMO_TENANT_ID", "demo-tenant-001")
-MASTER_VERSION = os.getenv("MASTER_DATA_VERSION", "v1")
+from database import Job, get_db
+from calculation_snapshots import build_snapshot, load_snapshot
+from excel_exporter.exporter import (
+    generate_internal_workbook,
+    generate_submission_workbook,
+)
 
 router = APIRouter()
 
 
-@router.get("/{job_id}/xlsx")
-async def export_xlsx(job_id: str, db: AsyncSession = Depends(get_db)):
+async def _snapshot_for_export(
+    job_id: str, snapshot_id: str | None, db: AsyncSession
+) -> tuple[Job, dict]:
     job = await db.get(Job, job_id)
     if not job:
         raise HTTPException(404, "Job not found")
+    snapshot = load_snapshot(snapshot_id) if snapshot_id else await build_snapshot(db, job_id)
+    if not snapshot or snapshot.get("job", {}).get("id") != job_id:
+        raise HTTPException(404, "Calculation snapshot not found for this job")
+    return job, snapshot
 
-    rows_q = await db.execute(
-        select(BOQRow).where(BOQRow.job_id == job_id).order_by(BOQRow.doc_order)
-    )
-    boq_rows = rows_q.scalars().all()
-    boq_row_ids = [r.id for r in boq_rows]
 
-    mapping_map = {}
-    if boq_row_ids:
-        mr_q = await db.execute(select(MappingResult).where(MappingResult.boq_row_id.in_(boq_row_ids)))
-        mapping_map = {m.boq_row_id: m for m in mr_q.scalars().all()}
+def _safe_stem(filename: str) -> str:
+    value = re.sub(r"[^A-Za-z0-9._-]", "_", filename.rsplit(".", 1)[0])
+    return value or "boq"
 
-    masters_q = await db.execute(
-        select(MasterItem).where(
-            MasterItem.tenant_id == DEMO_TENANT_ID,
-            MasterItem.version == MASTER_VERSION,
-        )
-    )
-    master_map = {m.id: m for m in masters_q.scalars().all()}
 
-    overrides_q = await db.execute(select(Override).where(Override.job_id == job_id))
-    override_map: dict[str, list[dict]] = {}
-    for ov in overrides_q.scalars().all():
-        override_map.setdefault(ov.row_id, []).append({
-            "field": ov.field,
-            "old_value": ov.old_value,
-            "new_value": ov.new_value,
-        })
-
-    export_rows: list[ExportRow] = []
-    for row in boq_rows:
-        mr = mapping_map.get(row.id)
-        master = master_map.get(mr.master_item_id) if mr and mr.master_item_id else None
-        status = mr.status.value if mr else "mapping_unresolved"
-        if row.row_type.value == "heading":
-            status = "non_billable_heading"
-        elif row.row_type.value == "metadata":
-            status = "non_billable_metadata"
-        elif mr and mr.status.value == "mapped_and_priced" and mr.unit_price_str and mr.extended_amount_str:
-            status = "mapped_and_priced"
-        coeff_applied = json.loads(mr.coeff_applied_json) if (mr and mr.coeff_applied_json) else []
-
-        export_rows.append(ExportRow(
-            stt=row.row_number or row.row_id,
-            section=row.section_path,
-            description_vi=row.description_vi,
-            unit=row.unit_raw or "",
-            quantity_raw=row.quantity_raw or "",
-            quantity=row.quantity,
-            master_code=master.item_code if master else None,
-            master_desc=master.description_vi if master else None,
-            unit_price_str=mr.unit_price_str if mr else None,
-            extended_amount_str=mr.extended_amount_str if mr else None,
-            confidence=mr.confidence if mr else None,
-            page=row.page,
-            status=status,
-            error_reason=mr.unresolved_reason if mr else "Not yet mapped",
-            formula_ref=mr.formula_ref if mr else None,
-            coeff_applied=coeff_applied,
-            unit_rule_ref=str(mr.unit_rule_id) if (mr and mr.unit_rule_id is not None) else None,
-            evidence=mr.evidence if mr else None,
-            overrides=override_map.get(row.row_id, []),
-        ))
-
-    xlsx_bytes = generate_excel(export_rows, job_id)
-    safe_filename = re.sub(r"[^A-Za-z0-9._-]", "_", job.filename.replace(".pdf", ""))
-    if not safe_filename:
-        safe_filename = "boq"
-
+@router.get("/{job_id}/internal.xlsx")
+async def export_internal_xlsx(
+    job_id: str,
+    snapshot_id: str | None = Query(default=None),
+    db: AsyncSession = Depends(get_db),
+):
+    job, snapshot = await _snapshot_for_export(job_id, snapshot_id, db)
     return Response(
-        content=xlsx_bytes,
+        content=generate_internal_workbook(snapshot),
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         headers={
-            "Content-Disposition": f'attachment; filename="{safe_filename}_du_thau.xlsx"'
+            "Content-Disposition": f'attachment; filename="{_safe_stem(job.filename)}_internal_{snapshot["snapshot_id"]}.xlsx"',
+            "X-Calculation-Snapshot": snapshot["snapshot_id"],
+            "X-Export-Status": "draft" if not snapshot["export_policy"]["final_submission_allowed"] else "complete",
         },
     )
+
+
+@router.get("/{job_id}/final.xlsx")
+async def export_final_xlsx(
+    job_id: str,
+    snapshot_id: str | None = Query(default=None),
+    db: AsyncSession = Depends(get_db),
+):
+    job, snapshot = await _snapshot_for_export(job_id, snapshot_id, db)
+    try:
+        content = generate_submission_workbook(snapshot)
+    except ValueError as exc:
+        raise HTTPException(409, {"message": str(exc), "block_reasons": snapshot["export_policy"]["final_block_reasons"]}) from exc
+    return Response(
+        content=content,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={
+            "Content-Disposition": f'attachment; filename="{_safe_stem(job.filename)}_submission_{snapshot["snapshot_id"]}.xlsx"',
+            "X-Calculation-Snapshot": snapshot["snapshot_id"],
+            "X-Export-Status": "final",
+        },
+    )
+
+
+@router.get("/{job_id}/xlsx")
+async def export_xlsx(job_id: str, db: AsyncSession = Depends(get_db)):
+    # Backwards-compatible draft link; all new exports share the immutable snapshot path.
+    return await export_internal_xlsx(job_id=job_id, snapshot_id=None, db=db)

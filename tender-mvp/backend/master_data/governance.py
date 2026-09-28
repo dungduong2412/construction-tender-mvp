@@ -139,8 +139,6 @@ def add_project_override(payload: dict[str, Any], actor: str) -> dict[str, Any]:
     )
     if not availability.available:
         raise ValueError(availability.reason or "Price is not available")
-    if not payload.get("effective_date"):
-        raise ValueError("effective_date is required")
     now = utc_now()
     record = {
         "project_id": str(payload["project_id"]),
@@ -149,6 +147,9 @@ def add_project_override(payload: dict[str, Any], actor: str) -> dict[str, Any]:
         "pricing_availability": availability.status,
         "source_reference": str(payload.get("source_reference") or ""),
         "effective_date": payload.get("effective_date"),
+        "price_freshness": price_freshness(
+            payload.get("effective_date"), payload.get("expiry_date"), available=True
+        ),
         "expiry_date": payload.get("expiry_date"),
         "approval_status": payload.get("approval_status"),
         "approved_by": payload.get("approved_by"),

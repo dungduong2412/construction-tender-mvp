@@ -129,6 +129,13 @@ def test_master_candidates_remain_staging_and_conflicts_visible(monkeypatch, tmp
     assert record["scope"] == "project_only"
     assert overview()["global_price_book_mutation_allowed"] is False
 
+    undated = add_project_override({
+        "project_id": "job-1", "resource_code": "UAT.NULL.DATE", "unit_price": "1",
+        "source_reference": "controlled UAT evidence", "effective_date": None,
+    }, "tester")
+    assert undated["effective_date"] is None
+    assert undated["price_freshness"] == "effective_date_not_available"
+
 
 def test_formula_proposal_requires_preview_and_approval_before_use(monkeypatch, tmp_path):
     monkeypatch.setattr(governance_store, "RUNTIME_DIR", tmp_path)

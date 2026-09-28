@@ -26,6 +26,8 @@ DEMO_TENANT_ID = os.getenv("DEMO_TENANT_ID", "demo-tenant-001")
 MASTER_VERSION = os.getenv("MASTER_DATA_VERSION", "v1")
 
 router = APIRouter()
+UAT_BASELINE_FIXTURE = Path(__file__).resolve().parents[2] / "fixtures" / "bang_tien_luong_uat_baseline_95.json"
+HISTORICAL_AZURE_FIXTURE = Path(__file__).resolve().parents[2] / "fixtures" / "bang_tien_luong_azure_historical_94.json"
 
 
 def _document_storage_dir() -> Path:
@@ -160,6 +162,145 @@ async def upload_pdf(
         job_id=job_id,
         status=JobStatus.uploaded,
         filename=file.filename,
+    )
+
+
+@router.post("/uat-validation-import", response_model=JobStatusResponse)
+async def import_uat_validation_pdf(
+    file: UploadFile = File(...),
+    db: AsyncSession = Depends(get_db),
+):
+    """Create a labelled UAT persistence project without paid provider calls.
+
+    This route is fail-closed outside UAT and must be explicitly enabled. It
+    stores the supplied real PDF while loading the already-verified canonical
+    source/pricing evidence fixture. It never counts as live Azure/OpenAI proof.
+    """
+    environment = os.getenv("APP_ENV", os.getenv("ENVIRONMENT", "")).strip().lower()
+    enabled = os.getenv("ALLOW_UAT_FIXTURE_IMPORT", "").strip().lower() in {"1", "true", "yes"}
+    if environment != "uat" or not enabled:
+        raise HTTPException(403, "UAT validation import is disabled")
+    if not file.filename or not file.filename.lower().endswith(".pdf"):
+        raise HTTPException(400, "Only PDF files are accepted")
+    pdf_bytes = await file.read()
+    if not pdf_bytes.startswith(b"%PDF-"):
+        raise HTTPException(400, "Uploaded file does not have a valid PDF signature")
+    try:
+        import fitz
+        with fitz.open(stream=pdf_bytes, filetype="pdf") as document:
+            if document.page_count != 4:
+                raise HTTPException(400, "UAT validation requires the four-page sample PDF")
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise HTTPException(400, "Uploaded PDF could not be validated") from exc
+
+    baseline = json.loads(UAT_BASELINE_FIXTURE.read_text(encoding="utf-8"))
+    raw_azure = json.loads(HISTORICAL_AZURE_FIXTURE.read_text(encoding="utf-8"))
+    rows = baseline.get("rows") or []
+    if len(rows) != 95 or sum(bool(row.get("billable")) for row in rows) != 82:
+        raise HTTPException(500, "Checked-in UAT source contract is invalid")
+
+    job_id = str(uuid.uuid4())
+    _persist_source_document(job_id, pdf_bytes)
+    now = datetime.now(timezone.utc)
+    job = Job(
+        id=job_id,
+        tenant_id=f"uat-validation-{job_id}",
+        filename=f"[UAT VALIDATION - NOT OFFICIAL] {file.filename}",
+        status=JobStatus.needs_review,
+    )
+    db.add(job)
+    db.add(ParsedDocument(
+        job_id=job_id,
+        raw_json=json.dumps(raw_azure, ensure_ascii=False),
+        page_count=4,
+        model_id="prebuilt-layout",
+        api_version="2024-11-30",
+    ))
+    try:
+        for source in rows:
+            row = BOQRow(
+                job_id=job_id,
+                row_id=f"uat-source-{int(source['source_index']):03d}",
+                row_number=source.get("stt"),
+                section_path=source.get("section_path") or "",
+                description_vi=source.get("description") or "",
+                unit_raw=source.get("unit") or None,
+                quantity_raw=source.get("quantity_raw") or None,
+                quantity=float(source["quantity"]) if source.get("quantity") not in (None, "") else None,
+                page=int(source.get("page") or 1),
+                region=json.dumps(source.get("polygon") or []),
+                row_type=RowType.line_item if source.get("billable") else RowType.metadata,
+                doc_order=int(source["source_index"]),
+                source_origin=source.get("source_origin") or "azure_document_intelligence",
+                source_provenance=source.get("source_provenance"),
+                azure_polygon_available=bool(source.get("azure_polygon_available", True)),
+            )
+            db.add(row)
+            await db.flush()
+
+            master = None
+            if source.get("treatment") == "mapped_and_priced":
+                master = MasterItem(
+                    tenant_id=job.tenant_id,
+                    version="source-20260927",
+                    item_code=source.get("mapped_work_item") or f"UAT.{source['source_index']}",
+                    description_vi=source.get("mapped_description") or source.get("description") or "",
+                    unit=source.get("unit") or "",
+                    unit_price=float(source["unit_price"]),
+                    formula_ref=source.get("formula_ref"),
+                    source_sheet=source.get("price_source_reference"),
+                    created_by="source-evidence-import",
+                    created_at=now,
+                    last_updated_by="source-evidence-import",
+                    last_updated_at=now,
+                    price_source_reference=source.get("price_source_reference"),
+                    price_effective_date=None,
+                    approval_status="source_verified",
+                )
+                db.add(master)
+                await db.flush()
+
+            is_billable = bool(source.get("billable"))
+            status = (
+                MappingStatus.mapped_and_priced if master else
+                MappingStatus.mapped_price_unavailable if is_billable else
+                MappingStatus.non_billable_metadata
+            )
+            db.add(MappingResult(
+                boq_row_id=row.id,
+                master_item_id=master.id if master else None,
+                status=status,
+                confidence=1.0 if master or not is_billable else None,
+                evidence="Pre-validated UAT persistence fixture; not a live provider result.",
+                unresolved_reason=source.get("reason") if is_billable and not master else None,
+                unit_price_str=str(source["unit_price"]) if master else None,
+                extended_amount_str=str(source["extension"]) if master else None,
+                price_source="source_reconciliation_fixture" if master else None,
+                formula_ref=source.get("formula_ref"),
+                master_version="source-20260927" if master else None,
+                pricing_availability="available" if master else ("not_available" if is_billable else "not_applicable"),
+                price_effective_date=None,
+                price_source_reference=source.get("price_source_reference") if master else None,
+                price_last_updated_by="source-evidence-import" if master else None,
+                price_last_updated_at=now if master else None,
+                mapping_last_updated_by="source-evidence-import",
+                mapping_last_updated_at=now,
+                mapped_by="source-evidence-import" if master else None,
+            ))
+        await db.commit()
+    except Exception:
+        await db.rollback()
+        _document_path(job_id).unlink(missing_ok=True)
+        raise
+
+    return JobStatusResponse(
+        job_id=job_id,
+        status=JobStatus.needs_review,
+        filename=job.filename,
+        row_count=95,
+        unresolved_count=16,
     )
 
 

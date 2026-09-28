@@ -103,6 +103,9 @@ def test_v2_routes_keep_dedicated_bearer_auth(monkeypatch):
     ("GET", "/api/export/job/internal.xlsx"),
     ("GET", "/api/export/job/final.xlsx"),
     ("GET", "/api/export/job/xlsx"),
+    ("GET", "/api/export/job/records"),
+    ("GET", "/api/export/job/records/export"),
+    ("POST", "/api/jobs/uat-validation-import"),
 ])
 def test_every_phase_3_5_route_requires_uat_auth(monkeypatch, method, path):
     monkeypatch.setenv("APP_ENV", "uat")

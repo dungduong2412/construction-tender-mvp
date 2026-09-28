@@ -208,6 +208,9 @@ class Job(Base):
     overrides: Mapped[list["Override"]] = relationship(
         back_populates="job", cascade="all, delete-orphan"
     )
+    exports: Mapped[list["ExportRecord"]] = relationship(
+        back_populates="job", cascade="all, delete-orphan"
+    )
 
 
 class ParsedDocument(Base):
@@ -387,3 +390,19 @@ class ConfigurationHistory(Base):
     actor: Mapped[str] = mapped_column(String(128), nullable=False)
     change_json: Mapped[str] = mapped_column(Text, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class ExportRecord(Base):
+    """Durable metadata for a generated workbook stored outside the database."""
+    __tablename__ = "export_records"
+
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    job_id: Mapped[str] = mapped_column(ForeignKey("jobs.id"), nullable=False, index=True)
+    snapshot_id: Mapped[str] = mapped_column(String(128), nullable=False, index=True)
+    export_type: Mapped[str] = mapped_column(String(32), nullable=False)
+    file_name: Mapped[str] = mapped_column(String(512), nullable=False)
+    sha256: Mapped[str] = mapped_column(String(64), nullable=False)
+    size_bytes: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+    job: Mapped["Job"] = relationship(back_populates="exports")

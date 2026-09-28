@@ -140,6 +140,13 @@ async def get_review_rows(job_id: str, db: AsyncSession = Depends(get_db)):
         )
     )
     master_map = {m.id: m for m in masters_q.scalars().all()}
+    referenced_master_ids = {
+        mapping.master_item_id for mapping in mapping_map.values()
+        if mapping.master_item_id and mapping.master_item_id not in master_map
+    }
+    if referenced_master_ids:
+        referenced = await db.execute(select(MasterItem).where(MasterItem.id.in_(referenced_master_ids)))
+        master_map.update({item.id: item for item in referenced.scalars().all()})
 
     # Load overrides
     overrides_q = await db.execute(

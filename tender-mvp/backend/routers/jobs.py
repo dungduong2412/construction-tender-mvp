@@ -8,12 +8,12 @@ from typing import Optional
 
 from fastapi import APIRouter, BackgroundTasks, Depends, File, HTTPException, UploadFile
 from fastapi.responses import FileResponse, Response
-from pydantic import BaseModel
-from sqlalchemy import func, select
+from pydantic import BaseModel, Field
+from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database import (
-    BOQRow, Job, JobStatus, MappingResult, MappingStatus,
+    BOQRow, Job, JobStageEvent, JobStatus, MappingResult, MappingStatus,
     MasterItem, ParsedDocument, UnitRule, Coefficient, RowType, get_db,
 )
 from parser_adapter.adapter import ParserAdapter, ParserAdapterError
@@ -72,6 +72,15 @@ class JobStatusResponse(BaseModel):
     error_message: Optional[str] = None
     row_count: Optional[int] = None
     unresolved_count: Optional[int] = None
+    source_row_count: Optional[int] = None
+    billable_count: Optional[int] = None
+    structural_count: Optional[int] = None
+    mapping_unresolved_count: Optional[int] = None
+    pricing_unavailable_count: Optional[int] = None
+    pricing_conflict_count: Optional[int] = None
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+    stage_sequence: list[dict] = Field(default_factory=list)
 
 
 class DocumentPage(BaseModel):
@@ -122,6 +131,80 @@ def _derive_mapping_status(
     return MappingStatus.mapping_unresolved
 
 
+async def _transition(db: AsyncSession, job: Job, stage: JobStatus) -> None:
+    """Persist the visible state and its audit event atomically."""
+    job.status = stage
+    db.add(JobStageEvent(job_id=job.id, stage=stage.value))
+    await db.commit()
+
+
+async def _job_status_response(db: AsyncSession, job: Job) -> JobStatusResponse:
+    source_count = int(await db.scalar(
+        select(func.count()).select_from(BOQRow).where(BOQRow.job_id == job.id)
+    ) or 0)
+    billable_count = int(await db.scalar(
+        select(func.count()).select_from(BOQRow).where(
+            BOQRow.job_id == job.id, BOQRow.row_type == RowType.line_item,
+        )
+    ) or 0)
+    issue_statuses = (
+        MappingStatus.mapping_ambiguous,
+        MappingStatus.mapping_unresolved,
+        MappingStatus.invalid_quantity_or_unit,
+    )
+    mapping_unresolved = int(await db.scalar(
+        select(func.count()).select_from(MappingResult).join(BOQRow).where(
+            BOQRow.job_id == job.id,
+            BOQRow.row_type == RowType.line_item,
+            MappingResult.status.in_(issue_statuses),
+        )
+    ) or 0)
+    pricing_unavailable = int(await db.scalar(
+        select(func.count()).select_from(MappingResult).join(BOQRow).where(
+            BOQRow.job_id == job.id,
+            BOQRow.row_type == RowType.line_item,
+            MappingResult.status == MappingStatus.mapped_price_unavailable,
+        )
+    ) or 0)
+    pricing_conflicts = int(await db.scalar(
+        select(func.count()).select_from(MappingResult).join(BOQRow).where(
+            BOQRow.job_id == job.id,
+            BOQRow.row_type == RowType.line_item,
+            MappingResult.price_review_required.is_(True),
+        )
+    ) or 0)
+    unresolved_total = int(await db.scalar(
+        select(func.count()).select_from(MappingResult).join(BOQRow).where(
+            BOQRow.job_id == job.id,
+            BOQRow.row_type == RowType.line_item,
+            or_(
+                MappingResult.status.in_((*issue_statuses, MappingStatus.mapped_price_unavailable)),
+                MappingResult.price_review_required.is_(True),
+            ),
+        )
+    ) or 0)
+    events = (await db.execute(
+        select(JobStageEvent).where(JobStageEvent.job_id == job.id).order_by(JobStageEvent.id)
+    )).scalars().all()
+    return JobStatusResponse(
+        job_id=job.id,
+        status=job.status,
+        filename=job.filename,
+        error_message=job.error_message,
+        row_count=source_count,
+        unresolved_count=unresolved_total,
+        source_row_count=source_count,
+        billable_count=billable_count,
+        structural_count=source_count - billable_count,
+        mapping_unresolved_count=mapping_unresolved,
+        pricing_unavailable_count=pricing_unavailable,
+        pricing_conflict_count=pricing_conflicts,
+        created_at=job.created_at,
+        updated_at=job.updated_at,
+        stage_sequence=[{"stage": event.stage, "occurred_at": event.occurred_at} for event in events],
+    )
+
+
 @router.post("/upload", response_model=JobStatusResponse)
 async def upload_pdf(
     background_tasks: BackgroundTasks,
@@ -151,6 +234,7 @@ async def upload_pdf(
     )
     try:
         db.add(job)
+        db.add(JobStageEvent(job_id=job_id, stage=JobStatus.uploaded.value))
         await db.commit()
     except Exception:
         _document_path(job_id).unlink(missing_ok=True)
@@ -158,11 +242,7 @@ async def upload_pdf(
 
     background_tasks.add_task(_process_job, job_id, pdf_bytes, file.filename)
 
-    return JobStatusResponse(
-        job_id=job_id,
-        status=JobStatus.uploaded,
-        filename=file.filename,
-    )
+    return await _job_status_response(db, job)
 
 
 @router.post("/uat-validation-import", response_model=JobStatusResponse)
@@ -211,6 +291,11 @@ async def import_uat_validation_pdf(
         status=JobStatus.needs_review,
     )
     db.add(job)
+    for stage in (
+        JobStatus.uploaded, JobStatus.parsing, JobStatus.mapping,
+        JobStatus.pricing, JobStatus.needs_review,
+    ):
+        db.add(JobStageEvent(job_id=job_id, stage=stage.value))
     db.add(ParsedDocument(
         job_id=job_id,
         raw_json=json.dumps(raw_azure, ensure_ascii=False),
@@ -295,13 +380,7 @@ async def import_uat_validation_pdf(
         _document_path(job_id).unlink(missing_ok=True)
         raise
 
-    return JobStatusResponse(
-        job_id=job_id,
-        status=JobStatus.needs_review,
-        filename=job.filename,
-        row_count=95,
-        unresolved_count=16,
-    )
+    return await _job_status_response(db, job)
 
 
 @router.get("/{job_id}/document")
@@ -394,33 +473,7 @@ async def get_job(job_id: str, db: AsyncSession = Depends(get_db)):
     job = await db.get(Job, job_id)
     if not job:
         raise HTTPException(404, "Job not found")
-    row_count = await db.scalar(
-        select(func.count()).select_from(BOQRow).where(BOQRow.job_id == job_id)
-    )
-    unresolved = await db.scalar(
-        select(func.count())
-        .select_from(MappingResult)
-        .join(BOQRow, BOQRow.id == MappingResult.boq_row_id)
-        .where(
-            BOQRow.job_id == job_id,
-            BOQRow.row_type == RowType.line_item,
-            MappingResult.status.in_([
-                MappingStatus.mapped_price_unavailable,
-                MappingStatus.mapping_ambiguous,
-                MappingStatus.mapping_unresolved,
-                MappingStatus.invalid_quantity_or_unit,
-            ]),
-        )
-    )
-
-    return JobStatusResponse(
-        job_id=job.id,
-        status=job.status,
-        filename=job.filename,
-        error_message=job.error_message,
-        row_count=int(row_count or 0),
-        unresolved_count=int(unresolved or 0),
-    )
+    return await _job_status_response(db, job)
 
 
 @router.get("/", response_model=list[JobStatusResponse])
@@ -450,8 +503,7 @@ async def _process_job(job_id: str, pdf_bytes: bytes, filename: str) -> None:
             return
         try:
             # --- PARSING ---
-            job.status = JobStatus.parsing
-            await db.commit()
+            await _transition(db, job, JobStatus.parsing)
 
             adapter = ParserAdapter()
             raw_result = await adapter.analyze(pdf_bytes)
@@ -496,8 +548,7 @@ async def _process_job(job_id: str, pdf_bytes: bytes, filename: str) -> None:
             await db.commit()
 
             # --- MAPPING + PRICING ---
-            job.status = JobStatus.mapping
-            await db.commit()
+            await _transition(db, job, JobStatus.mapping)
 
             # Load master data
             masters_q = await db.execute(
@@ -555,10 +606,7 @@ async def _process_job(job_id: str, pdf_bytes: bytes, filename: str) -> None:
             )
             db_rows = boq_rows_q.scalars().all()
 
-            # --- PRICING ---
-            job.status = JobStatus.pricing
-            await db.commit()
-
+            mapped_rows = []
             for db_row in db_rows:
                 # Build candidates (all master items as candidates for now; real system would use embeddings)
                 candidates = [
@@ -592,6 +640,14 @@ async def _process_job(job_id: str, pdf_bytes: bytes, filename: str) -> None:
                 )
 
                 mapping_out = await mapper.map_item(boq_item, candidates, MASTER_VERSION)
+
+                mapped_rows.append((db_row, boq_item, mapping_out))
+
+            # Mapping may involve remote semantic calls. Pricing is local and
+            # deterministic; do not report "pricing" while mapping is running.
+            await _transition(db, job, JobStatus.pricing)
+
+            for db_row, boq_item, mapping_out in mapped_rows:
 
                 price_out = engine.price_row(
                     boq_item, mapping_out, master_dict, unit_rules, coefficients, MASTER_VERSION
@@ -645,15 +701,15 @@ async def _process_job(job_id: str, pdf_bytes: bytes, filename: str) -> None:
                 m.status != MappingStatus.mapped_and_priced
                 for m in billable_rows
             )
-            job.status = JobStatus.needs_review if has_billable_issues else JobStatus.ready
-            await db.commit()
+            await _transition(
+                db, job,
+                JobStatus.needs_review if has_billable_issues else JobStatus.ready,
+            )
 
         except ParserAdapterError as exc:
-            job.status = JobStatus.failed
             job.error_message = f"Parser error: {exc}"
-            await db.commit()
+            await _transition(db, job, JobStatus.failed)
         except Exception as exc:
-            job.status = JobStatus.failed
             job.error_message = f"Pipeline error: {type(exc).__name__}: {exc}"
-            await db.commit()
+            await _transition(db, job, JobStatus.failed)
             raise

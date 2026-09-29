@@ -11,7 +11,7 @@ from contextlib import asynccontextmanager
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 
 # Load backend-only configuration before importing modules that initialize
@@ -93,7 +93,25 @@ async def health():
         "azure_document_intelligence_api_version": API_VERSION,
         "mock_parser": os.getenv("MOCK_PARSER", "").strip().lower() == "true",
         "mock_ai": os.getenv("MOCK_AI", "").strip().lower() == "true",
+        "uat_fixture_import_enabled": (
+            os.getenv("APP_ENV", os.getenv("ENVIRONMENT", "")).strip().lower() == "uat"
+            and os.getenv("ALLOW_UAT_FIXTURE_IMPORT", "").strip().lower() in {"1", "true", "yes"}
+        ),
     }
+
+
+@app.get("/favicon.ico", include_in_schema=False)
+async def favicon():
+    return Response(
+        content=(
+            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">'
+            '<rect width="64" height="64" rx="12" fill="#c84c16"/>'
+            '<text x="32" y="41" text-anchor="middle" font-family="Arial" '
+            'font-size="27" font-weight="700" fill="white">CT</text></svg>'
+        ),
+        media_type="image/svg+xml",
+        headers={"Cache-Control": "public, max-age=86400"},
+    )
 
 app.add_middleware(
     CORSMiddleware,

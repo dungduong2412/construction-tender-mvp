@@ -31,6 +31,7 @@ def test_uat_health_is_public_and_reports_safe_runtime_config(monkeypatch):
         "azure_document_intelligence_api_version": "2024-11-30",
         "mock_parser": False,
         "mock_ai": False,
+        "uat_fixture_import_enabled": False,
     }
 
 

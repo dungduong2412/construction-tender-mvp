@@ -211,6 +211,23 @@ class Job(Base):
     exports: Mapped[list["ExportRecord"]] = relationship(
         back_populates="job", cascade="all, delete-orphan"
     )
+    stage_events: Mapped[list["JobStageEvent"]] = relationship(
+        back_populates="job", cascade="all, delete-orphan", order_by="JobStageEvent.id"
+    )
+
+
+class JobStageEvent(Base):
+    """Append-only processing-state transition evidence for polling and UAT."""
+    __tablename__ = "job_stage_events"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    job_id: Mapped[str] = mapped_column(ForeignKey("jobs.id"), nullable=False, index=True)
+    stage: Mapped[str] = mapped_column(String(32), nullable=False)
+    occurred_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+
+    job: Mapped["Job"] = relationship(back_populates="stage_events")
 
 
 class ParsedDocument(Base):

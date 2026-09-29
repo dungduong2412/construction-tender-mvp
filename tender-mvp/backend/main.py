@@ -21,7 +21,7 @@ load_dotenv()
 from database import init_db
 from master_data.loader import load_master_data
 from parser_adapter.adapter import API_VERSION
-from routers import jobs, parser, review, export, train1
+from routers import calculation, jobs, parser, review, export, train1
 
 
 @asynccontextmanager
@@ -44,7 +44,7 @@ def _requires_uat_access(path: str) -> bool:
     if path.startswith("/api/train1") or path.startswith("/api/parser"):
         return False
     return not path.startswith("/api/") or path.startswith(
-        ("/api/jobs", "/api/review", "/api/export")
+        ("/api/jobs", "/api/review", "/api/export", "/api/calculation")
     )
 
 
@@ -108,6 +108,7 @@ app.include_router(parser.router, prefix="/api/parser", tags=["parser"])
 app.include_router(review.router, prefix="/api/review", tags=["review"])
 app.include_router(export.router, prefix="/api/export", tags=["export"])
 app.include_router(train1.router, prefix="/api/train1", tags=["train1"])
+app.include_router(calculation.router, prefix="/api/calculation", tags=["calculation"])
 
 # Serve frontend
 frontend_dir = os.path.join(os.path.dirname(__file__), "..", "frontend")

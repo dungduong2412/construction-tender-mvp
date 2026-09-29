@@ -1,0 +1,356 @@
+spec_version: 1.0
+status: reverse_engineered
+scope: calculation_reference_only
+source_workbook: DuToan KS CauBinhGoi 2609.21 DuThau.xls
+source_mutated: false
+
+currency: VND
+
+identifiers:
+  work_item_code:
+    primary_source: "Công trình!E:E"
+    norm_code_source: "Công trình!C:C"
+  resource_code:
+    primary_source: "Giá tháng!B:B"
+    normalized_code_source: "Giá tháng!J:J"
+  project_quantity:
+    source: "Công trình!P:P"
+    tender_rounding_decimals: 4
+
+calculation_branches:
+  approved_estimate:
+    sequence:
+      - Công trình
+      - HaoPhiVatTu
+      - Tổng hợp VT
+      - Đơn giá chi tiết
+      - Giá tổng hợp
+      - THKP ks duyet
+    headline_cell: "THKP ks duyet!J29"
+    headline_value: 4421407464
+    unrounded_control_cell: "THKP ks duyet!O29"
+    unrounded_control_value: 4421407464.3
+
+  tender:
+    sequence:
+      - Công trình
+      - HaoPhiVatTu
+      - Tổng hợp VT
+      - Chiết tính
+      - Dự thầu
+    live_total_cell: "Dự thầu!J47"
+    live_total_value: 4128377433
+    independent_control_cell: "Dự thầu!J49"
+    independent_control_value: 4128377433.2
+    literal_live_total_copy_cell: "Dự thầu!J50"
+    approved_snapshot_cell: "Dự thầu!J51"
+    approved_snapshot_value: 4142692903
+    approved_snapshot_provenance: unlinked_literal
+    approved_snapshot_note_cell: "Dự thầu!O51"
+    approved_snapshot_note: "chưa tính 10% dự phòng"
+
+resource_pricing:
+  material:
+    register: "Giá tháng!B6:K70"
+    code_column: B
+    unit_column: D
+    active_pre_vat_price_column: F
+    coefficient_column: G
+    displayed_post_vat_price_column: I
+    source_column: K
+
+  labor:
+    active_register: "Giá tháng!B72:K83"
+    active_rate_column: F
+    partial_build: "Nhân công!A5:U15"
+    partial_build_formula: "ROUND(SUM(H:R), 'Đầu vào'!D40)"
+    authority_note: >-
+      Giá tháng is authoritative for the current calculation because several
+      Nhân công rows have blank base wages and calculate to zero while Giá tháng
+      contains literal active rates.
+
+  machine:
+    active_register: "Giá tháng!B85:K115"
+    active_rate_column: F
+    build_sheet: Máy
+    build_total_column: K
+    general_components:
+      - depreciation
+      - repair
+      - other_cost
+      - fuel_or_energy_when_applicable
+      - operator_labor_when_applicable
+
+  fuel_and_energy:
+    prices:
+      diesel: { cell: "Đầu vào!D23", value: 28540 }
+      mazut: { cell: "Đầu vào!D24", value: 17680 }
+      electricity: { cell: "Đầu vào!D25", value: 2204.0655 }
+      petrol: { cell: "Đầu vào!D26", value: 21830 }
+    auxiliary_factors:
+      diesel: { cell: "Đầu vào!D29", value: 1.03 }
+      mazut: { cell: "Đầu vào!D30", value: 1.0 }
+      electricity: { cell: "Đầu vào!D31", value: 1.05 }
+      petrol: { cell: "Đầu vào!D32", value: 1.02 }
+
+  rounding_parameters:
+    price_decimals: { cell: "Đầu vào!D39", value: 1 }
+    labor_and_operator_decimals: { cell: "Đầu vào!D40", value: 0 }
+    total_rate_decimals: { cell: "Đầu vào!D41", value: 0 }
+    wage_coefficient_decimals: { cell: "Đầu vào!D42", value: 3 }
+
+direct_unit_cost:
+  owner_sheet: Đơn giá chi tiết
+  resource_line_formula: "ROUND(norm_quantity * resource_rate * coefficient, 1)"
+  auxiliary_material_formula: "ROUND(percent * ordinary_material_subtotal / 100, 1)"
+  other_machine_formula: "ROUND(percent * identified_machine_subtotal / 100, 1)"
+  includes:
+    - material
+    - labor
+    - machine
+  excludes:
+    - indirect_cost
+    - taxable_income
+    - survey_service_cost
+    - vat
+    - temporary_facilities
+    - contingency
+  worked_example:
+    code: CF.11620
+    range: "Đơn giá chi tiết!A41:H58"
+    material: { cell: "Đơn giá chi tiết!H42", value: 34642.1 }
+    labor: { cell: "Đơn giá chi tiết!H51", value: 1852359.6 }
+    machine: { cell: "Đơn giá chi tiết!H55", value: 80827.6 }
+
+quantity_extension:
+  owner_sheet: Giá tổng hợp
+  quantity_column: E
+  unit_material_column: F
+  unit_labor_column: G
+  unit_machine_column: H
+  extended_material_formula: "ROUND(E * F, 1)"
+  extended_labor_formula: "ROUND(E * G, 1)"
+  extended_machine_formula: "ROUND(E * H, 1)"
+  direct_total_formula: "I + J + K"
+  includes_indirect_cost_or_tax: false
+  worked_example:
+    code: CF.11620
+    range: "Giá tổng hợp!A15:M15"
+    quantity: 8
+    material_total: 277136.8
+    labor_total: 14818876.8
+    machine_total: 646620.8
+    direct_total: 15742634.4
+
+loaded_unit_price:
+  owner_sheet: Chiết tính
+  default_sequence:
+    T: "VL + NC + M"
+    C: "overhead_base * overhead_rate"
+    TT: "T * other_indirect_rate"
+    GT: "C + TT"
+    TL: "(T + GT) * taxable_income_rate"
+    Cpa: "(T + GT + TL) * survey_plan_rate"
+    Cbc: "(T + GT + TL) * survey_report_rate"
+    Cpvks: "Cpa + Cbc"
+    G: "T + GT + TL + Cpvks"
+    VAT: "G * vat_rate"
+    Gks: "G + VAT"
+    LT: "Gks * temporary_facilities_rate"
+    Gdp: "Gks * contingency_rate"
+    final: "ROUND(Gks + LT + Gdp, 0)"
+
+  categories:
+    - id: topography
+      hsxl_range: "HSXL!A5:D19"
+      overhead_base: NC
+      other_indirect_rate: 0.0
+      overhead_rate: 0.60
+      taxable_income_rate: 0.06
+      survey_plan_rate: 0.015
+      survey_report_rate: 0.025
+      vat_rate: 0.10
+      temporary_facilities_rate: 0.02
+      contingency_rate: 0.0
+      example_final_cell: "Chiết tính!H106"
+
+    - id: waterway_safety
+      hsxl_range: "HSXL!A24:D38"
+      overhead_base: NC
+      other_indirect_rate: 0.0
+      overhead_rate: 0.60
+      taxable_income_rate: 0.06
+      survey_plan_rate: 0.015
+      survey_report_rate: 0.025
+      vat_rate: 0.10
+      temporary_facilities_rate: 0.02
+      contingency_rate: 0.0
+      status: disabled_in_approved_estimate_by_multiplication_by_zero
+
+    - id: geotechnical
+      hsxl_range: "HSXL!A43:D57"
+      overhead_base: NC
+      other_indirect_rate: 0.0
+      overhead_rate: 0.60
+      taxable_income_rate: 0.06
+      survey_plan_rate: 0.015
+      survey_report_rate: 0.025
+      vat_rate: 0.10
+      temporary_facilities_rate: 0.02
+      contingency_rate: 0.0
+      example_final_cell: "Chiết tính!H420"
+
+    - id: laboratory
+      hsxl_range: "HSXL!A62:D76"
+      overhead_base: NC
+      other_indirect_rate: 0.0
+      overhead_rate: 0.60
+      taxable_income_rate: 0.06
+      survey_plan_rate: 0.015
+      survey_plan_enabled: false
+      survey_plan_disable_mechanism: multiply_by_zero
+      survey_report_rate: 0.025
+      vat_rate: 0.10
+      temporary_facilities_rate: 0.0
+      contingency_rate: 0.0
+      example_final_cell: "Chiết tính!H615"
+
+    - id: material_sources_and_disposal
+      hsxl_range: "HSXL!A81:D95"
+      overhead_base: NC
+      other_indirect_rate: 0.01
+      overhead_rate: 0.60
+      taxable_income_rate: 0.06
+      survey_plan_rate: 0.015
+      survey_report_rate: 0.025
+      vat_rate: 0.08
+      temporary_facilities_rate: 0.02
+      contingency_rate: 0.0
+
+    - id: traffic_survey
+      hsxl_range: "HSXL!A100:D114"
+      overhead_base: NC
+      other_indirect_rate: 0.01
+      overhead_rate: 0.60
+      taxable_income_rate: 0.06
+      survey_plan_rate: 0.015
+      survey_report_rate: 0.025
+      vat_rate: 0.08
+      temporary_facilities_rate: 0.02
+      contingency_rate: 0.0
+      example_final_cell: "Chiết tính!H1467"
+
+    - id: gpmb_stake_setting
+      hsxl_range: "HSXL!A119:D133"
+      overhead_base: NC
+      other_indirect_rate: 0.03
+      overhead_rate: 0.60
+      taxable_income_rate: 0.06
+      survey_plan_rate: 0.015
+      survey_report_rate: 0.025
+      vat_rate: 0.08
+      temporary_facilities_rate: 0.02
+      contingency_rate: 0.0
+      example_final_cell: "Chiết tính!H1581"
+
+    - id: gpmb_marker_production
+      hsxl_range: "HSXL!A138:D152"
+      overhead_base: T
+      other_indirect_rate: 0.03
+      overhead_rate: 0.60
+      taxable_income_rate: 0.06
+      survey_plan_rate: 0.02
+      survey_report_rate: 0.03
+      vat_rate: 0.08
+      temporary_facilities_rate: 0.02
+      contingency_rate: 0.0
+      example_final_cell: "Chiết tính!H1668"
+
+    - id: road_marker_production
+      hsxl_range: "HSXL!A157:D171"
+      overhead_base: T
+      other_indirect_rate: 0.03
+      overhead_rate: 0.60
+      taxable_income_rate: 0.06
+      survey_plan_rate: 0.02
+      survey_report_rate: 0.03
+      vat_rate: 0.08
+      temporary_facilities_rate: 0.022
+      contingency_rate: 0.0
+      example_final_cell: "Chiết tính!H1951"
+
+tender_presentation:
+  owner_sheet: Dự thầu
+  quantity_formula_pattern: "ROUND('Công trình'!P[row], 4)"
+  main_survey_unit_price_formula_pattern: "ROUNDDOWN('Chiết tính'!H[final], -3)"
+  ancillary_unit_price_formula_pattern: "ROUND('Chiết tính'!H[final], 1)"
+  amount_formula_pattern: "quantity * loaded_unit_price"
+  main_section_totals:
+    topography: { cell: "Dự thầu!J22", value: 114297433 }
+    geotechnical: { cell: "Dự thầu!J30", value: 3047732000 }
+    laboratory: { cell: "Dự thầu!J46", value: 966348000 }
+  live_total_formula: "J22 + J30 + J46"
+  live_total_cell: "Dự thầu!J47"
+  independent_control_formula: "SUM(J15:J46) / 2"
+  independent_control_reason: >-
+    The range contains both detail amounts and the three section totals, so the
+    sum is divided by two.
+
+approved_estimate_summary:
+  owner_sheet: THKP ks duyet
+  direct_cost:
+    material: 137761170
+    labor: 1918476609
+    machine: 69278204
+    T: 2125515983
+  indirect_cost_GT: 1151085965.4
+  taxable_income_TL: 196596116.9
+  survey_service_Cpvks: 128423991.5
+  pre_vat_G: 3601622056.8
+  vat: 360162205.7
+  post_vat_Gks: 3961784262.5
+  temporary_facilities_LT: 63444775.5
+  contingency_Gdp: 396178426.3
+  final_rounded: 4421407464
+
+reconciliation:
+  approved_estimate_total: 4421407464
+  approved_estimate_contingency: 396178426.3
+  approved_estimate_before_contingency: 4025229038.0
+  tender_live_total: 4128377433
+  tender_approved_snapshot: 4142692903
+  snapshot_minus_live: 14315470
+  approved_estimate_minus_snapshot: 278714561
+  causes:
+    - approved_estimate_includes_10_percent_contingency
+    - tender_loaded_unit_prices_have_zero_contingency
+    - category_specific_vat_rates
+    - category_specific_temporary_facilities_rates
+    - category_specific_other_indirect_rates
+    - disabled_survey_service_components
+    - item_level_rounding_and_rounddown
+    - approved_snapshot_is_not_the_live_tender_total
+
+external_dependencies:
+  - cells:
+      - "THKP ks duyet!L32"
+      - "THKP ks (1)!L32"
+      - "THKP ks (2)!L32"
+      - "DuToan GoiThau!G19"
+    formula_source: "'[2]Tong hop'!D13"
+    status: source_workbook_not_supplied
+    headline_impact: does_not_affect_THKP_J29
+  - cells:
+      - "Máy!D178"
+      - "Máy!D188"
+    formula_source: "[1]Trang_tính2!C23"
+    status: source_workbook_not_supplied
+
+integrity_findings:
+  usable_business_named_ranges: false
+  broken_defined_names:
+    - _xleta_PHI
+    - _xleta_ROUND
+    - _xlfn_SINGLE
+  cached_formula_errors_in_key_sheets: 0
+  approved_snapshot_has_in_workbook_precedent: false

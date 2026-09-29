@@ -7,6 +7,8 @@ from decimal import Decimal, ROUND_DOWN, ROUND_HALF_UP
 from pathlib import Path
 from typing import Any
 
+from pricing_engine.audited_contract import CATEGORIES, CATEGORY_ALIASES, formula_configuration, reconciliation_report
+
 
 class ApprovalCostRules(dict):
     """Explicit aggregate-first project approval rule set.
@@ -112,71 +114,23 @@ class CalculationEngineV2:
     }
 
     CATEGORY_RULES = {
-        "topography": {
-            "vat_rate": Decimal("0.10"),
-            "tt_rate": Decimal("0"),
-            "cpa_rate": Decimal("0.015"),
-            "cbc_rate": Decimal("0.025"),
-            "lt_rate": Decimal("0.02"),
-            "gdp_rate": Decimal("0"),
-            "c_base": "labour",
-            "disabled_components": {"cpa": False},
-        },
-        "geotechnical_drilling": {
-            "vat_rate": Decimal("0.10"),
-            "tt_rate": Decimal("0"),
-            "cpa_rate": Decimal("0.015"),
-            "cbc_rate": Decimal("0.025"),
-            "lt_rate": Decimal("0.02"),
-            "gdp_rate": Decimal("0"),
-            "c_base": "labour",
-            "disabled_components": {"cpa": False},
-        },
-        "laboratory": {
-            "vat_rate": Decimal("0.10"),
-            "tt_rate": Decimal("0"),
-            "cpa_rate": Decimal("0.015"),
-            "cbc_rate": Decimal("0.025"),
-            "lt_rate": Decimal("0"),
-            "gdp_rate": Decimal("0"),
-            "c_base": "labour",
-            "disabled_components": {"cpa": True},
-            "survey_laboratory": True,
-        },
-        "traffic_survey": {
-            "vat_rate": Decimal("0.08"),
-            "tt_rate": Decimal("0.01"),
-            "cpa_rate": Decimal("0.015"),
-            "cbc_rate": Decimal("0.025"),
-            "lt_rate": Decimal("0.02"),
-            "gdp_rate": Decimal("0"),
-            "c_base": "labour",
-            "disabled_components": {"cpa": False},
-        },
-        "gmpb_stake": {
-            "vat_rate": Decimal("0.08"),
-            "tt_rate": Decimal("0.03"),
-            "cpa_rate": Decimal("0.015"),
-            "cbc_rate": Decimal("0.025"),
-            "lt_rate": Decimal("0.02"),
-            "gdp_rate": Decimal("0"),
-            "c_base": "labour",
-            "disabled_components": {"cpa": False},
-        },
-        "gmpb_marker": {
-            "vat_rate": Decimal("0.08"),
-            "tt_rate": Decimal("0.03"),
-            "cpa_rate": Decimal("0.02"),
-            "cbc_rate": Decimal("0.03"),
-            "lt_rate": Decimal("0.02"),
-            "gdp_rate": Decimal("0"),
-            "c_base": "T",
-            "disabled_components": {"cpa": False},
-        },
+        category: {
+            **{
+                key: Decimal(str(value))
+                for key, value in values.items()
+                if key in {"c_rate", "tt_rate", "cpa_rate", "cbc_rate", "vat_rate", "lt_rate"}
+            },
+            "c_base": values["c_base"],
+            "disabled_components": dict(values.get("disabled_components") or {}),
+            "approval_multiplier": Decimal(str(values.get("approval_multiplier", "1"))),
+            "approval_status": values.get("approval_status", "Effective"),
+        }
+        for category, values in CATEGORIES.items()
     }
 
     def _category_key(self, category: str) -> str:
-        return str(category or "default").lower().replace(" ", "_").replace("-", "_")
+        key = str(category or "default").lower().replace(" ", "_").replace("-", "_")
+        return CATEGORY_ALIASES.get(key, key)
 
     def _rule_for_category(self, category: str) -> dict[str, Any]:
         merged = dict(self.CATEGORY_DEFAULTS)
@@ -367,7 +321,7 @@ class CalculationEngineV2:
         c = _round(c_base_amount * _d(rule.get("c_rate", Decimal("0.60"))), "0.1")
         tt = _round(t * _d(rule.get("tt_rate", 0)), "0.1")
         gt = _round(c + tt, "0.1")
-        tl = _round((t + gt) * Decimal("0.06"), "0.1")
+        tl = _round((t + gt) * _d(rule.get("taxable_income_rate", Decimal("0.06"))), "0.1")
         cp_base = t + gt + tl
         disabled = bool(rule.get("disabled_components", {}).get("cpa", False))
         cpa = Decimal("0") if disabled else _round(cp_base * _d(rule.get("cpa_rate", 0)), "0.1")
@@ -377,7 +331,7 @@ class CalculationEngineV2:
         vat = _round(g * _d(rule.get("vat_rate", 0)), "0.1")
         gks = _round(g + vat, "0.1")
         lt_rate = _d(rule.get("lt_rate", 0))
-        lt = Decimal("0") if disabled and rule.get("survey_laboratory") else _round(gks * lt_rate, "0.1")
+        lt = _round(gks * lt_rate, "0.1")
         gdp = _round(gks * _d(rule.get("gdp_rate", 0)), "0.1") if _d(rule.get("gdp_rate", 0)) != 0 else Decimal("0")
         final = (gks + lt + gdp).quantize(Decimal("1"), rounding=ROUND_HALF_UP)
         return {
@@ -452,7 +406,7 @@ class CalculationEngineV2:
                     classification = "EXTERNAL_UNRESOLVED"
                 else:
                     entry = price_book.get(price_code)
-                    if not entry:
+                    if not entry or (isinstance(entry, dict) and entry.get("unit_price") in (None, "")):
                         missing_dependencies.append(f"resource_price:{price_code}")
                         classification = "EXTERNAL_UNRESOLVED"
                     else:
@@ -772,6 +726,9 @@ class CalculationEngineV2:
             category = str(totals.get("category") or "default")
             rule = self.approval_rules_for(category, runtime=runtime, approval_group=group_key)
             components = self._compute_loaded_components(totals["material"], totals["labour"], totals["machine"], rule)
+            multiplier = _d(rule.get("approval_multiplier", 1))
+            if multiplier != Decimal("1"):
+                components = {key: value * multiplier for key, value in components.items()}
             approval_group_components[group_key] = components
             if category not in approval_components:
                 approval_components[category] = {name: Decimal("0") for name in components.keys()}
@@ -960,6 +917,12 @@ class CalculationEngineV2:
             "current_tender_is_target": current_tender_total == current_tender_target,
             "snapshot_is_unlinked_literal": snapshot_literal_total != current_tender_total,
         }
+
+    def audited_formula_configuration(self) -> list[dict[str, Any]]:
+        return formula_configuration()
+
+    def audited_reconciliation_report(self) -> dict[str, Any]:
+        return reconciliation_report()
 
 
 def load_golden_fixture(path: str | Path) -> dict[str, Any]:

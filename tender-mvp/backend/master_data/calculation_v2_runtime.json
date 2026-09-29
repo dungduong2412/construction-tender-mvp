@@ -1785,17 +1785,15 @@
         "Chiết tính!H1452:H1467",
         "Giá tổng hợp!A128:M128"
       ],
-      "status": "partially_resolved",
-      "missing_dependencies": [
-        "labour.UNRESOLVED.KS4_8.LABOUR"
-      ],
+      "status": "resolved_from_cached_workbook_rate",
+      "missing_dependencies": [],
       "hsxl_coefficient": "1.0",
       "source_provenance": [
         {
-          "element": "labour.UNRESOLVED.KS4_8.LABOUR",
+          "element": "labour.KS4_8.CACHED",
           "value": "298700.0",
           "source": "Đơn giá chi tiết!H683",
-          "classification": "EXTERNAL_UNRESOLVED"
+          "classification": "CACHED_WORKBOOK_VALUE"
         },
         {
           "element": "material_total",
@@ -1843,7 +1841,7 @@
       "resource_recipe": [
         {
           "resource_type": "labour",
-          "code": "UNRESOLVED.KS4_8.LABOUR",
+          "code": "KS4_8.CACHED",
           "description": "Nhân công",
           "unit": "",
           "quantity": "1.0",
@@ -1851,7 +1849,7 @@
           "source_sheet": "Đơn giá chi tiết",
           "sheet_ref": "H683",
           "line_total": "298700.0",
-          "classification": "EXTERNAL_UNRESOLVED",
+          "classification": "CACHED_WORKBOOK_VALUE",
           "coefficient": "1.0000"
         }
       ],
@@ -1977,7 +1975,7 @@
       "work_item_norm": [
         {
           "resource_type": "labour",
-          "code": "UNRESOLVED.KS4_8.LABOUR",
+          "code": "KS4_8.CACHED",
           "description": "Nhân công",
           "unit": "",
           "norm_quantity": "1.0",
@@ -1992,7 +1990,7 @@
       "hsxl_rules": {
         "c_rate": "0.6",
         "c_base": "labour",
-        "tt_rate": "1",
+        "tt_rate": "0.01",
         "vat_rate": "0.08",
         "lt_rate": "0.02"
       }
@@ -3009,6 +3007,12 @@
     }
   },
   "resource_price_book": {
+    "KS4_8.CACHED": {
+      "unit_price": "298700.0",
+      "source_sheet": "Đơn giá chi tiết",
+      "sheet_ref": "H683",
+      "classification": "CACHED_WORKBOOK_VALUE"
+    },
     "A28.0341": {
       "unit_price": "1713.0",
       "source_sheet": "Giá tháng",

@@ -1,0 +1,11 @@
+{
+  "contract_version": "1.0",
+  "source_workbook": "DuToan KS CauBinhGoi 2609.21 DuThau.xls",
+  "tender": {"target_cell": "Dự thầu!J47", "workbook_amount": 4128377433, "engine_amount": 4128377433, "delta": 0, "status": "EXACT"},
+  "approval": {"target_cell": "THKP ks duyet!J29", "workbook_amount": 4421407464, "engine_amount": 4421407464, "unrounded_amount": 4421407464.3, "delta": 0, "status": "EXACT", "contingency": 396178426.3},
+  "j51": {"cell": "Dự thầu!J51", "amount": 4142692903, "status": "REFERENCE ONLY — NOT ENGINE TARGET"},
+  "external_dependencies": [
+    {"formula": "'[2]Tong hop'!D13", "affects_j47": false, "affects_j29": false, "cached_value_available": true, "blocker": false},
+    {"formula": "'[1]Trang_tính2'!C23", "affects_j47": false, "affects_j29": false, "cached_value_available": true, "blocker": false}
+  ]
+}

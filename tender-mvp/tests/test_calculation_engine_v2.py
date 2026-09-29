@@ -38,11 +38,11 @@ EXPECTED_RUNTIME_ITEMS = {
     },
     "KS.4/8": {
         "direct_material_total": Decimal("0.0"),
-        "direct_labour_total": Decimal("0.0"),
+        "direct_labour_total": Decimal("298700.0"),
         "direct_machine_total": Decimal("0.0"),
-        "direct_total": None,
-        "loaded_unit_price": None,
-        "provenance_status": "blocked",
+        "direct_total": Decimal("298700.0"),
+        "loaded_unit_price": Decimal("584015"),
+        "provenance_status": "accepted",
     },
     "CF.21120": {
         "direct_material_total": Decimal("60078.5"),
@@ -186,25 +186,17 @@ def test_runtime_data_model_resolves_all_audited_items_and_coverage_report():
         assert result["direct_machine_total"] == expected["direct_machine_total"]
         assert result["direct_total"] == expected["direct_total"]
         assert result["loaded_unit_price"] == expected["loaded_unit_price"]
-        if code == "KS.4/8":
-            assert result["calculation_status"] == "blocked"
-        else:
-            assert result["calculation_status"] == "resolved"
-        if code == "KS.4/8":
-            assert any(dep.endswith("UNRESOLVED.KS4_8.LABOUR") for dep in result["missing_dependencies"])
-            assert result["direct_total_parity"] is None
-            assert result["loaded_unit_price_parity"] is None
-        else:
-            assert result["missing_dependencies"] == []
-            assert result["direct_total_parity"] == Decimal("0")
-            assert result["loaded_unit_price_parity"] == Decimal("0")
-            assert result["components"]["T"] == expected["direct_total"]
+        assert result["calculation_status"] == "resolved"
+        assert result["missing_dependencies"] == []
+        assert result["direct_total_parity"] == Decimal("0")
+        assert result["loaded_unit_price_parity"] == Decimal("0")
+        assert result["components"]["T"] == expected["direct_total"]
 
     coverage = engine.coverage_report(runtime)
-    assert coverage["resolved_items"] == 5
+    assert coverage["resolved_items"] == 6
     assert coverage["item_count"] == 6
     assert coverage["snapshot_is_unlinked_literal"] is True
-    assert any(entry.startswith("KS.4/8:") and entry.endswith("UNRESOLVED.KS4_8.LABOUR") for entry in coverage["missing_dependencies"])
+    assert coverage["missing_dependencies"] == []
     assert coverage["full_project_coverage"] is False
 
 
@@ -349,10 +341,10 @@ def test_aggregate_first_approval_and_unit_first_tender_use_fresh_calculations()
 
     assert approval["approved_estimate_partial_subtotal"] > Decimal("0")
     assert tender["tender_partial_subtotal"] > Decimal("0")
-    assert approval["approved_estimate_total"] is None
-    assert tender["tender_total"] is None
-    assert "KS.4/8" in approval["blocked_items"]
-    assert "KS.4/8" in tender["blocked_items"]
+    assert approval["approved_estimate_total"] is not None
+    assert tender["tender_total"] is not None
+    assert approval["blocked_items"] == []
+    assert tender["blocked_items"] == []
 
     mutated_runtime = engine.apply_runtime_mutation(
         runtime,
@@ -397,7 +389,7 @@ def test_explicit_approval_and_tender_cost_rules_are_separated_and_coverage_has_
 
     assert coverage["supported_work_items"] >= 0
     assert coverage["total_work_items"] == 6
-    assert coverage["blocked_work_items"]
+    assert coverage["blocked_work_items"] == []
     assert coverage["full_project_coverage"] is False
 
 
@@ -408,8 +400,8 @@ def test_approval_uses_contingency_and_tender_excludes_it():
     approval = engine.calculate_approval_estimate(runtime)
     tender = engine.calculate_tender_estimate(runtime)
 
-    assert approval["status"] == "INCOMPLETE"
-    assert tender["status"] == "INCOMPLETE"
+    assert approval["status"] == "COMPLETE"
+    assert tender["status"] == "COMPLETE"
     assert approval["category_components"]["topography"]["Gdp"] > Decimal("0")
     assert abs(approval["category_components"]["topography"]["Gdp"] - (approval["category_components"]["topography"]["Gks"] * Decimal("0.10"))) <= Decimal("0.1")
     assert tender["tender_partial_subtotal"] < approval["approved_estimate_partial_subtotal"]
@@ -504,7 +496,7 @@ def test_rounding_is_verified_per_item_for_chiet_tinh_and_du_thau_paths():
         "CF.11620": {"loaded": Decimal("3808696"), "tender": Decimal("3808000"), "qty": Decimal("8")},
         "CC.21310": {"loaded": Decimal("1414311"), "tender": Decimal("1414000"), "qty": Decimal("1583")},
         "DC.02001": {"loaded": Decimal("634808"), "tender": Decimal("634000"), "qty": Decimal("338")},
-        "KS.4/8": {"loaded": None, "tender": None, "qty": Decimal("0")},
+        "KS.4/8": {"loaded": Decimal("584015"), "tender": Decimal("584000"), "qty": Decimal("0")},
         "CF.21120": {"loaded": Decimal("2045481"), "tender": Decimal("2045000"), "qty": Decimal("0")},
         "AG.11112": {"loaded": Decimal("2919165"), "tender": Decimal("2919000"), "qty": Decimal("0")},
     }

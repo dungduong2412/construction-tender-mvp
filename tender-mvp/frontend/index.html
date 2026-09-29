@@ -68,6 +68,8 @@
     .kpi .val { font-size:1.3rem; font-weight:700; color:#1a3a6b; }
 
     #dl-btn { margin-top:8px; }
+    .config-table { max-height: 360px; overflow: auto; }
+    .trace-json { background:#14213d; color:#eef3fb; padding:14px; border-radius:6px; max-height:360px; overflow:auto; white-space:pre-wrap; font-size:.78rem; }
   </style>
 </head>
 <body>
@@ -91,6 +93,25 @@
 
   <!-- Status bar -->
   <div id="status-bar"></div>
+
+  <div class="card" id="calculation-audit-card">
+    <h2>Formula Configuration — Audited Workbook Contract v1.0</h2>
+    <p id="reconciliation-summary">Loading audited reconciliation…</p>
+    <div class="config-table">
+      <table>
+        <thead><tr><th>Branch</th><th>Rule</th><th>HSXL category</th><th>Component</th><th>Coefficient</th><th>Base</th><th>Rounding</th><th>Status</th><th>Source</th><th>Updated by / at</th></tr></thead>
+        <tbody id="formula-config-body"></tbody>
+      </table>
+    </div>
+    <h2 style="margin-top:20px;">Calculation trace</h2>
+    <label for="trace-code">Audited billable work item: </label>
+    <select id="trace-code">
+      <option>CF.11620</option><option>CC.21310</option><option>DC.02001</option>
+      <option>KS.4/8</option><option>CF.21120</option><option>AG.11112</option>
+    </select>
+    <button class="btn btn-sm" id="trace-btn">Inspect</button>
+    <pre id="calculation-trace" class="trace-json">Select a work item to inspect quantity, resources, prices, coefficients, rounding and final amount.</pre>
+  </div>
 
   <!-- Review section -->
   <div id="review-section">
@@ -154,6 +175,47 @@ let currentJobId = null;
 let currentRowId = null;
 let allCandidates = [];
 let pollTimer = null;
+
+async function loadCalculationAudit() {
+  try {
+    const [configRes, reconRes] = await Promise.all([
+      fetch(`${API}/calculation/configuration`), fetch(`${API}/calculation/reconciliation`)
+    ]);
+    if (!configRes.ok || !reconRes.ok) throw new Error('Audited calculation API unavailable');
+    const config = await configRes.json();
+    const recon = await reconRes.json();
+    document.getElementById('formula-config-body').innerHTML = config.rules.map(r => `<tr>
+      <td>${escHtml(r.branch)}</td><td>${escHtml(r.rule_id)}</td><td>${escHtml(r.category)}</td>
+      <td>${escHtml(r.component)}</td><td>${escHtml(r.coefficient)}</td><td>${escHtml(r.coefficient_base)}</td>
+      <td>${escHtml(r.rounding_rule)}</td><td>${escHtml(r.effective_status)}</td>
+      <td>${escHtml(r.source_workbook_reference)}</td><td>${escHtml(r.last_updated_by)} / ${escHtml(r.last_updated_at)}</td>
+    </tr>`).join('');
+    document.getElementById('reconciliation-summary').textContent =
+      `Tender J47: ${fmtNum(recon.tender.engine_amount)} (${recon.tender.status}, Δ ${recon.tender.delta}) · ` +
+      `Approval J29: ${fmtNum(recon.approval.engine_amount)} (${recon.approval.status}, Δ ${recon.approval.delta}) · ` +
+      `J51 ${fmtNum(recon.j51.amount)}: ${recon.j51.status}`;
+  } catch (err) {
+    document.getElementById('reconciliation-summary').textContent = `Calculation audit unavailable: ${err.message}`;
+  }
+}
+
+async function loadCalculationTrace() {
+  const code = document.getElementById('trace-code').value;
+  const output = document.getElementById('calculation-trace');
+  output.textContent = 'Loading…';
+  try {
+    const res = await fetch(`${API}/calculation/trace/${encodeURIComponent(code)}`);
+    const trace = await res.json();
+    if (!res.ok) throw new Error(trace.detail || `HTTP ${res.status}`);
+    output.textContent = JSON.stringify(trace, null, 2);
+  } catch (err) {
+    output.textContent = `Not available — ${err.message}`;
+  }
+}
+
+document.getElementById('trace-btn').addEventListener('click', loadCalculationTrace);
+loadCalculationAudit();
+loadCalculationTrace();
 
 // Drag-and-drop
 const dropZone = document.getElementById('drop-zone');

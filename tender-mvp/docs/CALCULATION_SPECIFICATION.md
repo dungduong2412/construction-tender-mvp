@@ -1,5 +1,7 @@
 # Calculation Specification — DuToan KS CauBinhGoi 2609.21 DuThau
 
+Machine-readable companion: `calculation-spec.yaml`.
+
 ## 1. Executive conclusions
 
 1. The workbook contains two materially different calculation branches:

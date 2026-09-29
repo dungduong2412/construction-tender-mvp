@@ -51,6 +51,8 @@ router = APIRouter(dependencies=[Depends(_require_train_auth_header)])
 
 def _fixture_mode_enabled() -> bool:
     env = os.getenv("APP_ENV", os.getenv("ENVIRONMENT", "")).strip().lower()
+    if env == "uat":
+        return os.getenv("ALLOW_UAT_FIXTURE_IMPORT", "").strip().lower() in {"1", "true", "yes"}
     return env in {"", "local", "test", "testing", "dev", "development"}
 
 

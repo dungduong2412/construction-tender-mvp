@@ -887,6 +887,22 @@ def test_train2_all_endpoints_require_auth_and_fixture_is_env_gated(monkeypatch)
         assert export_no_auth.status_code == 401
 
 
+def test_train2_uat_fixture_requires_explicit_acceptance_flag(monkeypatch):
+    monkeypatch.setenv("TRAIN2_UPLOAD_AUTH_TOKEN", "token")
+    monkeypatch.setenv("APP_ENV", "uat")
+    monkeypatch.delenv("ALLOW_UAT_FIXTURE_IMPORT", raising=False)
+
+    with TestClient(app) as client:
+        blocked = client.post("/api/train1/runs/real-fixture", headers={"Authorization": "Bearer token"})
+        assert blocked.status_code == 403
+
+        monkeypatch.setenv("ALLOW_UAT_FIXTURE_IMPORT", "true")
+        allowed = client.post("/api/train1/runs/real-fixture", headers={"Authorization": "Bearer token"})
+        assert allowed.status_code == 200
+        assert allowed.json()["integration_label"] == "recorded_real_response"
+        assert allowed.json()["live_integration_verified"] is False
+
+
 @pytest.mark.skipif(not REAL_RESPONSE_FIXTURE_PATH.exists(), reason="Recorded real response fixture missing")
 def test_recorded_real_fixture_path_exists():
     assert REAL_RESPONSE_FIXTURE_PATH.exists()

@@ -11,7 +11,7 @@ from contextlib import asynccontextmanager
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 
 # Load backend-only configuration before importing modules that initialize
@@ -21,7 +21,7 @@ load_dotenv()
 from database import init_db
 from master_data.loader import load_master_data
 from parser_adapter.adapter import API_VERSION
-from routers import calculation, jobs, parser, review, export, train1
+from routers import administration, calculation, jobs, parser, review, export, train1
 
 
 @asynccontextmanager
@@ -44,7 +44,7 @@ def _requires_uat_access(path: str) -> bool:
     if path.startswith("/api/train1") or path.startswith("/api/parser"):
         return False
     return not path.startswith("/api/") or path.startswith(
-        ("/api/jobs", "/api/review", "/api/export", "/api/calculation")
+        ("/api/jobs", "/api/review", "/api/export", "/api/calculation", "/api/admin")
     )
 
 
@@ -93,7 +93,25 @@ async def health():
         "azure_document_intelligence_api_version": API_VERSION,
         "mock_parser": os.getenv("MOCK_PARSER", "").strip().lower() == "true",
         "mock_ai": os.getenv("MOCK_AI", "").strip().lower() == "true",
+        "uat_fixture_import_enabled": (
+            os.getenv("APP_ENV", os.getenv("ENVIRONMENT", "")).strip().lower() == "uat"
+            and os.getenv("ALLOW_UAT_FIXTURE_IMPORT", "").strip().lower() in {"1", "true", "yes"}
+        ),
     }
+
+
+@app.get("/favicon.ico", include_in_schema=False)
+async def favicon():
+    return Response(
+        content=(
+            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">'
+            '<rect width="64" height="64" rx="12" fill="#c84c16"/>'
+            '<text x="32" y="41" text-anchor="middle" font-family="Arial" '
+            'font-size="27" font-weight="700" fill="white">CT</text></svg>'
+        ),
+        media_type="image/svg+xml",
+        headers={"Cache-Control": "public, max-age=86400"},
+    )
 
 app.add_middleware(
     CORSMiddleware,
@@ -107,8 +125,9 @@ app.include_router(jobs.router, prefix="/api/jobs", tags=["jobs"])
 app.include_router(parser.router, prefix="/api/parser", tags=["parser"])
 app.include_router(review.router, prefix="/api/review", tags=["review"])
 app.include_router(export.router, prefix="/api/export", tags=["export"])
-app.include_router(train1.router, prefix="/api/train1", tags=["train1"])
 app.include_router(calculation.router, prefix="/api/calculation", tags=["calculation"])
+app.include_router(administration.router, prefix="/api/admin", tags=["administration"])
+app.include_router(train1.router, prefix="/api/train1", tags=["train1"])
 
 # Serve frontend
 frontend_dir = os.path.join(os.path.dirname(__file__), "..", "frontend")

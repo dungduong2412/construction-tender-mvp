@@ -3,6 +3,7 @@ from __future__ import annotations
 import copy
 import json
 import os
+import tempfile
 import uuid
 from dataclasses import dataclass
 from decimal import Decimal, InvalidOperation
@@ -73,6 +74,70 @@ class Train1Pipeline:
         self.allow_zero_quantity = os.getenv("TRAIN2_ALLOW_ZERO_QUANTITY", "false").lower() in {"1", "true", "yes"}
         self._runs: dict[str, Train1Run] = {}
         self._unit_rules = self._load_unit_rules()
+
+    def _run_storage_dir(self) -> Path:
+        configured = os.getenv("TRAIN2_RUN_STORAGE_DIR", "").strip()
+        if configured:
+            return Path(configured).expanduser().resolve()
+        return Path(__file__).resolve().parent.parent.parent / "runtime" / "train2_runs"
+
+    def _run_path(self, run_id: str) -> Path:
+        try:
+            safe_id = str(uuid.UUID(run_id))
+        except ValueError as exc:
+            raise KeyError(f"Run not found: {run_id}") from exc
+        return self._run_storage_dir() / f"{safe_id}.json"
+
+    @staticmethod
+    def _json_safe(value: Any) -> Any:
+        if isinstance(value, Decimal):
+            return str(value)
+        if isinstance(value, dict):
+            return {key: Train1Pipeline._json_safe(item) for key, item in value.items()}
+        if isinstance(value, (list, tuple)):
+            return [Train1Pipeline._json_safe(item) for item in value]
+        return value
+
+    def _persist_run(self, run: Train1Run) -> None:
+        directory = self._run_storage_dir()
+        directory.mkdir(parents=True, exist_ok=True)
+        payload = self._json_safe({
+            "run_id": run.run_id,
+            "source_document_id": run.source_document_id,
+            "parsed_rows": run.parsed_rows,
+            "runtime": run.runtime,
+            "review": run.review,
+        })
+        fd, temporary_name = tempfile.mkstemp(prefix=f".{run.run_id}.", suffix=".json", dir=directory)
+        try:
+            with os.fdopen(fd, "w", encoding="utf-8") as handle:
+                json.dump(payload, handle, ensure_ascii=False, indent=2, sort_keys=True)
+                handle.write("\n")
+            os.replace(temporary_name, self._run_path(run.run_id))
+        finally:
+            if os.path.exists(temporary_name):
+                os.unlink(temporary_name)
+
+    def _get_run(self, run_id: str) -> Train1Run:
+        run = self._runs.get(run_id)
+        if run is not None:
+            return run
+        path = self._run_path(run_id)
+        if not path.is_file():
+            raise KeyError(f"Run not found: {run_id}")
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+            run = Train1Run(
+                run_id=payload["run_id"],
+                source_document_id=payload["source_document_id"],
+                parsed_rows=payload["parsed_rows"],
+                runtime=payload["runtime"],
+                review=payload["review"],
+            )
+        except (OSError, json.JSONDecodeError, KeyError, TypeError) as exc:
+            raise KeyError(f"Run not found: {run_id}") from exc
+        self._runs[run_id] = run
+        return run
 
     def _load_unit_rules(self) -> list[dict[str, Any]]:
         if not UNIT_RULES_PATH.exists():
@@ -172,12 +237,11 @@ class Train1Pipeline:
             review=review,
         )
         self._runs[run_id] = run
+        self._persist_run(run)
         return {"run_id": run_id, **review}
 
     def get_review(self, run_id: str) -> dict[str, Any]:
-        run = self._runs.get(run_id)
-        if run is None:
-            raise KeyError(f"Run not found: {run_id}")
+        run = self._get_run(run_id)
         return {"run_id": run_id, **run.review}
 
     def apply_manual_mapping(
@@ -189,9 +253,7 @@ class Train1Pipeline:
         unit_confirmed: bool = False,
         unit_correction: str | None = None,
     ) -> dict[str, Any]:
-        run = self._runs.get(run_id)
-        if run is None:
-            raise KeyError(f"Run not found: {run_id}")
+        run = self._get_run(run_id)
 
         rows = copy.deepcopy(run.parsed_rows)
         target = next((r for r in rows if str(r.get("row_id")) == row_id), None)
@@ -226,12 +288,11 @@ class Train1Pipeline:
             integration_label=str(run.review.get("integration_label") or "fixture"),
             integration_note=run.review.get("integration_note"),
         )
+        self._persist_run(run)
         return {"run_id": run_id, **run.review}
 
     def mutate_runtime_prices(self, run_id: str, price_updates: dict[str, str]) -> dict[str, Any]:
-        run = self._runs.get(run_id)
-        if run is None:
-            raise KeyError(f"Run not found: {run_id}")
+        run = self._get_run(run_id)
         mutated_runtime = copy.deepcopy(run.runtime)
         price_book = mutated_runtime.get("resource_price_book") or {}
         for code, new_price in price_updates.items():
@@ -246,12 +307,11 @@ class Train1Pipeline:
             integration_label=str(run.review.get("integration_label") or "fixture"),
             integration_note=run.review.get("integration_note"),
         )
+        self._persist_run(run)
         return {"run_id": run_id, **run.review}
 
     def mutate_approval_group_rules(self, run_id: str, group_key: str, updates: dict[str, str]) -> dict[str, Any]:
-        run = self._runs.get(run_id)
-        if run is None:
-            raise KeyError(f"Run not found: {run_id}")
+        run = self._get_run(run_id)
         mutated_runtime = copy.deepcopy(run.runtime)
         groups = mutated_runtime.setdefault("approval_rule_groups", {})
         group = groups.setdefault(group_key, {})
@@ -265,12 +325,11 @@ class Train1Pipeline:
             integration_label=str(run.review.get("integration_label") or "fixture"),
             integration_note=run.review.get("integration_note"),
         )
+        self._persist_run(run)
         return {"run_id": run_id, **run.review}
 
     def export_excel(self, run_id: str) -> bytes:
-        run = self._runs.get(run_id)
-        if run is None:
-            raise KeyError(f"Run not found: {run_id}")
+        run = self._get_run(run_id)
         review = run.review
 
         wb = Workbook()

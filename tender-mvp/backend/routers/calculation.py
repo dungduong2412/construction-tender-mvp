@@ -1,10 +1,14 @@
+"""Integrated calculation snapshot and audited workbook-contract API."""
 from __future__ import annotations
 
 from decimal import Decimal
 from typing import Any
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from calculation_snapshots import build_snapshot, load_snapshot
+from database import get_db
 from pricing_engine.audited_contract import formula_configuration, reconciliation_report
 from pricing_engine.calculation_engine_v2 import CalculationEngineV2
 
@@ -40,3 +44,19 @@ async def get_calculation_trace(work_item_code: str):
     except KeyError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
     return _json_safe(result)
+
+
+@router.get("/snapshots/{snapshot_id}/immutable")
+async def get_immutable_snapshot(snapshot_id: str):
+    snapshot = load_snapshot(snapshot_id)
+    if not snapshot:
+        raise HTTPException(404, "Calculation snapshot not found")
+    return snapshot
+
+
+@router.get("/{job_id}")
+async def get_calculation(job_id: str, db: AsyncSession = Depends(get_db)):
+    try:
+        return await build_snapshot(db, job_id)
+    except KeyError as exc:
+        raise HTTPException(404, "Job not found") from exc

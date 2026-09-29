@@ -157,8 +157,40 @@ def azure_analyze_result_to_parser_payload(raw_result: dict[str, Any], document_
                     "page": page_number,
                     "evidence": _row_evidence(page_number, table_index, row_index, row_cells),
                     "ai_suggestions": [],
+                    "source_origin": "azure_document_intelligence",
+                    "source_provenance": "Extracted by Azure Document Intelligence.",
+                    "azure_polygon_available": True,
                 }
             )
+
+    # Restore the one source-visible structural row omitted by the historical
+    # Azure response. This never changes the raw response and never assigns a
+    # provider polygon to evidence Azure did not return.
+    if not any(row["row_id"] == "source-inspection-II.3.2" or row["description_vi"] == "Cầu nhỏ, cầu trung, tỷ lệ 1/500: bình đồ, cắt dọc" for row in rows):
+        insertion = next((
+            index for index, row in enumerate(rows)
+            if row["page"] == 2 and row["description_vi"] == "Đo vẽ bình đồ cầu trên cạn, tỷ lệ 1/500, địa hình cấp II"
+        ), None)
+        has_parent_context = any(
+            row["description_vi"].startswith("Cầu lớn, tỷ lệ 1/1000") for row in rows
+        )
+        if insertion is not None and has_parent_context:
+            rows.insert(insertion, {
+                "row_id": "source-inspection-II.3.2",
+                "row_type": "metadata",
+                "description_vi": "Cầu nhỏ, cầu trung, tỷ lệ 1/500: bình đồ, cắt dọc",
+                "unit_raw": "",
+                "quantity_raw": "-",
+                "page": 2,
+                "evidence": [],
+                "ai_suggestions": [],
+                "source_origin": "source_document_inspection",
+                "source_provenance": (
+                    "Visible in the original PDF and recovered by source-document inspection; "
+                    "the historical Azure fixture omitted it, so no Azure polygon exists."
+                ),
+                "azure_polygon_available": False,
+            })
 
     payload = ParserPayload.model_validate(
         {

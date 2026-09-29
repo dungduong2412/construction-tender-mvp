@@ -46,6 +46,9 @@ MASTER_ITEMS = {
         "id": 1, "item_code": "KS-006",
         "description_vi": "Khoan thăm dò địa chất đường, lỗ khoan 0–30m, đất cấp II",
         "unit": "m", "unit_price": 380000.0, "formula_ref": "DT_KS_006",
+        "price_source_reference": "Test authoritative price schedule!A1",
+        "approval_status": "approved", "approved_by": "test-approver",
+        "zero_price_authorized": False,
     }
 }
 

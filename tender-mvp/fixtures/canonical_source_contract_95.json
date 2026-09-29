@@ -1,0 +1,26 @@
+{
+  "source": "Bang TIen Luong.pdf",
+  "canonical_source_rows": 95,
+  "historical_azure_rows": 94,
+  "billable_rows": 82,
+  "non_billable_rows": 13,
+  "unavailable_billable_rows": 16,
+  "historical_pre_correction_billable_rows": 83,
+  "nested_subsections_corrected": 1,
+  "nested_subsection": {
+    "source_index": 20,
+    "page": 1,
+    "stt": "II.3.1",
+    "description": "Cầu lớn, tỷ lệ 1/1000: bình đồ, cắt dọc",
+    "classification": "structural"
+  },
+  "recovered_structural_row": {
+    "source_index": 26,
+    "page": 2,
+    "stt": "II.3.2",
+    "description": "Cầu nhỏ, cầu trung, tỷ lệ 1/500: bình đồ, cắt dọc",
+    "classification": "structural",
+    "azure_polygon_available": false,
+    "provenance": "source_document_inspection"
+  }
+}

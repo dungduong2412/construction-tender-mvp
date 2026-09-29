@@ -82,7 +82,7 @@ class MasterCandidate:
     item_code: str
     description_vi: str
     unit: str
-    unit_price: float
+    unit_price: Optional[float]
     tags: dict
 
 
@@ -125,6 +125,10 @@ def _normalize_text(value: str) -> str:
 
 
 def _extract_row_features(item: BOQLineItem) -> dict[str, Optional[str]]:
+    # Item-level technical qualifiers must override broader section labels.
+    # A subsection may mention one representative scale while a child line
+    # explicitly specifies another; using the path first silently mis-maps it.
+    item_text = _normalize_text(item.description_vi)
     text = _normalize_text(f"{item.section_path} {item.description_vi}")
     features: dict[str, Optional[str]] = {
         "survey_discipline": None,
@@ -136,13 +140,13 @@ def _extract_row_features(item: BOQLineItem) -> dict[str, Optional[str]]:
         "soil_rock_class": None,
     }
 
-    scale_match = re.search(r"1\s*/\s*(200|500)", text)
+    scale_match = re.search(r"1\s*/\s*(200|500)", item_text)
     if scale_match:
         features["scale"] = f"1/{scale_match.group(1)}"
 
-    if "doi nui" in text:
+    if "doi nui" in item_text:
         features["terrain_class"] = "hilly"
-    elif "dong bang" in text:
+    elif "dong bang" in item_text:
         features["terrain_class"] = "plain"
 
     if "spt" in text or "xuyen tieu chuan" in text:

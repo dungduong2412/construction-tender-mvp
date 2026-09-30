@@ -84,6 +84,7 @@ class OverrideRequest(BaseModel):
 
 class AddRowRequest(BaseModel):
     description_vi: str
+    row_number: str | None = None
     unit: str = ""
     quantity_raw: str = ""
     section_path: str = "Bổ sung thủ công"
@@ -171,6 +172,7 @@ async def get_review_rows(job_id: str, db: AsyncSession = Depends(get_db)):
             "old_value": ov.old_value,
             "new_value": ov.new_value,
             "user": ov.user,
+            "created_at": ov.created_at.isoformat() if ov.created_at else None,
         })
 
     result = []
@@ -315,9 +317,13 @@ async def add_review_row(job_id: str, req: AddRowRequest, db: AsyncSession = Dep
     doc_order = (existing[-1].doc_order + 1) if existing else 1
     quantity = _parse_quantity(req.quantity_raw) if req.quantity_raw.strip() else None
     row_id = f"manual-{uuid.uuid4().hex[:12]}"
+    section_path = req.section_path.strip() or "Bổ sung thủ công"
+    inferred_group_code = section_path.replace(" / ", " > ").split(" > ")[-1].strip()
+    row_number = ((req.row_number or "").strip()
+                  or (inferred_group_code if row_type == RowType.heading else str(doc_order)))
     row = BOQRow(
-        job_id=job_id, row_id=row_id, row_number=str(doc_order),
-        section_path=req.section_path.strip() or "Bổ sung thủ công",
+        job_id=job_id, row_id=row_id, row_number=row_number,
+        section_path=section_path,
         description_vi=req.description_vi.strip(), unit_raw=req.unit.strip() or None,
         quantity_raw=req.quantity_raw.strip() or None, quantity=quantity, page=1,
         region=None, row_type=row_type, doc_order=doc_order,

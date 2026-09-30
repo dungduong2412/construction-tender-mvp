@@ -68,6 +68,16 @@ def test_canonical_reconciliation_is_95_source_rows_and_82_billable():
     evidence = json.loads((ROOT / "fixtures/canonical_source_contract_95.json").read_text())
     assert evidence["canonical_source_rows"] == 95
     assert evidence["historical_azure_rows"] == 94
+    recovered = evidence["recovered_structural_row"]
+    assert recovered == {
+        "source_index": 26,
+        "page": 2,
+        "stt": "II.3.2",
+        "description": "Cầu nhỏ, cầu trung, tỷ lệ 1/500: bình đồ, cắt dọc",
+        "classification": "structural",
+        "azure_polygon_available": False,
+        "provenance": "source_document_inspection",
+    }
     assert evidence["billable_rows"] == 82
     assert evidence["non_billable_rows"] == 13
     assert evidence["historical_pre_correction_billable_rows"] == 83

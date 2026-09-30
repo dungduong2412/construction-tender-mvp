@@ -91,6 +91,19 @@ def test_reconciliation_selection_is_deterministic_and_compact(app_server):
             assert page.locator(".step[data-route]").count() == 3
             assert page.locator("#review-tbody tr").count() > 1
 
+            # Changing only the SPA hash to another job must replace stale in-memory
+            # state; previously the URL changed while the old job remained rendered.
+            job_id = page.evaluate("currentJobId")
+            expected_count = page.evaluate("currentRows.length")
+            page.evaluate("location.hash = 'upload'")
+            page.wait_for_function("() => document.getElementById('page-upload').classList.contains('active')")
+            page.evaluate("() => { currentJobId = 'stale-job'; currentRows = []; selectedReviewRowId = null; }")
+            page.evaluate("id => { location.hash = `review/${id}`; }", job_id)
+            page.wait_for_function(
+                "([id, count]) => currentJobId === id && currentRows.length === count && document.getElementById('page-review').classList.contains('active')",
+                arg=[job_id, expected_count], timeout=20000,
+            )
+
             target = page.locator("#review-tbody tr").filter(has_text="Đo vẽ bình đồ tỷ lệ 1/500 vùng đồi núi").first
             target_id = target.get_attribute("data-row")
             target.click()

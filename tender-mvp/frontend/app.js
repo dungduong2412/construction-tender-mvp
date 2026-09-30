@@ -26,6 +26,7 @@ let catalogue = [];
 let editingCatalogueId = null;
 let lastRoute = 'upload';
 const collapsedGroups = new Set();
+const primaryRoutes = new Set(['upload', 'review', 'estimate', 'catalogue']);
 
 async function json(response) {
   if (!response.ok) {
@@ -36,7 +37,7 @@ async function json(response) {
   return response.json();
 }
 
-function route(name) {
+function route(name, {syncHash = true} = {}) {
   document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
   $(`page-${name}`).classList.add('active');
   document.querySelectorAll('.step[data-route]').forEach(button => button.classList.toggle('active', button.dataset.route === name));
@@ -44,8 +45,36 @@ function route(name) {
   if (name === 'review' && currentJobId) loadReview();
   if (name === 'estimate' && currentJobId) loadEstimate();
   if (name === 'catalogue') loadCatalogue();
-  location.hash = name + (currentJobId && name !== 'upload' ? `/${currentJobId}` : '');
+  const targetHash = name + (currentJobId && ['review', 'estimate'].includes(name) ? `/${currentJobId}` : '');
+  if (syncHash && location.hash.replace('#', '') !== targetHash) location.hash = targetHash;
 }
+
+function resetJobView(jobId) {
+  currentJobId = jobId;
+  currentRows = [];
+  currentRow = null;
+  currentSnapshot = null;
+  documentMeta = null;
+  loadedReviewJobId = null;
+  selectedReviewRowId = null;
+  visibleReviewRows = [];
+  currentPage = 1;
+}
+
+function applyHashRoute() {
+  const [requestedName, requestedJobId] = location.hash.replace('#', '').split('/');
+  const name = primaryRoutes.has(requestedName) ? requestedName : 'upload';
+  const jobRoute = ['review', 'estimate'].includes(name);
+  const jobChanged = Boolean(jobRoute && requestedJobId && requestedJobId !== currentJobId);
+  if (jobChanged) resetJobView(requestedJobId);
+
+  const activeName = document.querySelector('.page.active')?.id?.replace('page-', '');
+  if (!jobChanged && activeName === name) return;
+  if (jobRoute && !currentJobId) return route('upload', {syncHash:false});
+  route(name, {syncHash:false});
+}
+
+window.addEventListener('hashchange', applyHashRoute);
 
 document.querySelectorAll('.step[data-route]').forEach(button => button.onclick = () => route(button.dataset.route));
 $('catalogue-open').onclick = () => route('catalogue');
@@ -546,8 +575,4 @@ async function retireCat(id) {
 
 fetch('/health').then(json).then(health => $('environment-badge').textContent = (health.environment || 'local').toUpperCase()).catch(() => {});
 loadJobs();
-const initialRoute = location.hash.replace('#','').split('/');
-if (initialRoute[1]) {
-  currentJobId = initialRoute[1];
-  route(['review','estimate'].includes(initialRoute[0]) ? initialRoute[0] : 'upload');
-} else route(['upload','review','estimate','catalogue'].includes(initialRoute[0]) ? initialRoute[0] : 'upload');
+applyHashRoute();

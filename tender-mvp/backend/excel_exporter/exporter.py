@@ -82,6 +82,113 @@ def generate_internal_workbook(snapshot: dict[str, Any]) -> bytes:
     return buf.getvalue()
 
 
+def generate_estimate_schedule(snapshot: dict[str, Any], view: str) -> bytes:
+    """Export the estimator-facing schedule for either approval or tender review.
+
+    This is deliberately available while incomplete. Missing authoritative values
+    remain text markers and the workbook carries a visible DRAFT / INCOMPLETE band.
+    """
+    if view not in {"approval", "tender"}:
+        raise ValueError("view must be approval or tender")
+    branch = snapshot.get(view) or {}
+    incomplete = branch.get("status") != "COMPLETE"
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Phê duyệt nội bộ" if view == "approval" else "Dự thầu"
+    ws.sheet_view.showGridLines = False
+    ws.freeze_panes = "A6"
+    ws.page_setup.orientation = "landscape"
+    ws.page_setup.fitToWidth = 1
+    ws.sheet_properties.pageSetUpPr.fitToPage = True
+    widths = [7, 14, 58, 12, 14, 16, 16, 16, 18, 20]
+    for index, width in enumerate(widths, 1):
+        ws.column_dimensions[get_column_letter(index)].width = width
+    ws.merge_cells("A1:J1")
+    ws["A1"] = "BẢN KÊ PHÊ DUYỆT NỘI BỘ" if view == "approval" else "BẢN KÊ DỰ THẦU"
+    ws["A1"].font = Font(name="Arial", bold=True, size=15)
+    ws["A1"].alignment = Alignment(horizontal="center")
+    ws.merge_cells("A2:J2")
+    ws["A2"] = snapshot.get("job", {}).get("filename") or "Bảng tiên lượng"
+    ws["A2"].alignment = Alignment(horizontal="center")
+    if incomplete:
+        ws.merge_cells("A3:J3")
+        ws["A3"] = "DRAFT / INCOMPLETE — CÒN HẠNG MỤC CHƯA ĐỦ CĂN CỨ"
+        ws["A3"].font = Font(name="Arial", bold=True, color="9C2F16")
+        ws["A3"].fill = PatternFill("solid", fgColor="FDE7D8")
+        ws["A3"].alignment = Alignment(horizontal="center")
+    headers = ["STT", "Mã số", "Mô tả công việc", "Đơn vị tính", "Khối lượng",
+               "Vật liệu", "Nhân công", "Máy", "Đơn giá", "Thành tiền"]
+    _headers(ws, 5, headers)
+    thin = Side(style="thin", color="D6D3D1")
+    row_index = 6
+    for item in snapshot.get("rows", []):
+        if item.get("row_type") != "line_item":
+            continue
+        detail = item.get("approval_detail") or {}
+        approval_resolved = detail.get("calculation_status") == "resolved"
+        material = _number(detail.get("direct_material_unit")) if view == "approval" and approval_resolved else None
+        labour = _number(detail.get("direct_labour_unit")) if view == "approval" and approval_resolved else None
+        machine = _number(detail.get("direct_machine_unit")) if view == "approval" and approval_resolved else None
+        price_available = bool(item.get("pricing_available")) if view == "tender" else approval_resolved
+        unit_price = _number(item.get("tender_unit_price")) if view == "tender" and price_available else None
+        amount = _number(item.get("tender_amount")) if view == "tender" and price_available else None
+        if view == "approval" and approval_resolved:
+            unit_price = (material or 0) + (labour or 0) + (machine or 0)
+            qty = _number(item.get("quantity"))
+            amount = unit_price * qty if qty is not None else None
+        values = [item.get("row_number"), item.get("mapped_work_item"), item.get("description"),
+                  item.get("unit"), _number(item.get("quantity")), material, labour, machine,
+                  unit_price if price_available else "Chưa có đơn giá / Not available",
+                  amount if amount is not None else "Chưa có đơn giá / Not available"]
+        for col, value in enumerate(values, 1):
+            cell = ws.cell(row_index, col, value)
+            cell.font = Font(name="Arial", size=10)
+            cell.alignment = Alignment(horizontal="left" if col == 3 else "right" if col >= 5 else "center",
+                                       vertical="top", wrap_text=True)
+            cell.border = Border(bottom=thin)
+            if col >= 5 and isinstance(value, (int, float)):
+                cell.number_format = '#,##0.####' if col == 5 else '#,##0'
+        if not price_available:
+            ws.cell(row_index, 9).fill = PatternFill("solid", fgColor="FFF1D6")
+            ws.cell(row_index, 10).fill = PatternFill("solid", fgColor="FFF1D6")
+        row_index += 1
+    ws.cell(row_index, 3, "TỔNG HỢP CHI PHÍ")
+    ws.cell(row_index, 3).font = Font(name="Arial", bold=True)
+    ws.cell(row_index, 10, _number(branch.get("official_total")) if branch.get("official_total") is not None else "DRAFT / INCOMPLETE")
+    ws.cell(row_index, 10).font = Font(name="Arial", bold=True, color="9C2F16" if incomplete else "111827")
+    row_index += 1
+    if view == "approval":
+        labels = {"T": "Cộng chi phí trực tiếp", "C": "Chi phí chung", "TT": "Chi phí gián tiếp khác",
+                  "GT": "Cộng chi phí gián tiếp", "TL": "Thu nhập chịu thuế tính trước",
+                  "Cpa": "Lập phương án kỹ thuật khảo sát", "Cbc": "Lập báo cáo kết quả khảo sát",
+                  "Cpvks": "Cộng chi phí phục vụ khảo sát", "G": "Chi phí trước thuế",
+                  "VAT": "Thuế giá trị gia tăng (VAT)", "Gks": "Chi phí sau thuế",
+                  "LT": "Nhà tạm và điều hành", "Gdp": "Chi phí dự phòng (GDP)", "FINAL": "TỔNG CỘNG"}
+        for category, components in (branch.get("category_components") or {}).items():
+            ws.cell(row_index, 3, f"Nhóm: {category}")
+            ws.cell(row_index, 3).font = Font(name="Arial", bold=True, italic=True)
+            row_index += 1
+            for key, label in labels.items():
+                if key not in components:
+                    continue
+                ws.cell(row_index, 2, key)
+                ws.cell(row_index, 3, label)
+                ws.cell(row_index, 10, _number(components.get(key)))
+                ws.cell(row_index, 10).number_format = '#,##0'
+                for col in range(1, 11):
+                    ws.cell(row_index, col).fill = PatternFill("solid", fgColor="F7F4EE")
+                row_index += 1
+    ws.auto_filter.ref = f"A5:J{max(5, row_index - 1)}"
+    ws.print_area = f"A1:J{row_index - 1}"
+    ws.oddFooter.left.text = f"Snapshot: {snapshot.get('snapshot_id', '')}"
+    ws.oddFooter.right.text = "&P / &N"
+    wb.calculation.fullCalcOnLoad = True
+    wb.calculation.forceFullCalc = True
+    buf = io.BytesIO()
+    wb.save(buf)
+    return buf.getvalue()
+
+
 def generate_submission_workbook(snapshot: dict[str, Any]) -> bytes:
     """Create the submission-only workbook using the audited Dự thầu contract."""
     policy = snapshot.get("export_policy") or {}

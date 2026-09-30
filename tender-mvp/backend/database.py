@@ -49,6 +49,8 @@ def _ensure_legacy_columns(connection) -> None:
             "last_updated_at": "DATETIME", "price_source_reference": "TEXT", "price_effective_date": "VARCHAR(32)",
             "price_expiry_date": "VARCHAR(32)", "approval_status": "VARCHAR(32)", "approved_by": "VARCHAR(128)",
             "zero_price_authorized": "BOOLEAN DEFAULT 0",
+            "name_en": "TEXT", "long_description": "TEXT", "aliases_json": "TEXT",
+            "category": "VARCHAR(128)", "catalogue_status": "VARCHAR(32) DEFAULT 'active'",
         },
         "unit_rules": {
             "created_by": "VARCHAR(128)", "created_at": "DATETIME", "last_updated_by": "VARCHAR(128)",
@@ -122,6 +124,11 @@ def _ensure_nullable_master_prices(connection) -> None:
             approval_status VARCHAR(32) NULL,
             approved_by VARCHAR(128) NULL,
             zero_price_authorized BOOLEAN NOT NULL DEFAULT 0
+            ,name_en TEXT NULL
+            ,long_description TEXT NULL
+            ,aliases_json TEXT NULL
+            ,category VARCHAR(128) NULL
+            ,catalogue_status VARCHAR(32) NOT NULL DEFAULT 'active'
         )
     """))
     ordered_columns = [
@@ -129,6 +136,7 @@ def _ensure_nullable_master_prices(connection) -> None:
         "formula_ref", "source_sheet", "tags_json", "created_by", "created_at", "last_updated_by",
         "last_updated_at", "price_source_reference", "price_effective_date", "price_expiry_date",
         "approval_status", "approved_by", "zero_price_authorized",
+        "name_en", "long_description", "aliases_json", "category", "catalogue_status",
     ]
     names = ", ".join(f'"{name}"' for name in ordered_columns)
     connection.execute(text(f"INSERT INTO master_items_nullable_upgrade ({names}) SELECT {names} FROM master_items"))
@@ -298,6 +306,11 @@ class MasterItem(Base):
     approval_status: Mapped[Optional[str]] = mapped_column(String(32), nullable=True)
     approved_by: Mapped[Optional[str]] = mapped_column(String(128), nullable=True)
     zero_price_authorized: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    name_en: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    long_description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    aliases_json: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    category: Mapped[Optional[str]] = mapped_column(String(128), nullable=True)
+    catalogue_status: Mapped[str] = mapped_column(String(32), nullable=False, default="active")
 
 
 class UnitRule(Base):

@@ -61,6 +61,11 @@ async def _load_items(session) -> None:
                     approval_status=item.get("approval_status", "approved"),
                     approved_by=item.get("approved_by", "source-import"),
                     zero_price_authorized=bool(item.get("zero_price_authorized", False)),
+                    name_en=item.get("name_en"),
+                    long_description=item.get("long_description") or item.get("description_vi"),
+                    aliases_json=json.dumps(item.get("aliases", []), ensure_ascii=False),
+                    category=item.get("category") or (item.get("tags") or {}).get("survey_discipline"),
+                    catalogue_status=item.get("status", "active"),
                 )
             session.add(existing)
             await session.flush()
@@ -74,6 +79,10 @@ async def _load_items(session) -> None:
             existing.price_expiry_date = existing.price_expiry_date or item.get("price_expiry_date")
             existing.approval_status = existing.approval_status or item.get("approval_status", "approved")
             existing.approved_by = existing.approved_by or item.get("approved_by", "source-import")
+            existing.long_description = existing.long_description or item.get("long_description") or item.get("description_vi")
+            existing.aliases_json = existing.aliases_json or json.dumps(item.get("aliases", []), ensure_ascii=False)
+            existing.category = existing.category or item.get("category") or (item.get("tags") or {}).get("survey_discipline")
+            existing.catalogue_status = existing.catalogue_status or item.get("status", "active")
         await _record_import_history(session, "master_item", item["item_code"], item["version"], item)
 
 

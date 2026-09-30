@@ -555,6 +555,7 @@ async def _process_job(job_id: str, pdf_bytes: bytes, filename: str) -> None:
                 select(MasterItem).where(
                     MasterItem.tenant_id == DEMO_TENANT_ID,
                     MasterItem.version == MASTER_VERSION,
+                    MasterItem.catalogue_status == "active",
                 )
             )
             master_list = masters_q.scalars().all()
@@ -574,6 +575,10 @@ async def _process_job(job_id: str, pdf_bytes: bytes, filename: str) -> None:
                     "approved_by": m.approved_by,
                     "zero_price_authorized": m.zero_price_authorized,
                     "tags": json.loads(m.tags_json) if m.tags_json else {},
+                    "name_en": m.name_en,
+                    "long_description": m.long_description,
+                    "aliases": json.loads(m.aliases_json) if m.aliases_json else [],
+                    "category": m.category,
                 }
                 for m in master_list
             }
@@ -617,6 +622,10 @@ async def _process_job(job_id: str, pdf_bytes: bytes, filename: str) -> None:
                         unit=v["unit"],
                         unit_price=v["unit_price"],
                         tags=v["tags"],
+                        name_en=v["name_en"],
+                        long_description=v["long_description"],
+                        aliases=v["aliases"],
+                        category=v["category"],
                     )
                     for v in master_dict.values()
                 ]

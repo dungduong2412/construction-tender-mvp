@@ -12,6 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from database import ExportRecord, Job, get_db
 from calculation_snapshots import build_snapshot, load_snapshot
 from excel_exporter.exporter import (
+    generate_estimate_schedule,
     generate_internal_workbook,
     generate_submission_workbook,
 )
@@ -105,6 +106,28 @@ async def export_internal_xlsx(
             "X-Export-Path": record.file_name,
         },
     )
+
+
+@router.get("/{job_id}/estimate.xlsx")
+async def export_estimate_schedule(
+    job_id: str,
+    view: str = Query(default="tender", pattern="^(approval|tender)$"),
+    snapshot_id: str | None = Query(default=None),
+    db: AsyncSession = Depends(get_db),
+):
+    job, snapshot = await _snapshot_for_export(job_id, snapshot_id, db)
+    content = generate_estimate_schedule(snapshot, view)
+    label = "phe_duyet_noi_bo" if view == "approval" else "du_thau"
+    filename = f'{_safe_stem(job.filename)}_{label}_{snapshot["snapshot_id"]}.xlsx'
+    incomplete = (snapshot.get(view) or {}).get("status") != "COMPLETE"
+    record = await _persist_export(db, job_id=job_id, snapshot_id=snapshot["snapshot_id"],
+                                   export_type=f"estimate_{view}", filename=filename, content=content)
+    return Response(content=content,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"',
+                 "X-Calculation-Snapshot": snapshot["snapshot_id"],
+                 "X-Export-Status": "draft-incomplete" if incomplete else "complete",
+                 "X-Export-ID": record.id, "X-Export-Path": record.file_name})
 
 
 @router.get("/{job_id}/final.xlsx")

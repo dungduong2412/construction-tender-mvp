@@ -1,8 +1,9 @@
 """Master-data and formula-governance API routes."""
 from __future__ import annotations
 
-from typing import Any
 from datetime import datetime, timezone
+from decimal import Decimal, InvalidOperation
+from typing import Any
 
 import json
 import os
@@ -41,6 +42,14 @@ class ProjectOverride(BaseModel):
 
 
 class MasterPriceUpdate(BaseModel):
+    code: str | None = None
+    name_vi: str | None = None
+    name_en: str | None = None
+    long_description: str | None = None
+    aliases: list[str] | None = None
+    category: str | None = None
+    unit: str | None = None
+    status: str | None = None
     unit_price: str | None = None
     source_reference: str | None = None
     effective_date: str | None = None
@@ -48,6 +57,25 @@ class MasterPriceUpdate(BaseModel):
     approval_status: str = "approved"
     approved_by: str | None = None
     zero_price_authorized: bool = False
+    actor: str = "local-admin"
+
+
+class CatalogueItemCreate(BaseModel):
+    code: str
+    name_vi: str
+    name_en: str | None = None
+    long_description: str = ""
+    aliases: list[str] = Field(default_factory=list)
+    category: str = ""
+    unit: str
+    unit_price: str | None = None
+    source_reference: str | None = None
+    effective_date: str | None = None
+    expiry_date: str | None = None
+    approval_status: str = "approved"
+    approved_by: str | None = None
+    zero_price_authorized: bool = False
+    status: str = "active"
     actor: str = "local-admin"
 
 
@@ -88,6 +116,10 @@ async def get_master_data(db: AsyncSession = Depends(get_db)):
         ).order_by(ConfigurationHistory.id))).scalars())
         data["catalogue"].append({
             "id": item.id, "code": item.item_code, "description": item.description_vi, "unit": item.unit,
+            "name_vi": item.description_vi, "name_en": item.name_en,
+            "long_description": item.long_description or item.description_vi,
+            "aliases": json.loads(item.aliases_json or "[]"), "category": item.category,
+            "status": item.catalogue_status,
             "unit_price": str(item.unit_price) if item.unit_price is not None else None,
             "price_display": str(item.unit_price) if availability.available else "Not available",
             "pricing_available": availability.available, "pricing_availability": availability.status,
@@ -123,12 +155,20 @@ async def get_master_data(db: AsyncSession = Depends(get_db)):
     return data
 
 
-@router.patch("/master-data/catalogue/{item_id}")
-async def update_master_price(item_id: int, body: MasterPriceUpdate, db: AsyncSession = Depends(get_db)):
-    """Version a price change and flag dependent mappings without silently repricing them."""
-    item = await db.get(MasterItem, item_id)
-    if not item:
-        raise HTTPException(404, "Master item not found")
+@router.post("/master-data/catalogue", status_code=201)
+async def create_catalogue_item(body: CatalogueItemCreate, db: AsyncSession = Depends(get_db)):
+    tenant = os.getenv("DEMO_TENANT_ID", "demo-tenant-001")
+    version = os.getenv("MASTER_DATA_VERSION", "v1")
+    if body.status not in {"active", "retired"}:
+        raise HTTPException(400, "status must be active or retired")
+    if not body.code.strip() or not body.name_vi.strip() or not body.unit.strip():
+        raise HTTPException(400, "Code, Vietnamese name and unit are required")
+    duplicate = await db.scalar(select(MasterItem).where(
+        MasterItem.tenant_id == tenant, MasterItem.version == version,
+        MasterItem.item_code == body.code.strip(),
+    ))
+    if duplicate:
+        raise HTTPException(409, "Catalogue code already exists")
     availability = classify_price(
         body.unit_price, source_reference=body.source_reference,
         approval_status=body.approval_status, approved_by=body.approved_by,
@@ -136,21 +176,102 @@ async def update_master_price(item_id: int, body: MasterPriceUpdate, db: AsyncSe
     )
     if body.unit_price is not None and not availability.available:
         raise HTTPException(400, availability.reason or "Price is not available")
-    if body.unit_price is not None and (not body.effective_date or body.approval_status != "approved" or not body.approved_by):
+    if body.unit_price is not None and (not body.effective_date or not body.approved_by):
         raise HTTPException(400, "Approved source evidence, effective date and approver are required")
+    now = datetime.now(timezone.utc)
+    item = MasterItem(
+        tenant_id=tenant, version=version, item_code=body.code.strip(),
+        description_vi=body.name_vi.strip(), name_en=(body.name_en or "").strip() or None,
+        long_description=(body.long_description or "").strip() or body.name_vi.strip(),
+        aliases_json=json.dumps([value.strip() for value in body.aliases if value.strip()], ensure_ascii=False),
+        category=(body.category or "").strip() or None, unit=body.unit.strip(),
+        unit_price=float(availability.value) if availability.available and availability.value is not None else None,
+        price_source_reference=body.source_reference, source_sheet=body.source_reference,
+        price_effective_date=body.effective_date, price_expiry_date=body.expiry_date,
+        approval_status=body.approval_status, approved_by=body.approved_by,
+        zero_price_authorized=body.zero_price_authorized, catalogue_status=body.status,
+        created_by=body.actor, created_at=now, last_updated_by=body.actor, last_updated_at=now,
+        tags_json=json.dumps({"category": body.category}, ensure_ascii=False),
+    )
+    db.add(item)
+    await db.flush()
+    db.add(ConfigurationHistory(
+        record_type="master_item", record_key=item.item_code, version=f"{version}.1",
+        event="created", actor=body.actor,
+        change_json=json.dumps(body.model_dump(exclude={"actor"}), ensure_ascii=False),
+    ))
+    await db.commit()
+    await db.refresh(item)
+    return {"status": "created", "item_id": item.id, "code": item.item_code}
+
+
+@router.patch("/master-data/catalogue/{item_id}")
+async def update_master_price(item_id: int, body: MasterPriceUpdate, db: AsyncSession = Depends(get_db)):
+    """Version catalogue changes and flag dependants without silently repricing them."""
+    item = await db.get(MasterItem, item_id)
+    if not item:
+        raise HTTPException(404, "Master item not found")
+    fields = body.model_fields_set
+    proposed_price = body.unit_price if "unit_price" in fields else (str(item.unit_price) if item.unit_price is not None else None)
+    proposed_source = body.source_reference if "source_reference" in fields else item.price_source_reference
+    proposed_effective = body.effective_date if "effective_date" in fields else item.price_effective_date
+    proposed_approval = body.approval_status if "approval_status" in fields else item.approval_status
+    proposed_approver = body.approved_by if "approved_by" in fields else item.approved_by
+    proposed_zero = body.zero_price_authorized if "zero_price_authorized" in fields else item.zero_price_authorized
+    current_price = None if item.unit_price is None else str(item.unit_price)
+    try:
+        normalized_proposed = None if proposed_price is None else Decimal(str(proposed_price))
+        normalized_current = None if current_price is None else Decimal(str(current_price))
+    except (InvalidOperation, ValueError):
+        raise HTTPException(400, "unit_price must be a valid number")
+    price_changed = any((
+        normalized_proposed != normalized_current,
+        proposed_source != item.price_source_reference,
+        proposed_effective != item.price_effective_date,
+        (body.expiry_date if "expiry_date" in fields else item.price_expiry_date) != item.price_expiry_date,
+        proposed_approval != item.approval_status,
+        proposed_approver != item.approved_by,
+        proposed_zero != item.zero_price_authorized,
+    ))
+    availability = classify_price(proposed_price, source_reference=proposed_source,
+        approval_status=proposed_approval, approved_by=proposed_approver, zero_price_authorized=proposed_zero)
+    if price_changed and proposed_price is not None and not availability.available:
+        raise HTTPException(400, availability.reason or "Price is not available")
+    if price_changed and proposed_price is not None and (not proposed_effective or proposed_approval != "approved" or not proposed_approver):
+        raise HTTPException(400, "Approved source evidence, effective date and approver are required")
+    if body.status is not None and body.status not in {"active", "retired"}:
+        raise HTTPException(400, "status must be active or retired")
     before = {
         "unit_price": item.unit_price, "source_reference": item.price_source_reference,
         "effective_date": item.price_effective_date, "expiry_date": item.price_expiry_date,
         "approval_status": item.approval_status, "approved_by": item.approved_by,
     }
     now = datetime.now(timezone.utc)
-    item.unit_price = float(availability.value) if availability.available and availability.value is not None else None
-    item.price_source_reference = body.source_reference
-    item.price_effective_date = body.effective_date
-    item.price_expiry_date = body.expiry_date
-    item.approval_status = body.approval_status
-    item.approved_by = body.approved_by
-    item.zero_price_authorized = body.zero_price_authorized
+    if "code" in fields and body.code and body.code.strip() != item.item_code:
+        duplicate = await db.scalar(select(MasterItem).where(MasterItem.tenant_id == item.tenant_id,
+            MasterItem.version == item.version, MasterItem.item_code == body.code.strip(), MasterItem.id != item.id))
+        if duplicate:
+            raise HTTPException(409, "Catalogue code already exists")
+        item.item_code = body.code.strip()
+    if "name_vi" in fields:
+        if not body.name_vi or not body.name_vi.strip(): raise HTTPException(400, "Vietnamese name is required")
+        item.description_vi = body.name_vi.strip()
+    if "name_en" in fields: item.name_en = (body.name_en or "").strip() or None
+    if "long_description" in fields: item.long_description = (body.long_description or "").strip() or item.description_vi
+    if "aliases" in fields: item.aliases_json = json.dumps([v.strip() for v in (body.aliases or []) if v.strip()], ensure_ascii=False)
+    if "category" in fields: item.category = (body.category or "").strip() or None
+    if "unit" in fields:
+        if not body.unit or not body.unit.strip(): raise HTTPException(400, "Unit is required")
+        item.unit = body.unit.strip()
+    if "status" in fields: item.catalogue_status = body.status or "active"
+    if price_changed:
+        item.unit_price = float(availability.value) if availability.available and availability.value is not None else None
+        item.price_source_reference = proposed_source
+        item.price_effective_date = proposed_effective
+        item.price_expiry_date = body.expiry_date if "expiry_date" in fields else item.price_expiry_date
+        item.approval_status = proposed_approval
+        item.approved_by = proposed_approver
+        item.zero_price_authorized = proposed_zero
     item.last_updated_by = body.actor
     item.last_updated_at = now
     existing_history = list((await db.execute(select(ConfigurationHistory).where(
@@ -158,7 +279,7 @@ async def update_master_price(item_id: int, body: MasterPriceUpdate, db: AsyncSe
     ))).scalars())
     db.add(ConfigurationHistory(
         record_type="master_item", record_key=item.item_code,
-        version=f"{item.version}.{len(existing_history) + 1}", event="price_updated", actor=body.actor,
+        version=f"{item.version}.{len(existing_history) + 1}", event="catalogue_updated", actor=body.actor,
         change_json=json.dumps({"before": before, "after": body.model_dump(exclude={"actor"})}, ensure_ascii=False),
     ))
     dependents = list((await db.execute(select(MappingResult).where(
@@ -171,6 +292,31 @@ async def update_master_price(item_id: int, body: MasterPriceUpdate, db: AsyncSe
     return {"status": "updated", "item_id": item.id, "pricing_availability": availability.status,
             "dependent_mappings_requiring_review": len(dependents), "last_updated_by": item.last_updated_by,
             "last_updated_at": item.last_updated_at.isoformat()}
+
+
+@router.delete("/master-data/catalogue/{item_id}")
+async def retire_catalogue_item(item_id: int, actor: str = "local-admin", db: AsyncSession = Depends(get_db)):
+    item = await db.get(MasterItem, item_id)
+    if not item:
+        raise HTTPException(404, "Master item not found")
+    if item.catalogue_status == "retired":
+        return {"status": "retired", "item_id": item.id, "physically_deleted": False}
+    now = datetime.now(timezone.utc)
+    item.catalogue_status = "retired"
+    item.last_updated_by = actor
+    item.last_updated_at = now
+    history_count = len(list((await db.execute(select(ConfigurationHistory).where(
+        ConfigurationHistory.record_type == "master_item", ConfigurationHistory.record_key == item.item_code,
+    ))).scalars()))
+    db.add(ConfigurationHistory(record_type="master_item", record_key=item.item_code,
+        version=f"{item.version}.{history_count + 1}", event="retired", actor=actor,
+        change_json=json.dumps({"status": "retired", "physically_deleted": False}, ensure_ascii=False)))
+    dependents = list((await db.execute(select(MappingResult).where(MappingResult.master_item_id == item.id))).scalars())
+    for mapping in dependents:
+        mapping.price_review_required = True
+    await db.commit()
+    return {"status": "retired", "item_id": item.id, "physically_deleted": False,
+            "referenced_records_preserved": len(dependents)}
 
 
 @router.post("/master-data/candidates/{scoped_id}/decision")

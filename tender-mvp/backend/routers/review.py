@@ -2,6 +2,7 @@
 import json
 import os
 import ast
+import uuid
 from datetime import datetime, timezone
 from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 from typing import Optional
@@ -81,6 +82,15 @@ class OverrideRequest(BaseModel):
     zero_price_authorized: bool = False
 
 
+class AddRowRequest(BaseModel):
+    description_vi: str
+    unit: str = ""
+    quantity_raw: str = ""
+    section_path: str = "Bổ sung thủ công"
+    row_type: str = "line_item"
+    user: str = "local-reviewer"
+
+
 EDITABLE_SOURCE_FIELDS = {
     "description_vi", "unit", "quantity_raw", "row_type", "section_path"
 }
@@ -137,6 +147,7 @@ async def get_review_rows(job_id: str, db: AsyncSession = Depends(get_db)):
         select(MasterItem).where(
             MasterItem.tenant_id == DEMO_TENANT_ID,
             MasterItem.version == MASTER_VERSION,
+            MasterItem.catalogue_status == "active",
         )
     )
     master_map = {m.id: m for m in masters_q.scalars().all()}
@@ -286,6 +297,55 @@ async def record_override(
     }
 
 
+@router.post("/{job_id}/rows", status_code=201)
+async def add_review_row(job_id: str, req: AddRowRequest, db: AsyncSession = Depends(get_db)):
+    """Append a user-authored row while preserving its manual provenance."""
+    job = await db.get(Job, job_id)
+    if not job:
+        raise HTTPException(404, "Job not found")
+    if not req.description_vi.strip():
+        raise HTTPException(400, "Vietnamese description is required")
+    try:
+        row_type = RowType(req.row_type)
+    except ValueError as exc:
+        raise HTTPException(400, "row_type must be heading, metadata, or line_item") from exc
+    existing = list((await db.execute(
+        select(BOQRow).where(BOQRow.job_id == job_id).order_by(BOQRow.doc_order)
+    )).scalars())
+    doc_order = (existing[-1].doc_order + 1) if existing else 1
+    quantity = _parse_quantity(req.quantity_raw) if req.quantity_raw.strip() else None
+    row_id = f"manual-{uuid.uuid4().hex[:12]}"
+    row = BOQRow(
+        job_id=job_id, row_id=row_id, row_number=str(doc_order),
+        section_path=req.section_path.strip() or "Bổ sung thủ công",
+        description_vi=req.description_vi.strip(), unit_raw=req.unit.strip() or None,
+        quantity_raw=req.quantity_raw.strip() or None, quantity=quantity, page=1,
+        region=None, row_type=row_type, doc_order=doc_order,
+        source_origin="manual_entry",
+        source_provenance=f"Added in Bản kê dự thầu by {req.user.strip() or 'local-reviewer'}",
+        azure_polygon_available=False,
+    )
+    db.add(row)
+    await db.flush()
+    status = (MappingStatus.mapping_unresolved if row_type == RowType.line_item else
+              MappingStatus.non_billable_heading if row_type == RowType.heading else MappingStatus.non_billable_metadata)
+    db.add(MappingResult(
+        boq_row_id=row.id, master_item_id=None, status=status,
+        confidence=0.0 if row_type == RowType.line_item else 1.0,
+        tags_json=json.dumps({}, ensure_ascii=False), evidence="User-authored row; catalogue selection required." if row_type == RowType.line_item else "User-authored structural row.",
+        unresolved_reason="Chọn công việc trong danh mục và đơn giá có căn cứ." if row_type == RowType.line_item else None,
+        master_version=MASTER_VERSION, pricing_availability="not_available" if row_type == RowType.line_item else NOT_APPLICABLE,
+        mapping_last_updated_by=req.user.strip() or "local-reviewer", mapping_last_updated_at=datetime.now(timezone.utc),
+        mapped_by=req.user.strip() or "local-reviewer",
+    ))
+    db.add(Override(job_id=job_id, row_id=row_id, field="row_added", old_value=None,
+                    new_value=req.description_vi.strip(), user=req.user.strip() or "local-reviewer"))
+    job.status = JobStatus.needs_review
+    await db.commit()
+    return {"status": "created", "row_id": row_id, "doc_order": doc_order,
+            "source_origin": "manual_entry"}
+
+
 async def _current_field_value(
     db: AsyncSession, row: BOQRow, field: str
 ) -> Optional[str]:
@@ -390,6 +450,7 @@ async def get_candidates(job_id: str, row_id: str, db: AsyncSession = Depends(ge
         select(MasterItem).where(
             MasterItem.tenant_id == DEMO_TENANT_ID,
             MasterItem.version == MASTER_VERSION,
+            MasterItem.catalogue_status == "active",
         )
     )
     return [
@@ -397,6 +458,9 @@ async def get_candidates(job_id: str, row_id: str, db: AsyncSession = Depends(ge
             "id": m.id,
             "item_code": m.item_code,
             "description_vi": m.description_vi,
+            "long_description": m.long_description,
+            "aliases": json.loads(m.aliases_json or "[]"),
+            "category": m.category,
             "unit": m.unit,
             "unit_price": str(m.unit_price) if m.unit_price is not None else None,
             "pricing_availability": classify_price(

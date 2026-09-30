@@ -84,6 +84,10 @@ class MasterCandidate:
     unit: str
     unit_price: Optional[float]
     tags: dict
+    name_en: Optional[str] = None
+    long_description: Optional[str] = None
+    aliases: list[str] | None = None
+    category: Optional[str] = None
 
 
 @dataclass
@@ -415,11 +419,22 @@ class SemanticMapper:
                 classification="mapping_unresolved",
             )
         desc = f"{item.section_path} {item.description_vi}".lower()
+        desc_tokens = set(re.findall(r"[a-z0-9]+", _normalize_text(desc)))
 
         def score(c: MasterCandidate) -> float:
             s = 0.0
             tags = c.tags or {}
+            evidence_text = " ".join([
+                c.description_vi or "", c.name_en or "", c.long_description or "",
+                " ".join(c.aliases or []), c.category or "", c.unit or "",
+            ])
+            evidence_tokens = set(re.findall(r"[a-z0-9]+", _normalize_text(evidence_text)))
+            overlap = desc_tokens.intersection(evidence_tokens)
+            if overlap:
+                s += min(3.0, len(overlap) / max(len(desc_tokens), 1) * 4.0)
             if c.unit.strip().lower() == item.unit_raw.strip().lower():
+                s += 1.5
+            if c.category and _normalize_text(c.category) in _normalize_text(desc):
                 s += 1.0
             if tags.get("road_bridge_context") == "road" and "đường" in desc:
                 s += 2.0
@@ -461,7 +476,7 @@ class SemanticMapper:
             tags=best.tags,
             evidence=(
                 f"[MOCK] Context match selected '{best.description_vi}' (code: {best.item_code}) "
-                f"using section_path + description + unit + tagged constraints."
+                f"using name + long description + aliases + category + unit + tagged constraints."
             ),
             unresolved_reason=None,
             status="resolved",
@@ -476,6 +491,10 @@ class SemanticMapper:
                     "id": c.id,
                     "item_code": c.item_code,
                     "description_vi": c.description_vi,
+                    "name_en": c.name_en,
+                    "long_description": c.long_description,
+                    "aliases": c.aliases or [],
+                    "category": c.category,
                     "unit": c.unit,
                     "tags": c.tags,
                 }
@@ -504,6 +523,7 @@ RULES:
 3. Never conflate ha with 100ha, m with 100m, TN with thí nghiệm without explicit approval.
 4. If no candidate is a confident match, set master_item_id to null and provide unresolved_reason.
 5. Extract tags only from evidence in the PDF description and master record; never invent attributes.
+6. Match against Vietnamese name, long description, aliases, category and unit together; exact-name equality is not required.
 
 OUTPUT SCHEMA:
 {{
